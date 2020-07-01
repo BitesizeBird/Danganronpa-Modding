@@ -29,61 +29,88 @@ These IDs are referenced for voice lines, sprites and trial podium position.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Change UI
+Opcodes
 ---
-Change UI|Element, State
+0x00 - Text Count
+0x06 - Animation
+0x08 - Voice Line
+0x09 - Music
+0x0a - SFX A
+0x0c - Truth Bullet ??? (truth bullets added? Has two parameters)
+0x1a - Stop Script
+0x1d - Something with Character ID ??? (used during nonstop debate)
+0x1e - Sprite
+0x18 - Portrait Shake (during class trials !!!)
+0x19 - Run Script
+0x21 - Speaker
+0x22 - Screen Fade
+0x25 - Change UI - 2 parameters
+0x26 - Sets a flag
+0x32 - Truth Bullets loaded
+0x3b - Difficulty ???
+0x4b - Wait for Input
+0x4c - Wait Frame
 
-Element - ???
-State - In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it.
-
-e.g. Change UI|1, 0
-https://wiki.spiralframework.info/wiki/UI_Elements
+========================================================================================================================
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Text box format ???
+Text Count - 0x00
 ---
-Format|Type
+Text Count|x, y
 
-Type - The type of text box formatting. ???
-0 - Other character speaking ???
-4 - Player character speaking/thoughts ???
+The number of times Text opcode is called.
+This is (x + 256*y).
 
-e.g. Format|0
+e.g. Text Count|106, 2
+Text opcode is called 618 times. (106 + 256*2)
 
-[Check to see if this also determines text colour or not ??? (Probably doesn't)]
+Doesn't seem to be necessary ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Text for a character speaking/thinking
+Text - 0x02
 ---
-Text|Dialogue\n
+Text|Dialogue goes here\n
 
-\n for new line
+\n for new line.
 Roughly 55 characters can fit per line so use \n after that.
 Only two lines can fit in the text box.
 Always end dialogue with \n
 
+<br> for bold ???
+
 Surround text with certain <CLT> numbers for different colours/sizes.
 <CLT 04>Text<CLT>\n for thoughts
 <CLT 17>Text<CLT> for weakpoints
-See CLTs.png for all of them. They go up to 96 though many are unused.
 
 e.g. Text|To be honest, I'm also... No, everyone else feels the\nsame, too.\n
+"To be honest, I'm also... No, everyone else feels the" will appear on the first line. "same, too." will appear on the second line.
+
 e.g. Text|<CLT 04>I have to remember how I got here...<CLT>\n
-The first example will have "same, too." on the 
+"I have to remember how I got here..." will be shown in blue.
+
+[See CLTs.png for all of them. They go up to 96 though many are unused. Upload CLTs.png !!!]
+
 ------------------------------------------------------------------------------------------------------------------------
 
-Speaker !!!
+Animation - 0x06
+???
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+Stop Script - 0x1a
 ---
-Speaker|x
-e.g. Speaker|39
+No parameters are used for this function.
 
-Speaker|0 for Hajime ???
+e.g. Stop Script|
+Stops the currently running script. 
+Make sure you're running another script before you stop running the current one.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Sprite
+Sprite - 0x1e
 ---
 Sprite|Position (in trials and something else outside ???), Character, Expression, Fade-in type ???, slide-in type ??? or Position outside of trials ???
 
@@ -100,6 +127,7 @@ In the base game, the last two parameters are always set to 0.
 
 IMPORTANT - defining which character's sprite also determines who is shown speaking in the textbox too.
 
+(positionID, characterID, spriteID, spriteState, spriteEntryTransition)
 
 Position
 --- 	
@@ -131,6 +159,42 @@ Put Mahiru sprite 16 into Sonia's trial position.
 
 ------------------------------------------------------------------------------------------------------------------------
 
+Speaker - 0x21
+---
+Speaker|x
+e.g. Speaker|39
+
+Speaker|0 for Hajime ???
+
+(Find out what numbers make what speaker show !!! x may just be character ID)
+------------------------------------------------------------------------------------------------------------------------
+
+Change UI - 0x25
+---
+Change UI|Element, State
+
+Element - ???
+State - In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it.
+
+e.g. Change UI|1, 0
+https://wiki.spiralframework.info/wiki/UI_Elements
+
+------------------------------------------------------------------------------------------------------------------------
+
+Format
+---
+Format|Type
+
+Type - The type of text box formatting. ???
+0 - Other character speaking ???
+4 - Player character speaking/thoughts ???
+
+e.g. Format|0
+
+[Check to see if this also determines text colour or not ??? (Probably doesn't)]
+
+------------------------------------------------------------------------------------------------------------------------
+
 Trial Camera
 ---
 Trial Camera|Position, x (used to add 256*x to value to the camera animation), Camera Animation, ???, ???, Position on screen (for Rebuttal Showdown. 0 for default/left, 1 for right)
@@ -142,15 +206,17 @@ Point towards Hajime's spot using camera animation 116.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Voice lines
+Voice lines - 0x08
 ---
-Voice Line|Character, Type of line, ???, Line, Volume
+Voice Line|Character, Chapter, ???, Line, Volume
 
-Type of line -  1 to 6 will be lines from trials 1 to 6 respectively, 99 
+Chapter -  1 to 6 will be lines from trials 1 to 6 respectively, 99 
 Line (starts from 1)
 
 e.g. Voice Line|0, 2, 0, 6, 100
 This should play Hajime's 6th line from Trial 2 which is "Girl C is Ibuki." ???
+
+(Voice Line|$characterID, $chapter, ${voiceLineID shr 8}, ${voiceLineID % 256}, $volume)
 
 [Voice.xlsx that transcribes all of the voice lines in the game. These could do with the parameters for OSL too !!!
 ------------------------------------------------------------------------------------------------------------------------
@@ -170,7 +236,7 @@ Flashes the screen completely white. Useful for when a character says something 
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Music
+Music - 0x09
 ---
 Music|Song, Volume, ???
 
@@ -179,6 +245,14 @@ Volume - Adjust volume from 0 to 100
 
 e.g Music|25, 100, 0
 
+------------------------------------------------------------------------------------------------------------------------
+
+Wait for Input - 0x4b
+---
+No parameters are used for this function
+
+e.g. Wait for Input|
+Waits until user clicks or presses button to advance text
 ------------------------------------------------------------------------------------------------------------------------
 
 Flags
@@ -192,26 +266,7 @@ Flag, Character ID, Alive or Dead (0 for alive, 1 for dead)
 Set Flag|17, 0, 0
 Set Flag|17, 1, 1
 
-
-
-
-
-
-Opcodes
-
-0x06 - Animation - 8 parameters
-0x09 - Music - 3 parameters
-0x0a - SFX A
-0x0c - Truth Bullet ??? (truth bullets added?)
-0x1d - Something with Character ID ??? (used during nonstop debate)
-0x18 - Portrait Shake (during class trials !!!)
-0x19 - Run Script
-0x22 - Screen Fade
-0x25 - Change UI - 2 parameters
-0x26 - Sets a flag
-0x32 - Truth Bullets loaded
-0x3b - Difficulty ???
-0x4c - Wait Frame
+------------------------------------------------------------------------------------------------------------------------
 
 
 Check difficulty ???
