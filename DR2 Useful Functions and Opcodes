@@ -28,6 +28,17 @@ Sprite|0, X, X, 5, 2
 TRIALS
 ------------------------------------------------------------------------------------------------------------------------
 
+Loading truth bullets
+---
+So, the below will set the truth bullets 1, 2 and 3 for Mean difficulty. ???
+0x3b|1, 245
+0x32|1
+0x32|2
+0x32|3
+0x32|255
+
+------------------------------------------------------------------------------------------------------------------------
+
 Rebuttal Showdown
 ---
 Music|25, 100, 0 - Song that plays when rebuttal is triggered. This can be changed but this is the song always used in the base game.
