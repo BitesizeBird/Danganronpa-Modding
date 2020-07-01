@@ -1,15 +1,6 @@
 NO_TEXT = 1
 WITH_TEXT = 2
 
-def read_u32(data, offset):
-    return struct.unpack('<I', data[offset:offset+4])[0], offset+4
-
-def read_u16(data, offset):
-    return struct.unpack('<H', data[offset:offset+2])[0], offset+2
-
-def read_u8(data, offset):
-    return data[offset], offset+1
-
 import argparse
 
 parser = argparse.ArgumentParser(description='.lin disassembler')
@@ -17,6 +8,7 @@ parser.add_argument('input')
 args = vars(parser.parse_args())
 
 import struct
+from ..helper import *
 
 with open(args['input'], 'rb') as inp:
     data = inp.read()
