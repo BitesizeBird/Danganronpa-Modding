@@ -95,6 +95,7 @@ In the base game, the last two parameters are always set to 0.
 
 IMPORTANT - defining which character's sprite also determines who is shown speaking in the textbox too.
 
+
 Position
 --- 	
 Outside of trials, use 0 for the first NPC to speak. ???
@@ -355,11 +356,15 @@ Change UI|1, 0
 
 Opcodes
 
-0x0c - Truth Bullet
+0x09 - Music
+0x0a - SFX A
+0x0c - Truth Bullet ??? (truth bullets added?)
 0x19 - Run Script
 0x22 - Screen Fade
 0x25 - Change UI
 0x26 - Sets a flag
+0x32 - Truth Bullets loaded
+0x3b - Difficulty?
 
 
 Check difficulty??? - 0x3b|1, x (245 for Mean, 247 for Fair, 249 for Gentle)
