@@ -47,9 +47,9 @@ class Wad:
                 subfiles = dir_subfiles)
 
         # IMPORTANT: fix file offsets
-        base_offset = file.tell()
+        self._base_offset = file.tell()
         for _, file_ in self.files.items():
-            file_['offset'] += base_offset
+            file_['offset'] += self._base_offset
 
         file.close()
 
@@ -75,10 +75,10 @@ class Wad:
         else:
             # write new offset (file end)
             old_file_size = os.path.getsize(path)
-            write_u64(file, old_file_size)
+            write_u64(file, old_file_size - self._base_offset)
             # reallocate
             file.close()
-            file = open(path, 'a')
+            file = open(path, 'ab')
             file.write(data)
         file.close()
 
