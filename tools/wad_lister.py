@@ -6,10 +6,11 @@ parser.add_argument('input')
 args = vars(parser.parse_args())
 
 with open(args['input'], 'rb') as file:
-    wad = formats.wad.Wad(file)
+    wad = formats.wad.Wad()
+    wad.read(file)
 
-    for filename in wad.file_names:
+    for filename in wad.files:
         print(filename)
     print('=====')
-    for dirname in wad.dir_names:
+    for dirname in wad.dirs:
         print(dirname)
