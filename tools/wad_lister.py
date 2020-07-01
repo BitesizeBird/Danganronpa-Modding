@@ -9,8 +9,8 @@ with open(args['input'], 'rb') as file:
     wad = formats.wad.Wad()
     wad.read(file)
 
-    for filename in wad.files:
-        print(filename)
+    for filename, metadata in wad.files.items():
+        print(filename, metadata)
     print('=====')
-    for dirname in wad.dirs:
+    for dirname, _ in wad.dirs.items():
         print(dirname)
