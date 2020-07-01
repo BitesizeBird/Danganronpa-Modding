@@ -1,9 +1,26 @@
+To be updated
+---
 Anything marked with ??? is not guaranteed and needs to be confirmed.
 Anything marked with !!! needs further documentation, most likely a separate file (such as an image with all of a character's sprites)
 
 ------------------------------------------------------------------------------------------------------------------------
 
+shr 8
+---
+Some opcodes have parameters with shr 8 in them
+shr 8 means shift right 8 which is equivalent to dividing by 2^8, i.e. 256.
+The value in this parameter is multiplied by 256 and then added onto the other corresponding parameter.
+
+e.g. Say we had a opcode: Example|Scene shr 8, Scene
+And if we had a case where Example|2, 7
+This would find Scene 7 + 2*256 = 519
+
+shr 8 doesn't seem to be necessary to use when values are above 256 but are found in the base game's scripts.
+
+------------------------------------------------------------------------------------------------------------------------
+
 Character IDs
+---
 These IDs are referenced for voice lines, sprites and trial podium position.
 0 - Hajime
 1 - Nagito
@@ -47,17 +64,19 @@ Opcodes
 0x0f - Student Title Entry
 
 0x10 - Student Report Info
+0x14 - Trial Camera
+0x15 - Load Map
+0x19 - Run Script
 0x1a - Stop Script
 0x1d - Something with Character ID ??? (used during nonstop debate)
 0x1e - Sprite
 0x1f - Screen Flash
-0x18 - Portrait Shake (during class trials !!!)
-0x19 - Run Script
 
 0x21 - Speaker
 0x22 - Screen Fade
 0x25 - Change UI - 2 parameters
 0x26 - Set Flag
+0x27 - Check Character
 0x29 - Check Object
 0x2a - Set Label
 0x2b - Choice
@@ -78,7 +97,7 @@ Opcodes
 
 Text Count - 0x00
 ---
-Text Count|x, y
+Text Count|x, shr 8 
 
 The number of times Text opcode is called.
 This is (x + 256*y).
@@ -106,13 +125,13 @@ Surround text with certain <CLT> numbers for different colours/sizes.
 <CLT 04>Text<CLT>\n for sound effects. Green.
 <CLT 17>Text<CLT> for weakpoints. Yellow.
 
+See CLTs.png for all of them. They go up to 96 though many are unused.
+
 e.g. Text|To be honest, I'm also... No, everyone else feels the\nsame, too.\n
 "To be honest, I'm also... No, everyone else feels the" will appear on the first line. "same, too." will appear on the second line.
 
 e.g. Text|<CLT 04>I have to remember how I got here...<CLT>\n
 "I have to remember how I got here..." will be shown in blue.
-
-[See CLTs.png for all of them. They go up to 96 though many are unused. Upload CLTs.png !!!]
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -146,7 +165,6 @@ Adds sepia tone filter.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-
 Movie - 0x05
 ---
 Movie|Seems to be which actual movie ???, ID ???
@@ -160,18 +178,20 @@ Plays Usami appearing movie.
 
 Animation - 0x06
 ---
-Animation|2, 240, 0, 0, 0, 0, 0, 1
-???
+Animation|ID shr 8, ID, ???, ???, ???, ???, ???, Frame
 
 e.g. Animation|2, 240, 0, 0, 0, 0, 0, 1
+Play animation 752 (at frame 1 ???)
+
+(Animation|${id shr 8}, ${id % 256}, $arg3, $arg4, $arg5, $arg6, $arg7, $frame)
 
 ------------------------------------------------------------------------------------------------------------------------
 
 Voice lines - 0x08
 ---
-Voice Line|Character, Chapter, ???, Line, Volume
+Voice Line|Character ID, Chapter, ???, Line, Volume
 
-Chapter -  1 to 6 will be lines from trials 1 to 6 respectively, 99 
+Chapter -  1 to 6 will be lines from trials 1 to 6 respectively, 99 for general sounds and CG lines ???
 Line (starts from 1)
 
 e.g. Voice Line|0, 2, 0, 6, 100
@@ -179,7 +199,8 @@ This should play Hajime's 6th line from Trial 2 which is "Girl C is Ibuki." ???
 
 (Voice Line|$characterID, $chapter, ${voiceLineID shr 8}, ${voiceLineID % 256}, $volume)
 
-[Voice.xlsx that transcribes all of the voice lines in the game. These could do with the parameters for OSL too !!!
+[Voice.xlsx that transcribes all of the voice lines in the game. These could do with the parameters for OSL too !!!]
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Music - 0x09
@@ -205,6 +226,7 @@ Play 'DING' sound effect at full volume.
 (SFX A|${id shr 8}, ${id % 256}, $volume)
 
 Need to gather and describe sound effects !!!
+
 ------------------------------------------------------------------------------------------------------------------------
 
 SFX B - 0x0b
@@ -212,11 +234,17 @@ SFX B - 0x0b
 SFX B|???, ???
 
 (SFX B|$arg1, $arg2)
+
+------------------------------------------------------------------------------------------------------------------------
+
+Truth Bullets Added ??? - 0x0c
+---
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Student Title Entry - 0x0f
 ---
-Set Title|Character, ???, State
+Set Title|Character ID, ???, State
 
 !!!
 
@@ -225,12 +253,47 @@ Set Title|Character, ???, State
 
 Student Report Info - 0x10
 ---
-Set Report Info|Character, ???, State
+Set Report Info|Character ID, ???, State
 
 !!!
 
 Set Report Info|$characterID, $arg2, $state"
 (Possibly for student report card and what is displayed after FTE with them?)
+
+------------------------------------------------------------------------------------------------------------------------
+
+Trial Camera - 0x14
+---
+Trial Camera|Character ID, Motion shr 8, Motion, ???, ???, Position on screen
+
+Character - Camera will apply motion pointing towards this character's podium.
+Motion - Determine which camera angle/motion is used. See DR2 Trial Camera Angle Values.xslx for a comprehensive list.
+Position on screen - 0 for default. For Rebuttal Showdowns, the screen is split down the middle. Use 0 for left, 1 for right.
+
+e.g. Trial Camera|0, 0, 116, 0, 0, 0
+Point towards Hajime's spot using camera motion 116.
+
+[DR2 Trial Camera Angle Values.xslx exists. Need to edit and upload video of these angles !!!]
+
+------------------------------------------------------------------------------------------------------------------------
+
+Load Map - 0x15
+---
+Load Map|Room, State, Padding, Unk4 ???
+
+e.g. Load Map|0, 1, 1, 0
+Loads the Beach
+
+!!!
+
+------------------------------------------------------------------------------------------------------------------------
+
+Script - 0x19
+---
+Script|Chapter, Scene shr 8, Scene, Room shr 8, Room
+
+Script|1, 0, 203, 0, 0
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Stop Script - 0x1a
@@ -243,9 +306,17 @@ Make sure you're running another script before you stop running the current one.
 
 ------------------------------------------------------------------------------------------------------------------------
 
+Run Script - 0x1b
+---
+Run Script|Chapter, Scene shr 8, Scene, Room shr 8, Room
+
+e.g. Run Script|1, 3, 231, 0, 1
+
+------------------------------------------------------------------------------------------------------------------------
+
 Sprite - 0x1e
 ---
-Sprite|Position (in trials and something else outside ???), Character, Expression, Fade-in type ???, slide-in type ??? or Position outside of trials ???
+Sprite|Position ID(in trials and something else outside ???), Character ID, Expression, Fade-in type ???, slide-in type ??? or Position outside of trials ???
 
 Position - Outside of trials, determines if a new character is speaking, During trials, determines which podium the sprite should go in. Further explanation below.
 Character - Self explanatory. Use the above Character IDs to specify which character.
@@ -343,8 +414,8 @@ Element - ???
 State - In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it.
 
 e.g. Change UI|1, 0
-https://wiki.spiralframework.info/wiki/UI_Elements
 
+!!!
 ------------------------------------------------------------------------------------------------------------------------
 
 Set Flag - 0x26
@@ -366,6 +437,15 @@ Set Flag|17, 1, 1
 
 (Set Flag|$group, $id, $state)
 
+------------------------------------------------------------------------------------------------------------------------
+
+Check Character - 0x27
+---
+Check Character|Character ID
+
+???
+
+(Check Character|$characterID)
 ------------------------------------------------------------------------------------------------------------------------
 
 Check Object - 0x29
@@ -407,6 +487,19 @@ Show Background|Background, State
 
 ------------------------------------------------------------------------------------------------------------------------
 
+Truth bullets Load ??? - 0x32
+---
+0x32|x - Truth bullets loaded. Must include 0x32|255 at the end? (Perhaps to validate 'incorrect' weak points that don't have truth bullets)
+
+e.g.
+0x32|1
+0x32|2
+0x32|3
+0x32|255
+Loads truth bullets 1, 2 and 3
+
+------------------------------------------------------------------------------------------------------------------------
+
 Go to Label - 0x34
 ---
 Go To Label|ID, ???
@@ -429,7 +522,7 @@ Check difficulty ??? - 0x3b
 ---
 0x3b|1, Difficulty 
 
-Difficulty - 245 for Mean, 247 for Fair, 249 for Gentle ???
+Difficulty - 245 for Mean, 247 for Fair, 249 for Gentle (all of these are for the Logic difficulty) ???
 
 e.g. 0x3b|1, 245
 Check if difficulty is set to Mean ???
@@ -445,17 +538,6 @@ e.g. End Flag Check|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Trial Camera
----
-Trial Camera|Position, x (used to add 256*x to value to the camera animation), Camera Animation, ???, ???, Position on screen (for Rebuttal Showdown. 0 for default/left, 1 for right)
-
-e.g. Trial Camera|0, 0, 116, 0, 0, 0
-Point towards Hajime's spot using camera animation 116.
-
-[DR2 Trial Camera Angle Values.xslx exists. Need to edit and upload video of these angles !!!]
-
-------------------------------------------------------------------------------------------------------------------------
-
 Wait for Input - 0x4b
 ---
 No parameters are used for this function.
@@ -463,24 +545,3 @@ No parameters are used for this function.
 e.g. Wait for Input|
 Waits until user clicks or presses button to advance text
 ------------------------------------------------------------------------------------------------------------------------
-
-
-
-Truth bullets
----
-0x32|x - Truth bullets loaded. Must include 0x32|255 at the end? (Perhaps to validate 'incorrect' weak points that don't have truth bullets)
-
-e.g.
-0x32|1
-0x32|2
-0x32|3
-0x32|255
-Loads truth bullets 1, 2 and 3
-
-So, the below will set the truth bullets 1, 2 and 3 for Mean difficulty. ???
-0x3b|1, 245
-0x32|1
-0x32|2
-0x32|3
-0x32|255
-
