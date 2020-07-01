@@ -1,0 +1,486 @@
+Anything marked with ??? is not guaranteed and needs to be confirmed.
+Anything marked with !!! needs further documentation, most likely a separate file (such as an image with all of a character's sprites)
+
+------------------------------------------------------------------------------------------------------------------------
+
+Character IDs
+These IDs are referenced for voice lines, sprites and trial podium position.
+0 - Hajime
+1 - Nagito
+2 - Byakuya
+3 - Gundam
+4 - Kazuichi
+5 - Teruteru
+6 - Nekomaru
+7 - Fuyuhiko
+8 - Akane
+9 - Chiaki
+10 - Sonia 
+11 - Hiyoko
+12 - Mahiru
+13 - Mikan
+14 - Ibuki
+15 - Peko
+16 - Monokuma
+17 - Monomi
+18 - Junko
+19 - Mechamaru
+20 - Naegi
+21 - Kiyoko
+22 - Togami
+
+------------------------------------------------------------------------------------------------------------------------
+
+Opcodes
+---
+0x00 - Text Count
+0x02 - Text
+0x03 - Format
+0x04 - Filter
+0x05 - Movie
+0x06 - Animation
+0x08 - Voice Line
+0x09 - Music
+0x0a - SFX A
+0x0b - SFX B
+0x0c - Truth Bullet ??? (truth bullets added? Has two parameters)
+0x0f - Student Title Entry
+
+0x10 - Student Report Info
+0x1a - Stop Script
+0x1d - Something with Character ID ??? (used during nonstop debate)
+0x1e - Sprite
+0x1f - Screen Flash
+0x18 - Portrait Shake (during class trials !!!)
+0x19 - Run Script
+
+0x21 - Speaker
+0x22 - Screen Fade
+0x25 - Change UI - 2 parameters
+0x26 - Set Flag
+0x29 - Check Object
+0x2a - Set Label
+0x2b - Choice
+
+0x30 - Show Background
+0x32 - Truth Bullets loaded
+0x34 - Go to Label
+0x35 - Check Flag A
+0x3b - Difficulty ???
+0x3c - End Flag Check
+
+0x4b - Wait for Input
+0x4c - Wait Frame
+
+========================================================================================================================
+
+------------------------------------------------------------------------------------------------------------------------
+
+Text Count - 0x00
+---
+Text Count|x, y
+
+The number of times Text opcode is called.
+This is (x + 256*y).
+
+e.g. Text Count|106, 2
+Text opcode is called 618 times. (106 + 256*2)
+
+Doesn't seem to be necessary ???
+
+------------------------------------------------------------------------------------------------------------------------
+
+Text - 0x02
+---
+Text|Dialogue goes here\n
+
+\n for new line.
+Roughly 55 characters can fit per line so use \n after that.
+Only two lines can fit in the text box.
+Always end dialogue with \n
+
+<br> for bold ???
+
+Surround text with certain <CLT> numbers for different colours/sizes.
+<CLT 04>Text<CLT>\n for thoughts. Blue.
+<CLT 04>Text<CLT>\n for sound effects. Green.
+<CLT 17>Text<CLT> for weakpoints. Yellow.
+
+e.g. Text|To be honest, I'm also... No, everyone else feels the\nsame, too.\n
+"To be honest, I'm also... No, everyone else feels the" will appear on the first line. "same, too." will appear on the second line.
+
+e.g. Text|<CLT 04>I have to remember how I got here...<CLT>\n
+"I have to remember how I got here..." will be shown in blue.
+
+[See CLTs.png for all of them. They go up to 96 though many are unused. Upload CLTs.png !!!]
+
+------------------------------------------------------------------------------------------------------------------------
+
+Format - 0x03
+---
+Format|Type
+
+Type - The type of text box formatting. ???
+0 - Other character speaking ???
+4 - Player character speaking/thoughts ???
+
+e.g. Format|0
+
+[Check to see if this also determines text colour or not ??? (Probably doesn't)]
+
+------------------------------------------------------------------------------------------------------------------------
+
+Filter - 0x04
+---
+Filter|???, Filter, ???, ???
+
+Filter - Adds a screen filter.
+0 - No filter
+1 - Sepia tone
+!!!
+
+e.g. Filter|1, 1, 0, 0
+Adds sepia tone filter.
+
+(Filter|$arg1, $filter, $arg3, $arg4)
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+Movie - 0x05
+---
+Movie|Seems to be which actual movie ???, ID ???
+
+e.g. Movie|2, 1
+Plays Usami appearing movie.
+
+(Movie|${id shr 8}, ${id % 256}")
+
+------------------------------------------------------------------------------------------------------------------------
+
+Animation - 0x06
+---
+Animation|2, 240, 0, 0, 0, 0, 0, 1
+???
+
+e.g. Animation|2, 240, 0, 0, 0, 0, 0, 1
+
+------------------------------------------------------------------------------------------------------------------------
+
+Voice lines - 0x08
+---
+Voice Line|Character, Chapter, ???, Line, Volume
+
+Chapter -  1 to 6 will be lines from trials 1 to 6 respectively, 99 
+Line (starts from 1)
+
+e.g. Voice Line|0, 2, 0, 6, 100
+This should play Hajime's 6th line from Trial 2 which is "Girl C is Ibuki." ???
+
+(Voice Line|$characterID, $chapter, ${voiceLineID shr 8}, ${voiceLineID % 256}, $volume)
+
+[Voice.xlsx that transcribes all of the voice lines in the game. These could do with the parameters for OSL too !!!
+------------------------------------------------------------------------------------------------------------------------
+
+Music - 0x09
+---
+Music|Song, Volume, ???
+
+Song - Determine which song to play (!!! create list of songs with ID)
+Volume - Adjust volume from 0 to 100
+
+e.g Music|25, 100, 0
+Play song 25 at full volume.
+
+!!!
+------------------------------------------------------------------------------------------------------------------------
+
+SFX A - 0x0a
+---
+SFX A|???, Sound effect, Volume
+
+e.g. SFX A|0, 19, 100
+Play 'DING' sound effect at full volume.
+
+(SFX A|${id shr 8}, ${id % 256}, $volume)
+
+Need to gather and describe sound effects !!!
+------------------------------------------------------------------------------------------------------------------------
+
+SFX B - 0x0b
+---
+SFX B|???, ???
+
+(SFX B|$arg1, $arg2)
+------------------------------------------------------------------------------------------------------------------------
+
+Student Title Entry - 0x0f
+---
+Set Title|Character, ???, State
+
+!!!
+
+(Set Title|$characterID, $arg2, $state)
+------------------------------------------------------------------------------------------------------------------------
+
+Student Report Info - 0x10
+---
+Set Report Info|Character, ???, State
+
+!!!
+
+Set Report Info|$characterID, $arg2, $state"
+(Possibly for student report card and what is displayed after FTE with them?)
+------------------------------------------------------------------------------------------------------------------------
+
+Stop Script - 0x1a
+---
+No parameters are used for this function.
+
+e.g. Stop Script|
+Stops the currently running script. 
+Make sure you're running another script before you stop running the current one.
+
+------------------------------------------------------------------------------------------------------------------------
+
+Sprite - 0x1e
+---
+Sprite|Position (in trials and something else outside ???), Character, Expression, Fade-in type ???, slide-in type ??? or Position outside of trials ???
+
+Position - Outside of trials, determines if a new character is speaking, During trials, determines which podium the sprite should go in. Further explanation below.
+Character - Self explanatory. Use the above Character IDs to specify which character.
+Expression - Which sprite of that character to use. 
+Fade-in type - How a sprite fades into view. 0 is no fade in, 1 is fast fade-in, 2 is slow fade-in
+Slide-in type - How a sprite slides into view. 0 is no slide in, 1 and 2 for the rest. ??? Good for dialogue between multiple characters outside of trials.
+
+e.g. Sprite|0, 0, 16, 1, 2
+This shows Hajime's sprite with expression 16 with a fast fade in and sliding in from the left. ???
+
+In the base game, the last two parameters are always set to 0.
+
+IMPORTANT - defining which character's sprite also determines who is shown speaking in the textbox too.
+
+(positionID, characterID, spriteID, spriteState, spriteEntryTransition)
+
+Position
+--- 	
+Outside of trials, use 0 for the first NPC to speak. ???
+Alternate between using 0 and 1 every time a new NPC speaks. ???
+If the same character has a second text box after the first, keep using the same number???
+
+e.g. (I've simplified just to Sprite and Text below where there would usually be more.)
+Sprite|1, 6, 5, 1, 2
+Text|ANYTHING IS POSSIBLE WITH A FIGHTING SPIRIT!!!\n
+
+Sprite|0, 3, 1, 1, 0
+Text|A bold boast... However, let me give you some advice.\n
+
+Sprite|0, 3, 18, 1, 0
+Text|The truly strong...do not raise their voice so\nrecklessly.\n
+
+Sprite|1, 11, 1, 1, 1
+Text|Hey, hey! Let's start talking already!\n
+
+Here, Nekomaru speaks (with position 1), then Gunhdam speaks twice (position is set to 0 both times), then Hiyoko speaks (with position 1).
+
+
+For trials, the number will match the character ID and put them in that character's podium.
+i.e. Sonia's ID is 10. Setting the Position to 10 will put that sprite into Sonia's trial position.
+			
+e.g. Sprite|10, 12, 16, 1, 2
+Put Mahiru sprite 16 into Sonia's trial position.
+
+------------------------------------------------------------------------------------------------------------------------
+
+Screen Flash - 0x1f
+---
+Screen Flash|Red, Green, Blue, Fade in duration, Hold duration, Fade out duration, Opacity
+
+Red, Green, Blue - How much red, green and blue is in the flash respectively. Use RBG to determine which colour you want. 255, 255, 255 for white.
+Fade in duration - How long the flash takes to reach its full opacity in frames
+Hold duration - How long the flash stays at full opacity in frames
+Fade out duration - How long the flash takes to disappear in frames
+Opacity - How transparent the flash is when it reaches its maximum. 0 to 255. 0 for invisible, 255 for opaque.
+
+The games runs at 60 frames per second so setting 60 as the duration will take 1 second to complete that action.
+
+e.g. Screen Flash|255, 255, 255, 4, 0, 30, 255
+Flashes the screen completely white. It takes 4 frames to reach full opacity and immediately fades out. It has completely faded after 30 frames (1/2 a second).
+------------------------------------------------------------------------------------------------------------------------
+
+Speaker - 0x21
+---
+Speaker|x
+e.g. Speaker|39
+
+Speaker|0 for Hajime ???
+
+(Find out what numbers make what speaker show !!! x may just be character ID)
+------------------------------------------------------------------------------------------------------------------------
+
+Screen Fade - 0x22
+---
+Screen Fade|Fade Type, Colour, Duration
+
+Fade Type - 0 for fade in from colour, 1 for fade out to colour
+Colour - 0 - black (special)
+         1 - black
+         2 - white
+         3 - red
+         else - append("{$colour}") ???
+Duration - Time to perform action in frames. The games runs at 60 frames per second so setting 60 as the Duration will take 1 second to fade.
+
+e.g. Screen Fade|1, 1, 24
+Fades the screen out to black in 24 frames (around 1/2 a second).
+
+------------------------------------------------------------------------------------------------------------------------
+
+Change UI - 0x25
+---
+Change UI|Element, State
+
+Element - ???
+State - In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it.
+
+e.g. Change UI|1, 0
+https://wiki.spiralframework.info/wiki/UI_Elements
+
+------------------------------------------------------------------------------------------------------------------------
+
+Set Flag - 0x26
+------------
+Set Flag|Group, ID, State
+
+Group - ??? 1 seems to be for unlocking maps. 17 for whether a character should be dead for a trial?
+ID - ID within group. Depends on what group.
+State - Presumably, 0 and 1 ???
+
+These were present for unlocking map_001 and map_002
+Set Flag|1, 1, 1
+Set Flag|1, 2, 1
+
+Seems to correspond to whether a character should be dead or alive for the trial.
+Flag, Character ID, Alive or Dead (0 for alive, 1 for dead)
+Set Flag|17, 0, 0
+Set Flag|17, 1, 1
+
+(Set Flag|$group, $id, $state)
+
+------------------------------------------------------------------------------------------------------------------------
+
+Check Object - 0x29
+---
+Check Object|Object ID
+???
+
+(Check Object|$objectID)
+
+------------------------------------------------------------------------------------------------------------------------
+
+Set Label - 0x2a
+---
+Set Label|ID
+
+???
+
+(Set Label|$id)
+
+------------------------------------------------------------------------------------------------------------------------
+
+Choice - 0x2b
+---
+Choice|???
+
+(Choice|$arg1)
+
+------------------------------------------------------------------------------------------------------------------------
+
+Show Background - 0x30
+---
+Show Background|Background, State
+
+???
+
+!!!
+
+"Show Background|$backgroundID, $state"
+
+------------------------------------------------------------------------------------------------------------------------
+
+Go to Label - 0x34
+---
+Go To Label|ID, ???
+
+(Go To Label|${labelID % 256}, ${labelID shr 8})
+------------------------------------------------------------------------------------------------------------------------
+
+Check Flag A - 0x35
+---
+Check Flag A|???, Nonstop Debate Text ID
+
+Nonstop Debate Text ID - Used to determine which line to check in a nonstop debate.
+
+(Might be used for more things ???)
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+Check difficulty ??? - 0x3b
+---
+0x3b|1, Difficulty 
+
+Difficulty - 245 for Mean, 247 for Fair, 249 for Gentle ???
+
+e.g. 0x3b|1, 245
+Check if difficulty is set to Mean ???
+
+------------------------------------------------------------------------------------------------------------------------
+
+End Flag Check - 0x3c
+---
+No parameters are used for this function.
+
+e.g. End Flag Check|
+???
+
+------------------------------------------------------------------------------------------------------------------------
+
+Trial Camera
+---
+Trial Camera|Position, x (used to add 256*x to value to the camera animation), Camera Animation, ???, ???, Position on screen (for Rebuttal Showdown. 0 for default/left, 1 for right)
+
+e.g. Trial Camera|0, 0, 116, 0, 0, 0
+Point towards Hajime's spot using camera animation 116.
+
+[DR2 Trial Camera Angle Values.xslx exists. Need to edit and upload video of these angles !!!]
+
+------------------------------------------------------------------------------------------------------------------------
+
+Wait for Input - 0x4b
+---
+No parameters are used for this function.
+
+e.g. Wait for Input|
+Waits until user clicks or presses button to advance text
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+Truth bullets
+---
+0x32|x - Truth bullets loaded. Must include 0x32|255 at the end? (Perhaps to validate 'incorrect' weak points that don't have truth bullets)
+
+e.g.
+0x32|1
+0x32|2
+0x32|3
+0x32|255
+Loads truth bullets 1, 2 and 3
+
+So, the below will set the truth bullets 1, 2 and 3 for Mean difficulty. ???
+0x3b|1, 245
+0x32|1
+0x32|2
+0x32|3
+0x32|255
+
