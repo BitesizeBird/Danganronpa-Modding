@@ -384,6 +384,8 @@ Speaker - 0x21
 Speaker|x
 e.g. Speaker|39
 
+For off-screen speakers ???
+
 Speaker|0 for Hajime ???
 
 (Find out what numbers make what speaker show !!! x may just be character ID)
