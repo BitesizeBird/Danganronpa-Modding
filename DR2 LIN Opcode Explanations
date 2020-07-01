@@ -60,7 +60,7 @@ Opcodes
 0x09 - Music
 0x0a - SFX A
 0x0b - SFX B
-0x0c - Truth Bullet ??? (truth bullets added? Has two parameters)
+0x0c - Truth Bullet Added
 0x0f - Student Title Entry
 
 0x10 - Student Report Info
@@ -82,7 +82,7 @@ Opcodes
 0x2b - Choice
 
 0x30 - Show Background
-0x32 - Truth Bullets loaded
+0x32 - Truth Bullets Loaded
 0x34 - Go to Label
 0x35 - Check Flag A
 0x3b - Difficulty ???
@@ -239,6 +239,10 @@ SFX B|???, ???
 
 Truth Bullets Added ??? - 0x0c
 ---
+Truth Bullet|???, Truth Bullet ID
+
+e.g.
+Truth Bullet|0, 1
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -489,7 +493,7 @@ Show Background|Background, State
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Truth bullets Load ??? - 0x32
+Truth bullets Loaded ??? - 0x32
 ---
 0x32|x - Truth bullets loaded. Must include 0x32|255 at the end? (Perhaps to validate 'incorrect' weak points that don't have truth bullets)
 
