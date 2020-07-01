@@ -1,0 +1,324 @@
+Anything marked with ??? is not guaranteed and needs to be confirmed.
+
+Character IDs
+These IDs are referenced for voice lines, sprites and trial podium position.
+0 - Hajime
+1 - Nagito
+2 - Byakuya
+3 - Gundam
+4 - Kazuichi
+5 - Teruteru
+6 - Nekomaru
+7- Fuyuhiko
+8 - Akane
+9 - Chiaki
+10 - Sonia 
+11 - Hiyoko
+12 - Mahiru
+13 - Mikan
+14 - Ibuki
+15 - Peko
+16 - Monokuma
+17 - Monomi
+18 - Junko
+19 - Mechamaru
+20 - Naegi
+21 - Kiyoko
+22 - Togami
+
+
+
+Change UI|Element, State (In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it)
+Change UI|1, 0
+https://wiki.spiralframework.info/wiki/UI_Elements
+
+
+
+Format|Type
+Format|0
+0 - Other character speaking (?)
+4 - Player character speaking/thoughts (?)
+This is for the UI, NOT for the text colour. (MAYBE IT IS?)
+
+
+Text|Dialogue\n
+End all lines with \n
+\n for new line
+Roughly 55 characters per line.
+<CLT 04>Text<CLT>\n for thoughts
+<CLT 17>Text<CLT> for weakpoints
+
+
+
+
+Trial Camera|Position, x (used to add 256*x to value to camera angle), Camera Angle/Animation, 0, 0, Position on screen (for Rebuttal Showdown. 0 for default/left, 1 for right)
+Trial Camera|8, 0, 116, 0, 0, 0
+
+
+Sprite|Position, Character, Expression, Fade-in (1 is fast fade-in, 2 is slow fade-in), slide in from left or right (0 for none)
+Sprite|0, 0, 16, 1, 2
+
+Position - 	For trials, the number will match the character ID and put them in that character's podium.
+			i.e. Sonia's ID is 10. Setting the Position to 10 will put that sprite into Sonia's trial position/
+			For maps, there are already pre-defined positions so just use those.
+			For regular dialogue, use 0 for the character (aside the player's) who talks first.
+			1 for everyone else to denote that they're in a different position
+			
+e.g. Sprite|10, 12, 16, 1, 2 = Mahiru expression 16 in Sonia's trial position
+The Character ID also shows which character is speaking (during trials)
+
+FOR HAJIME SPEAKING DURING TRIAL
+Sprite|0, 12, x, 0, 0
+Trial Camera|0, 0, x, 0, 0, 0
+
+FOR MAHIRU SPEAKING DURING Trial
+Sprite|12, 0, x, 0, 0
+Trial Camera|12, 0, x, 0, 0, 0
+
+
+Voice Line|Character, Type of line, 0, Line, Volume
+Voice Line|10, 99, 0, 29, 100
+Type of line -  1 = Trial 1
+				2 = Trial 2 etc
+				
+				99 = Noises
+Line (starts from 1)
+
+
+Screen Flash|Red, Green, Blue, Fade in duration, Hold duration, Fade out duration, Opacity
+Screen Flash|255, 255, 255, 4, 0, 30, 255
+
+
+DING - 			SFX A|0, 19, 100
+				Screen Flash|255, 255, 255, 4, 0, 30, 255
+				
+Screen Shake - 	SFX A|0, X (recommend 18 or 22), 100
+				0x20|4, 0, 30, 4, 2
+				Change UI|13, 1
+				Text|Text\n
+				Wait Frame|
+				0x3a|6, 0, 0, 10
+				Change UI|13, 0
+				
+Walk Away - 	Wait Frame|
+				SFX A|0, 201, 100
+				Sprite|0, X, X, 5, 2
+				0x3a|6, 0, 0, 60
+
+
+Flags
+These were present for unlocking map_001 and map_002
+Set Flag|1, 1, 1
+Set Flag|1, 2, 1
+
+Seems to correspond to whether a character should be dead or alive for the trial.
+Flag, Character ID, Alive or Dead (0 for alive, 1 for dead)
+Set Flag|17, 0, 0
+Set Flag|17, 1, 1
+
+
+
+Rebuttal Showdown
+Example:
+Music|25, 100, 0
+Voice Line|7, 99, 0, 73, 100
+Animation|0, 211, 0, 0, 0, 0, 0, 1
+Change UI|72, 4
+Sprite|11, 11, 3, 0, 0
+Animation|0, 211, 0, 0, 0, 0, 0, 255
+Sprite|0, 0, 18, 2, 0
+Sprite|7, 7, 11, 1, 0
+Trial Camera|7, 1, 29, 0, 0, 0
+Trial Camera|0, 1, 19, 0, 0, 1
+Change UI|70, 1
+Sprite|7, 7, 11, 1, 0
+Voice Line|7, 2, 0, 36, 100
+Text|W-We haven't decided that yet!\n
+Wait Frame|
+Wait For Input|
+Sprite|0, 0, 21, 2, 0
+Trial Camera|0, 0, 12, 0, 0, 1
+Voice Line|0, 2, 0, 40, 100
+Text|Hey, Fuyuhiko... Why do you keep insisting that Hiyoko\nis the killer?\n
+
+Explanation
+Music|25, 100, 0 - Song that plays when rebuttal is triggered
+Voice Line|7, 99, 0, 73, 100 - Voice line of character who interjects
+Animation|0, 211, 0, 0, 0, 0, 0, 1
+Change UI|72, 4
+Sprite|11, 11, 3, 0, 0 - Change of Hiyoko sprite. Can easily hide sprite changes of other characters
+Animation|0, 211, 0, 0, 0, 0, 0, 255
+Sprite|0, 0, 18, 2, 0 - Set two sprites and two trial cameras. First value in code goes on the right of screen, second on the left.
+Sprite|7, 7, 11, 1, 0
+Trial Camera|7, 1, 29, 0, 0, 0 - Can trigger two trial cameras at the same time
+Trial Camera|0, 1, 19, 0, 0, 1 - The 1 at the end specifies that they go on the right
+Change UI|70, 1
+Sprite|7, 7, 11, 1, 0 - Still state sprite to show who's talking
+Voice Line|7, 2, 0, 36, 100
+Text|W-We haven't decided that yet!\n
+Wait Frame|
+Wait For Input|
+Sprite|0, 0, 21, 2, 0
+Trial Camera|0, 0, 12, 0, 0, 1
+Voice Line|0, 2, 0, 40, 100
+Text|Hey, Fuyuhiko... Why do you keep insisting that Hiyoko\nis the killer?\n
+
+
+Nonstop debates - The dialogue - e0x-2xx-000
+Example
+Check Flag A|0, 10
+Sprite|14, 14, 5, 0, 0
+Text|...Or something like that.\n
+Wait Frame|
+
+Explained
+Check Flag A|0, 10 - Checks against the ID set in the nonstop file
+Sprite|14, 14, 5, 0, 0
+Text|...Or <CLT 17>something<CLT> like that.\n - Surround words in <CLT 17> <CLT> to specify them as the weak point.
+Wait Frame|
+
+
+Nonstop debates - The actual code - nonstop_0x_0xx
+Example
+[New Section]
+TextID|10
+Type|0
+0x2|0
+Shoot With Evidence|65535
+0x4|65535
+0x5|2000
+Has Weak Point|0
+Advance|210
+0x8|0
+0x9|3
+Transition|3
+Fade Out|210
+Horizontal|140
+Vertical|260
+Angle Acceleration|10
+Angle|80
+Scale|100
+Final Scale|180
+0x12|0
+Rotation|20
+Rotation Speed|0
+Character|14
+Sprite|7
+Background Animation|450
+0x18|1
+0x1a|10
+Chapter|1
+0x1c|0
+0x1d|14
+0x1e|65535
+0x1f|0
+0x20|0
+0x21|0
+
+Explanation
+[New Section]
+TextID|10
+Type|0
+0x2|0
+Shoot With Evidence|65535 - Which truth bullet to use. If set to 255, no truth bullets work. Set to 65535 if there is no weak point.
+0x4|65535
+0x5|2000
+Has Weak Point|0 - If set to 1, all of the text will be a weak point unless specified by <CLT 17>Text<CLT> in the script file. Even if <CLT 17>Text<CLT> has been set in the dialogue, without this set to 1, nothing will change.
+Advance|210
+0x8|0
+0x9|3 - Text Shake. 0 for no shake, 1 for tremble.
+Transition|3 - How the text goes away. 0 for fade out, 3 for zoom away
+Fade Out|210
+Horizontal|140
+Vertical|260
+Angle Acceleration|10
+Angle|80
+Scale|100 - The starting size of the text
+Final Scale|180 - The final size of text
+0x12|0
+Rotation|20
+Rotation Speed|0
+Character|14
+Sprite|7
+Background Animation|450
+0x18|1 - Portrait bop?
+0x1a|10
+Chapter|1
+0x1c|0
+0x1d|14 - Character ID
+0x1e|65535
+0x1f|0
+0x20|0
+0x21|0
+
+Nonstop debates - incorrect answer to weak point - e0x-2xx-001
+Example
+----
+Check Flag A|0, 8
+Change UI|1, 1
+Sprite|15, 15, 5, 0, 0
+Trial Camera|15, 0, 13, 0, 0, 0
+Speaker|62
+Text|Byakuya never would have been able to see in dark.\nAny objections?\n
+Wait Frame|
+Wait Frame|
+Wait For Input|
+Sprite|0, 0, 2, 0, 0
+Trial Camera|0, 1, 45, 0, 0, 0
+Voice Line|0, 99, 0, 31, 100
+Format|4
+Text|<CLT 04>Looks like I made a mistake... I should think about this\none more time...<CLT>\n
+Wait Frame|
+Format|0
+Wait Frame|
+SFX A|0, 140, 100
+0x3a|13, 2, 2, 188
+Wait For Input|
+Sprite|0, 0, 0, 0, 0
+Change UI|1, 0
+
+Explanation
+-----
+Check Flag A|0, 8 - Check which line of the debate
+Change UI|1, 1
+Sprite|15, 15, 5, 0, 0
+Trial Camera|15, 0, 13, 0, 0, 0
+Speaker|62
+Text|Byakuya never would have been able to see in dark.\nAny objections?\n
+Wait Frame|
+Wait Frame|
+Wait For Input|
+Sprite|0, 0, 2, 0, 0
+Trial Camera|0, 1, 45, 0, 0, 0
+Voice Line|0, 99, 0, 31, 100
+Format|4
+Text|<CLT 04>Looks like I made a mistake... I should think about this\none more time...<CLT>\n
+Wait Frame|
+Format|0
+Wait Frame|
+SFX A|0, 140, 100
+0x3a|13, 2, 2, 188
+Wait For Input|
+Sprite|0, 0, 0, 0, 0
+Change UI|1, 0
+
+
+
+Opcodes
+
+Check difficulty??? - 0x3b|1, x (245 for Mean, 247 for Fair, 249 for Gentle)
+0x3b|1, 245
+
+Truth bullets - 0x32|x - Truth bullets loaded. Must include 0x32|255 at the end? (Perhaps to validate 'incorrect' weak points that don't have truth bullets)
+0x32|1
+0x32|2
+0x32|3
+0x32|255
+
+So, the below will set the truth bullets 1, 2 and 3 for Mean difficulty.
+0x3b|1, 245
+0x32|1
+0x32|2
+0x32|3
+0x32|255
+
