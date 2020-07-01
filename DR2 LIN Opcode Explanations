@@ -66,8 +66,9 @@ Opcodes
 0x10 - Student Report Info
 0x14 - Trial Camera
 0x15 - Load Map
-0x19 - Run Script
+0x19 - Script
 0x1a - Stop Script
+0x1b - Run Script
 0x1d - Something with Character ID ??? (used during nonstop debate)
 0x1e - Sprite
 0x1f - Screen Flash
@@ -85,6 +86,7 @@ Opcodes
 0x32 - Truth Bullets Loaded
 0x34 - Go to Label
 0x35 - Check Flag A
+0x37 - Show CG
 0x3b - Difficulty ???
 0x3c - End Flag Check
 
@@ -297,6 +299,14 @@ Script - 0x19
 Script|Chapter, Scene shr 8, Scene, Room shr 8, Room
 
 Script|1, 0, 203, 0, 0
+Loads the e01_203_00 script file.
+This is more for heading onto the next script, leaving the current one behind.
+
+You are not limited to the game's pre-existing scripts.
+e.g. Create a script called e11_000_00 script file.
+Use Script|11, 0, 0, 0, 0
+The game will then run this new script.
+May be very useful for creating mods and adding them as new modes.
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -308,6 +318,8 @@ e.g. Stop Script|
 Stops the currently running script. 
 Make sure you're running another script before you stop running the current one.
 
+You MUST include this in each script or else the game will softlock.
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Run Script - 0x1b
@@ -315,6 +327,10 @@ Run Script - 0x1b
 Run Script|Chapter, Scene shr 8, Scene, Room shr 8, Room
 
 e.g. Run Script|1, 3, 231, 0, 1
+Runs the e01_203_00 script file.
+This is more for subroutines and running a script in tandem to the current one.
+Run Script is a temporary call, and seems like it inherits the state that it's called from, and keeps state when it returns.
+It's used for stuff like adding Monocoins and the like.
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -322,7 +338,7 @@ Sprite - 0x1e
 ---
 Sprite|Position ID(in trials and something else outside ???), Character ID, Expression, Fade-in type ???, slide-in type ??? or Position outside of trials ???
 
-Position - Outside of trials, determines if a new character is speaking, During trials, determines which podium the sprite should go in. Further explanation below.
+Position - Sets where a character is placed in a room. Further explanation below.
 Character - Self explanatory. Use the above Character IDs to specify which character.
 Expression - Which sprite of that character to use. 
 Fade-in type - How a sprite fades into view. 0 is no fade in, 1 is fast fade-in, 2 is slow fade-in
@@ -339,7 +355,7 @@ IMPORTANT - defining which character's sprite also determines who is shown speak
 
 Position
 --- 	
-Outside of trials, use 0 for the first NPC to speak. ???
+During dialogue outside of trials, use 0 for the first NPC to speak. ???
 Alternate between using 0 and 1 every time a new NPC speaks. ???
 If the same character has a second text box after the first, keep using the same number???
 
@@ -358,6 +374,9 @@ Text|Hey, hey! Let's start talking already!\n
 
 Here, Nekomaru speaks (with position 1), then Gunhdam speaks twice (position is set to 0 both times), then Hiyoko speaks (with position 1).
 
+
+When standing in a room, the Position ID determines where in that room they stand.
+No clear indication as to where they might be placed so documentation may be needed for this. !!!
 
 For trials, the number will match the character ID and put them in that character's podium.
 i.e. Sonia's ID is 10. Setting the Position to 10 will put that sprite into Sonia's trial position.
@@ -523,6 +542,23 @@ Nonstop Debate Text ID - Used to determine which line to check in a nonstop deba
 
 ------------------------------------------------------------------------------------------------------------------------
 
+Show CG - 0x37
+---
+0x37|???, CG ID, ???
+
+First parameter is most likely a shr 8. However, there's only 206 CGs anyway.
+
+Last parameter seems to determine whether or not CG should be shown.
+0 loads the CG but does not show it ???
+1 loads the CG and shows it as a foreground image.
+2 Shows the CG on 'bottom layer', serving as a background image. 
+3 does not show the CG but unloads the CG.
+
+e.g. 0x37|0, 6, 1 
+Show's Twogami dead CG.
+
+List of CGs can be found in dr2_data\Dr2\data\all\cg !!!
+------------------------------------------------------------------------------------------------------------------------
 
 Check difficulty ??? - 0x3b
 ---
