@@ -27,53 +27,112 @@ These IDs are referenced for voice lines, sprites and trial podium position.
 22 - Togami
 
 
+Change UI
+---
+Change UI|Element, State
 
-Change UI|Element, State (In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it)
-Change UI|1, 0
+Element - ???
+State - In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it.
+
+e.g. Change UI|1, 0
 https://wiki.spiralframework.info/wiki/UI_Elements
 
 
-
+Text box format ???
+---
 Format|Type
-Format|0
-0 - Other character speaking (?)
-4 - Player character speaking/thoughts (?)
+
+Type - The type of text box formatting. ???
+0 - Other character speaking ???
+4 - Player character speaking/thoughts ???
+
+e.g. Format|0
+
 This is for the UI, NOT for the text colour. (MAYBE IT IS?)
 
 
+Text for a character speaking/thinking
+---
 Text|Dialogue\n
-End all lines with \n
+
 \n for new line
-Roughly 55 characters per line.
+Roughly 55 characters can fit per line so use \n after that.
+Always end dialogue with \n
+
+Surround text with certain <CLT> numbers for different colours/sizes.
 <CLT 04>Text<CLT>\n for thoughts
 <CLT 17>Text<CLT> for weakpoints
+See CLTs.png for all of them. They go up to 96 though many are unused.
+
+e.g. Text|To be honest, I'm also... No, everyone else feels the\nsame, too.\n
+e.g. Text|<CLT 04>I have to remember how I got here...<CLT>\n
 
 
+Speaker ???
+---
+Speaker|39
+
+e.g. Speaker
+
+Speaker|0 for Hajime ???
+
+
+Sprite
+---
+Sprite|Position (in trials and something else outside ???), Character, Expression, Fade-in type ???, slide-in type ??? or Position outside of trials ???
+
+Position - Outside of trials, determines if a new character is speaking, During trials, determines which podium the sprite should go in. Further explanation below.
+Character - Self explanatory. Use the above Character IDs to specify which character.
+Expression - Which sprite of that character to use. 
+Fade-in type - How a sprite fades into view. 0 is no fade in, 1 is fast fade-in, 2 is slow fade-in
+Slide-in type - How a sprite slides into view. 0 is no slide in, 1 and 2 for the rest. ??? Good for dialogue between multiple characters outside of trials.
+
+e.g. Sprite|0, 0, 16, 1, 2
+
+This shows Hajime's sprite with expression 16 with a fast fade in and sliding in from the left. ???
+
+In the base game, the last two parameters are always set to 0.
+
+IMPORTANT - defining which character's sprite also determines who is shown speaking in the textbox too.
+
+Position
+--- 	
+Outside of trials, use 0 for the first NPC to speak. ???
+Alternate between using 0 and 1 every time a new NPC speaks. ???
+If the same character has a second text box after the first, keep using the same number???
+
+e.g. (I've simplified just to Sprite and Text below where there would usually be more.)
+Sprite|1, 6, 5, 1, 2
+Text|ANYTHING IS POSSIBLE WITH A FIGHTING SPIRIT!!!\n
+
+Sprite|0, 3, 1, 1, 0
+Text|A bold boast... However, let me give you some advice.\n
+
+Sprite|0, 3, 18, 1, 0
+Text|The truly strong...do not raise their voice so\nrecklessly.\n
+
+Sprite|1, 11, 1, 1, 1
+Text|Hey, hey! Let's start talking already!\n
+
+Here, Nekomaru speaks (with position 1), then Gunhdam speaks twice (position is set to 0 both times), then Hiyoko speaks (with position 1).
+
+
+For trials, the number will match the character ID and put them in that character's podium.
+			i.e. Sonia's ID is 10. Setting the Position to 10 will put that sprite into Sonia's trial position.
+			For maps, there are already pre-defined positions so just use those.
+			For regular dialogue, use 0 for the character (aside the player's) who talks first.
+			1 for everyone else to denote that they're in a different position ???
+			Seemingly, the script alternates between using 0 and 1 each time a new character talks
+			
+e.g. Sprite|10, 12, 16, 1, 2 = Mahiru expression 16 in Sonia's trial position
+The Character ID also shows which character is speaking (during trials)
 
 
 Trial Camera|Position, x (used to add 256*x to value to camera angle), Camera Angle/Animation, 0, 0, Position on screen (for Rebuttal Showdown. 0 for default/left, 1 for right)
 Trial Camera|8, 0, 116, 0, 0, 0
 
 
-Sprite|Position, Character, Expression, Fade-in (1 is fast fade-in, 2 is slow fade-in), slide in from left or right (0 for none)
-Sprite|0, 0, 16, 1, 2
 
-Position - 	For trials, the number will match the character ID and put them in that character's podium.
-			i.e. Sonia's ID is 10. Setting the Position to 10 will put that sprite into Sonia's trial position/
-			For maps, there are already pre-defined positions so just use those.
-			For regular dialogue, use 0 for the character (aside the player's) who talks first.
-			1 for everyone else to denote that they're in a different position
-			
-e.g. Sprite|10, 12, 16, 1, 2 = Mahiru expression 16 in Sonia's trial position
-The Character ID also shows which character is speaking (during trials)
-
-FOR HAJIME SPEAKING DURING TRIAL
-Sprite|0, 12, x, 0, 0
-Trial Camera|0, 0, x, 0, 0, 0
-
-FOR MAHIRU SPEAKING DURING Trial
-Sprite|12, 0, x, 0, 0
-Trial Camera|12, 0, x, 0, 0, 0
 
 
 Voice Line|Character, Type of line, 0, Line, Volume
@@ -89,24 +148,34 @@ Screen Flash|Red, Green, Blue, Fade in duration, Hold duration, Fade out duratio
 Screen Flash|255, 255, 255, 4, 0, 30, 255
 
 
-DING - 			SFX A|0, 19, 100
-				Screen Flash|255, 255, 255, 4, 0, 30, 255
+Useful effects for dialogue
+------------
+
+DING
+---
+SFX A|0, 19, 100
+Screen Flash|255, 255, 255, 4, 0, 30, 255
 				
-Screen Shake - 	SFX A|0, X (recommend 18 or 22), 100
-				0x20|4, 0, 30, 4, 2
-				Change UI|13, 1
-				Text|Text\n
-				Wait Frame|
-				0x3a|6, 0, 0, 10
-				Change UI|13, 0
+Screen Shake
+---
+SFX A|0, x, 100 - (where x is any number. I would recommend 18 or 22 for screen shake)
+0x20|4, 0, 30, 4, 2
+Change UI|13, 1
+Text|Text\n
+Wait Frame|
+0x3a|6, 0, 0, 10
+Change UI|13, 0
 				
-Walk Away - 	Wait Frame|
-				SFX A|0, 201, 100
-				Sprite|0, X, X, 5, 2
-				0x3a|6, 0, 0, 60
+Walk Away
+---
+Wait Frame|
+SFX A|0, 201, 100
+Sprite|0, X, X, 5, 2
+0x3a|6, 0, 0, 60
 
 
 Flags
+------------
 These were present for unlocking map_001 and map_002
 Set Flag|1, 1, 1
 Set Flag|1, 2, 1
@@ -117,36 +186,16 @@ Set Flag|17, 0, 0
 Set Flag|17, 1, 1
 
 
+TRIALS
+------------
 
 Rebuttal Showdown
-Example:
-Music|25, 100, 0
-Voice Line|7, 99, 0, 73, 100
-Animation|0, 211, 0, 0, 0, 0, 0, 1
-Change UI|72, 4
-Sprite|11, 11, 3, 0, 0
-Animation|0, 211, 0, 0, 0, 0, 0, 255
-Sprite|0, 0, 18, 2, 0
-Sprite|7, 7, 11, 1, 0
-Trial Camera|7, 1, 29, 0, 0, 0
-Trial Camera|0, 1, 19, 0, 0, 1
-Change UI|70, 1
-Sprite|7, 7, 11, 1, 0
-Voice Line|7, 2, 0, 36, 100
-Text|W-We haven't decided that yet!\n
-Wait Frame|
-Wait For Input|
-Sprite|0, 0, 21, 2, 0
-Trial Camera|0, 0, 12, 0, 0, 1
-Voice Line|0, 2, 0, 40, 100
-Text|Hey, Fuyuhiko... Why do you keep insisting that Hiyoko\nis the killer?\n
-
-Explanation
-Music|25, 100, 0 - Song that plays when rebuttal is triggered
+---
+Music|25, 100, 0 - Song that plays when rebuttal is triggered. This can be changed but this is the song always used in the base game.
 Voice Line|7, 99, 0, 73, 100 - Voice line of character who interjects
 Animation|0, 211, 0, 0, 0, 0, 0, 1
 Change UI|72, 4
-Sprite|11, 11, 3, 0, 0 - Change of Hiyoko sprite. Can easily hide sprite changes of other characters
+Sprite|11, 11, 3, 0, 0 - Can easily hide sprite changes of other characters. This changed Hiyoko's sprite. When Fuyuhiko interrupted.
 Animation|0, 211, 0, 0, 0, 0, 0, 255
 Sprite|0, 0, 18, 2, 0 - Set two sprites and two trial cameras. First value in code goes on the right of screen, second on the left.
 Sprite|7, 7, 11, 1, 0
@@ -305,6 +354,13 @@ Change UI|1, 0
 
 
 Opcodes
+
+0x0c - Truth Bullet
+0x19 - Run Script
+0x22 - Screen Fade
+0x25 - Change UI
+0x26 - Sets a flag
+
 
 Check difficulty??? - 0x3b|1, x (245 for Mean, 247 for Fair, 249 for Gentle)
 0x3b|1, 245
