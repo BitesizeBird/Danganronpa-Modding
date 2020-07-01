@@ -19,3 +19,7 @@ def read_u8(data, offset):
     return data[offset], offset+1
 def read_u8(file):
     return file.read(1)[0]
+
+
+def write_u64(file, value):
+    file.write(struct.pack('<Q', value))
