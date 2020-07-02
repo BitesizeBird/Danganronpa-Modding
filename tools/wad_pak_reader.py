@@ -26,6 +26,7 @@ for file in wad_header.files:
             str_data = bytearray()
             
             in_ = input.read(2)
+            assert in_ == b'\xff\xfe'
             while in_ != b'\0\0':
                 str_data.extend(in_)
                 in_ = input.read(2)
