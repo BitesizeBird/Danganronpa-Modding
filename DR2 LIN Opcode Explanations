@@ -69,13 +69,13 @@ Opcodes
 0x19 - Script
 0x1a - Stop Script
 0x1b - Run Script
-0x1d - Something with Character ID ??? (used during nonstop debate)
+0x1c - Restart Script
 0x1e - Sprite
 0x1f - Screen Flash
 
 0x21 - Speaker
 0x22 - Screen Fade
-0x25 - Change UI - 2 parameters
+0x25 - Change UI
 0x26 - Set Flag
 0x27 - Check Character
 0x29 - Check Object
@@ -87,6 +87,7 @@ Opcodes
 0x34 - Go to Label
 0x35 - Check Flag A
 0x37 - Show CG
+0x3a - Set Game State
 0x3b - Difficulty ???
 0x3c - End Flag Check
 
@@ -334,6 +335,13 @@ It's used for stuff like adding Monocoins and the like.
 
 ------------------------------------------------------------------------------------------------------------------------
 
+Restart Script - 0x1c
+---
+Restarts the current script file from the beginning.
+
+According to the wiki, SPIRAL does not currently support this opcode. ???
+------------------------------------------------------------------------------------------------------------------------
+
 Sprite - 0x1e
 ---
 Sprite|Position ID(in trials and something else outside ???), Character ID, Expression, Fade-in type ???, slide-in type ??? or Position outside of trials ???
@@ -435,11 +443,12 @@ Change UI - 0x25
 ---
 Change UI|Element, State
 
-Element - ???
+Element - What part of the UI is being specified.
 State - In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it.
 
 e.g. Change UI|1, 0
 
+https://wiki.spiralframework.info/UI_Elements
 !!!
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -455,10 +464,16 @@ These were present for unlocking map_001 and map_002
 Set Flag|1, 1, 1
 Set Flag|1, 2, 1
 
-Seems to correspond to whether a character should be dead or alive for the trial.
-Flag, Character ID, Alive or Dead (0 for alive, 1 for dead)
-Set Flag|17, 0, 0
+
+
+Set Flag|17, Character ID, State
+
+Sets whether a character shows as dead within the handbook. Both report cards and the map show this.
+
+e.g. Set Flag|17, 0, 0
+This shows as Hajime alive in the handbook.
 Set Flag|17, 1, 1
+This shows as Nagito dead in the handbook.
 
 (Set Flag|$group, $id, $state)
 
@@ -558,6 +573,16 @@ e.g. 0x37|0, 6, 1
 Show's Twogami dead CG.
 
 List of CGs can be found in dr2_data\Dr2\data\all\cg !!!
+
+------------------------------------------------------------------------------------------------------------------------
+
+Set Game State - 0x3a
+---
+0x3a|State, Operation, Variable shr 8, Variable
+
+
+https://wiki.spiralframework.info/Set_Game_State
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Check difficulty ??? - 0x3b
@@ -587,3 +612,10 @@ No parameters are used for this function.
 e.g. Wait for Input|
 Waits until user clicks or presses button to advance text
 ------------------------------------------------------------------------------------------------------------------------
+
+Wait Frame - 0x4c
+---
+No parameters are used for this function.
+
+e.g. Wait Frame|
+Waits a frame ???
