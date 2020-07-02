@@ -18,16 +18,21 @@ for file in wad_header.files:
 assert pak_offset is not None
 
 pak_header = pak.PakHeader(input, pak_offset)
-print(len(pak_header.offsets))
-pak_header = pak.PakHeader(input, pak_header.base_offset + pak_header.offsets[16])
-print(len(pak_header.offsets))
+pak8_header = pak.PakHeader(input, pak_header.base_offset + pak_header.offsets[8])
+pak9_header = pak.PakHeader(input, pak_header.base_offset + pak_header.offsets[9])
+pak16_header = pak.PakHeader(input, pak_header.base_offset + pak_header.offsets[16])
 
 report_card = {}
 
 for i in range(16):
     data = []
-    for j in range(8):
-        offset = pak_header.base_offset + pak_header.offsets[16*j + i]
+    for j in range(8): # misc data
+        offset = pak16_header.base_offset + pak16_header.offsets[16*j + i]
+        input.seek(offset)
+        value = read_string(input)
+        data.append(value)
+    for j in range(3): # ultimate talent displays
+        offset = pak8_header.base_offset + pak8_header.offsets[16*j + i]
         input.seek(offset)
         value = read_string(input)
         data.append(value)
@@ -41,6 +46,21 @@ for i in range(16):
             'birthday': data[5],
             'likes': data[6],
             'dislikes': data[7],
+            'ultimate': [
+                data[8],
+                data[9],
+                data[10],
+                ],
             }
+
+    if i > 0:
+        summaries = []
+        for j in range(3): # fte blurbs
+            offset = pak9_header.base_offset + pak9_header.offsets[3*i + j]
+            input.seek(offset)
+            value = read_string(input)
+            summaries.append(value)
+
+        report_card['{:02}'.format(i)]['fte_summaries'] = summaries
 
 print(toml.dumps(report_card))
