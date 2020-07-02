@@ -1,5 +1,15 @@
 import struct
 
+def read_string(file):
+    data = bytearray()
+    in_ = file.read(2)
+    assert in_ == b'\xff\xfe' # byte order mark
+    in_ = file.read(2)
+    while in_ != b'\0\0':
+        data.extend(in_)
+        in_ = file.read(2)
+    return data.decode('utf-16-le')
+
 def read_u64(data, offset):
     return struct.unpack('<Q', data[offset:offset+8])[0], offset+8
 def read_u64(file):
