@@ -5,11 +5,11 @@ parser = argparse.ArgumentParser(description='.wad file lister')
 parser.add_argument('input')
 args = vars(parser.parse_args())
 
-wad = formats.wad.Wad()
-wad.read(args['input'])
+header = formats.wad.WadHeader(open(args['input'], 'rb'))
+print(header.header_size)
 
-for filename, metadata in wad.files.items():
-    print(filename, metadata)
+for file in header.files:
+    print(file)
 print('=====')
-for dirname, _ in wad.dirs.items():
-    print(dirname)
+for dir in header.dirs:
+    print(dir['path'])
