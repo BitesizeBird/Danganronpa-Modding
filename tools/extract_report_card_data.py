@@ -55,8 +55,8 @@ for i in range(16):
 
     if i > 0:
         summaries = []
-        for j in range(3): # fte blurbs
-            offset = pak9_header.base_offset + pak9_header.offsets[3*i + j]
+        for j in range(5): # fte blurbs
+            offset = pak9_header.base_offset + pak9_header.offsets[5*(i-1) + j]
             input.seek(offset)
             value = read_string(input)
             summaries.append(value)
