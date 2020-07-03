@@ -1,4 +1,4 @@
-from metadata import DataPath
+from metadata import PakString
 
 truth_bullets = {}
 _wad = 'dr2_data_us.wad'
@@ -8,10 +8,10 @@ for i in range(200):
     key = '{:03}'.format(i)
 
     truth_bullets[key] = {
-            'name': DataPath(_wad, _pak, [4, i]),
+            'name': PakString(_wad, _pak, [4, i]),
             'descriptions': [
-                DataPath(_wad, _pak, [5, i]),
-                DataPath(_wad, _pak, [6, i]),
-                DataPath(_wad, _pak, [7, i]),
+                PakString(_wad, _pak, [5, i]),
+                PakString(_wad, _pak, [6, i]),
+                PakString(_wad, _pak, [7, i]),
             ],
     }

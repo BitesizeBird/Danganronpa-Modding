@@ -1,7 +1,7 @@
 import formats.pak as pak
 from formats.helper import read_string
 
-class DataPath:
+class PakString:
     def __init__(self, wad_name, pak_path, pak_indices):
         self.wad_name = wad_name
         self.pak_path = pak_path
@@ -21,7 +21,7 @@ class DataPath:
 
 # assumes there is only dr2_data_us.wad
 def extract_from_metadata(wad_header, file, meta):
-    if isinstance(meta, DataPath):
+    if isinstance(meta, PakString):
         return meta.extract_string(wad_header, file)
     elif isinstance(meta, list):
         return [extract_from_metadata(wad_header, file, v) for v in meta]

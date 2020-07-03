@@ -1,4 +1,4 @@
-from metadata import DataPath
+from metadata import PakString
 
 presents = {}
 _wad = 'dr2_data_us.wad'
@@ -9,6 +9,6 @@ for i in range(140):
     key = '{:03}'.format(i)
 
     presents[key] = {
-            'name':        DataPath(_wad, _pak, [2, i]),
-            'description': DataPath(_wad, _pak, [3, i]),
+            'name':        PakString(_wad, _pak, [2, i]),
+            'description': PakString(_wad, _pak, [3, i]),
     }
