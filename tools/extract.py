@@ -7,6 +7,7 @@ parser = argparse.ArgumentParser(description='extracts data from dr2_data.wad an
 parser.add_argument('dr2_data')
 parser.add_argument('dr2_data_us')
 parser.add_argument('output')
+parser.add_argument('--prefix', default='')
 args = vars(parser.parse_args())
 
 data = open(args['dr2_data'], 'rb')
@@ -20,4 +21,4 @@ wads = {
     'dr2_data_us': [data_us, data_us_header],
 }
 
-metadata.extract_all(wads, args['output'])
+metadata.extract(wads, args['output'], args['prefix'])

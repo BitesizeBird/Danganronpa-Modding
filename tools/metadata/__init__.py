@@ -53,11 +53,13 @@ def extract_from_metadata(wads, meta):
     else:
         raise ValueError
 
-def extract_all(wads, outdir):
+def extract(wads, outdir, prefix=''):
     import os
     import toml
 
     for fname, meta in files.items():
+        if not fname.startswith(prefix): continue
+
         fpath = os.path.join(outdir, fname)
         print('writing {}'.format(fpath))
 
