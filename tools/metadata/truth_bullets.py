@@ -1,7 +1,7 @@
 from metadata import PakString
 
 truth_bullets = {}
-_wad = 'dr2_data_us.wad'
+_wad = 'dr2_data_us'
 _pak = 'Dr2/data/us/bin/bin_progress_font_l.pak'
 
 for i in range(200):
