@@ -1,4 +1,4 @@
-from ..helper import *
+from formats.helper import *
 
 class PakHeader:
     def __init__(self, file, base_offset=None):

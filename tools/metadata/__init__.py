@@ -75,10 +75,13 @@ def extract_all(wads, outdir):
 import metadata.report_card
 import metadata.presents
 import metadata.truth_bullets
+import metadata.backgrounds
 
 files = {
         'report_card.toml': report_card.report_card,
         'presents.toml': presents.presents,
         'truth_bullets.toml': truth_bullets.truth_bullets,
 }
+
 presents.add_files(files)
+backgrounds.add_files(files)

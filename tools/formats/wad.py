@@ -1,4 +1,4 @@
-from ..helper import *
+from formats.helper import *
 import os
 
 class WadHeader:

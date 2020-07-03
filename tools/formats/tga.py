@@ -17,7 +17,7 @@ def read_tga(file, offset=None):
     color_map_offset = read_u16(file)
     color_map_length = read_u16(file)
     color_map_entry_size = read_u8(file)
-    assert color_map_entry_size == 32
+    assert color_map_entry_size in [24, 32]
 
     x_origin = read_u16(file)
     y_origin = read_u16(file)
@@ -32,8 +32,12 @@ def read_tga(file, offset=None):
     # read color data
     color_map = []
     for _ in range(color_map_length):
-        color = file.read(4)
-        color_map.append((color[2], color[1], color[0], color[3]))
+        if color_map_entry_size == 24:
+            color = file.read(3)
+            color_map.append((color[2], color[1], color[0]))
+        elif color_map_entry_size == 32:
+            color = file.read(4)
+            color_map.append((color[2], color[1], color[0], color[3]))
 
     # read image data
     image_data = []
