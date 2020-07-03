@@ -828,9 +828,10 @@ This shows as Nagito dead in the handbook.
 
 Check Character - 0x27
 ---------
-Check Character|Character ID
+Check Character|Position ID
 
-???
+Checks whether the player has clicked on a character in a scene.
+Checks against the Position ID they were initiated into.
 
 (Check Character|$characterID)
 ------------------------------------------------------------------------------------------------------------------------
