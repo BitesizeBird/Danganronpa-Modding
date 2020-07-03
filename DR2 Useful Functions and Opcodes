@@ -5,6 +5,10 @@ DING
 ---
 SFX A|0, 19, 100
 Screen Flash|255, 255, 255, 4, 0, 30, 255
+
+Door squeak
+---
+SFX A|0, 208, 100
 				
 Screen Shake
 ---
