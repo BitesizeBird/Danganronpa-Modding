@@ -668,9 +668,10 @@ Change UI|23, x
 
 ------------------------------------------------
 
-Change UI|26, 4
+Change UI|26, Position ID
 ------
-Pans the camera over ???
+Pans the camera towards a certain position. Used for when a certain cahracter initiates a conversation when no bust sprites are showing.
+
 
 ------------------------------------------------
 
