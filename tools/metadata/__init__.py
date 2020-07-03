@@ -76,6 +76,7 @@ import metadata.report_card
 import metadata.presents
 import metadata.truth_bullets
 import metadata.backgrounds
+import metadata.sprites
 
 files = {
         'report_card.toml': report_card.report_card,
@@ -85,3 +86,4 @@ files = {
 
 presents.add_files(files)
 backgrounds.add_files(files)
+sprites.add_files(files)
