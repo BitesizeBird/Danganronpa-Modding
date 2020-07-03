@@ -60,7 +60,7 @@ Opcodes
 0x09 - Music
 0x0a - SFX A
 0x0b - SFX B
-0x0c - Truth Bullet Added
+0x0c - Add Truth Bullet
 0x0f - Student Title Entry
 
 0x10 - Student Report Info
@@ -99,7 +99,7 @@ Opcodes
 ------------------------------------------------------------------------------------------------------------------------
 
 Text Count - 0x00
----
+---------
 Text Count|x, shr 8 
 
 The number of times Text opcode is called.
@@ -113,7 +113,7 @@ Doesn't seem to be necessary ???
 ------------------------------------------------------------------------------------------------------------------------
 
 Text - 0x02
----
+---------
 Text|Dialogue goes here\n
 
 \n for new line.
@@ -139,7 +139,7 @@ e.g. Text|<CLT 04>I have to remember how I got here...<CLT>\n
 ------------------------------------------------------------------------------------------------------------------------
 
 Format - 0x03
----
+---------
 Format|Type
 
 Type - The type of text box formatting. ???
@@ -153,7 +153,7 @@ e.g. Format|0
 ------------------------------------------------------------------------------------------------------------------------
 
 Filter - 0x04
----
+---------
 Filter|???, Filter, ???, ???
 
 Filter - Adds a screen filter.
@@ -169,7 +169,7 @@ Adds sepia tone filter.
 ------------------------------------------------------------------------------------------------------------------------
 
 Movie - 0x05
----
+---------
 Movie|Seems to be which actual movie ???, ID ???
 
 e.g. Movie|2, 1
@@ -180,7 +180,7 @@ Plays Usami appearing movie.
 ------------------------------------------------------------------------------------------------------------------------
 
 Animation - 0x06
----
+---------
 Animation|ID shr 8, ID, ???, ???, ???, ???, ???, Frame
 
 e.g. Animation|2, 240, 0, 0, 0, 0, 0, 1
@@ -191,7 +191,7 @@ Play animation 752 (at frame 1 ???)
 ------------------------------------------------------------------------------------------------------------------------
 
 Voice lines - 0x08
----
+---------
 Voice Line|Character ID, Chapter, ???, Line, Volume
 
 Chapter -  1 to 6 will be lines from trials 1 to 6 respectively, 99 for general sounds and CG lines ???
@@ -207,11 +207,16 @@ This should play Hajime's 6th line from Trial 2 which is "Girl C is Ibuki." ???
 ------------------------------------------------------------------------------------------------------------------------
 
 Music - 0x09
----
+---------
 Music|Song, Volume, ???
 
-Song - Determine which song to play (!!! create list of songs with ID)
-Volume - Adjust volume from 0 to 100
+Song
+---
+Determine which song to play (!!! create list of songs with ID)
+
+Volume
+---
+Adjust volume from 0 to 100
 
 e.g Music|25, 100, 0
 Play song 25 at full volume.
@@ -220,7 +225,7 @@ Play song 25 at full volume.
 ------------------------------------------------------------------------------------------------------------------------
 
 SFX A - 0x0a
----
+---------
 SFX A|???, Sound effect, Volume
 
 e.g. SFX A|0, 19, 100
@@ -233,24 +238,52 @@ Need to gather and describe sound effects !!!
 ------------------------------------------------------------------------------------------------------------------------
 
 SFX B - 0x0b
----
+---------
 SFX B|???, ???
 
 (SFX B|$arg1, $arg2)
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Truth Bullets Added ??? - 0x0c
+Add Truth Bullet - 0x0c
+---------
+Truth Bullet|Truth Bullet ID, State
+
+Adds a Truth Bullet to the Truth Bullet section of the handbook.
+Set Flag|0, 6, 1 needs to be set first to access these Truth Bullets.
+
+Each Truth Bullet has 3 descriptions. The 2nd and 3rd descriptions are usually empty.
+These later descriptions are used to update the description when new information is gathered in-game (e.g. Remnants of Despair Truth Bullet).
+
+Truth Bullet ID
 ---
-Truth Bullet|???, Truth Bullet ID
+The ID of the Truth Bullet being added.
+Each chapter's Truth Bullets are in groups of 30, starting with the Monokuma File.
+e.g. ID = 0 is Monokuma File 1, ID = 30 is Monokuma File 2, ID = 60 is Monokuma File 3, etc.
+This also means that there are a lot of empty slots with the placeholder name ※.
+
+State
+---
+0 - Removes the Truth Bullet from the Truth Bullet section of the handbook.
+1 - Adds the Truth Bullet with the 1st description.
+2 - Adds the Truth Bullet with the 2nd description.
+3 - Adds the Truth Bullet with the 3rd description.
+
+Going over 3 for this parameter can cause overflow, bringing text from other descriptions (e.g. report cards) or crashing the game.
 
 e.g.
 Truth Bullet|0, 1
+Adds the Monokuma File 1 Truth Bullet.
+
+This opcode calls its data from
+dr2/data/us/bin/bin_progress_f
+
+Would like to document all of the truth bullets !!!
 
 ------------------------------------------------------------------------------------------------------------------------
 
 Student Title Entry - 0x0f
----
+---------
 Set Title|Character ID, ???, State
 
 !!!
@@ -259,7 +292,7 @@ Set Title|Character ID, ???, State
 ------------------------------------------------------------------------------------------------------------------------
 
 Student Report Info - 0x10
----
+---------
 Set Report Info|Character ID, ???, State
 
 !!!
@@ -270,7 +303,7 @@ Set Report Info|$characterID, $arg2, $state"
 ------------------------------------------------------------------------------------------------------------------------
 
 Trial Camera - 0x14
----
+---------
 Trial Camera|Character ID, Motion shr 8, Motion, ???, ???, Position on screen
 
 Character - Camera will apply motion pointing towards this character's podium.
@@ -285,18 +318,45 @@ Point towards Hajime's spot using camera motion 116.
 ------------------------------------------------------------------------------------------------------------------------
 
 Load Map - 0x15
----
-Load Map|Room, State, Padding, Unk4 ???
+---------
+Load Map|Room, State, Padding, Time of Day
 
-e.g. Load Map|0, 1, 1, 0
-Loads the Beach
+Room
+---
+Unsure what this is. Setting to 1 seemed to load some of the hallways of Hope's Peak used for Chapter 6.
+However, some states for this are completely black, implying they are unused.
+Perhaps a shr 8 ???
+
+If no valid map is loaded, an infinite black room is laoded that the player can walk around in.
+It has only one position ID so all other characters will be put in the same spot, overlapping each other.
+
+State
+---
+Determines which map is loaded.
+Would like to document these too !!!
+
+Padding
+---
+Setting this to 1 made the whole room dark. Unsure what this is used for. ???
+
+
+Time of Day
+---
+Loads a different variant of the map.
+0 - Day variant
+1 - Night variant
+
+e.g. Load Map|0, 1, 0, 0
+Loads the Beach in daylight.
+
+Need to check if Time of Day is just 0 and 1 or if there are more such as above.
 
 !!!
 
 ------------------------------------------------------------------------------------------------------------------------
 
 Script - 0x19
----
+---------
 Script|Chapter, Scene shr 8, Scene, Room shr 8, Room
 
 Script|1, 0, 203, 0, 0
@@ -312,7 +372,7 @@ May be very useful for creating mods and adding them as new modes.
 ------------------------------------------------------------------------------------------------------------------------
 
 Stop Script - 0x1a
----
+---------
 No parameters are used for this function.
 
 e.g. Stop Script|
@@ -324,7 +384,7 @@ You MUST include this in each script or else the game will softlock.
 ------------------------------------------------------------------------------------------------------------------------
 
 Run Script - 0x1b
----
+---------
 Run Script|Chapter, Scene shr 8, Scene, Room shr 8, Room
 
 e.g. Run Script|1, 3, 231, 0, 1
@@ -336,82 +396,99 @@ It's used for stuff like adding Monocoins and the like.
 ------------------------------------------------------------------------------------------------------------------------
 
 Restart Script - 0x1c
----
+---------
 Restarts the current script file from the beginning.
 
 According to the wiki, SPIRAL does not currently support this opcode. ???
 ------------------------------------------------------------------------------------------------------------------------
 
 Sprite - 0x1e
----
-Sprite|Position ID(in trials and something else outside ???), Character ID, Expression, Fade-in type ???, slide-in type ??? or Position outside of trials ???
+---------
+Sprite|Position ID, Character ID, Expression, Fade-in type ???, slide-in type ???
+(positionID, characterID, spriteID, spriteState, spriteEntryTransition)
 
-Position - Sets where a character is placed in a room. Further explanation below.
-Character - Self explanatory. Use the above Character IDs to specify which character.
-Expression - Which sprite of that character to use. 
-Fade-in type - How a sprite fades into view. 0 is no fade in, 1 is fast fade-in, 2 is slow fade-in
-Slide-in type - How a sprite slides into view. 0 is no slide in, 1 and 2 for the rest. ??? Good for dialogue between multiple characters outside of trials.
+Used to place particular character sprites down, either into a map, trial or during dialogue.
+
+Position ID
+---
+Sets where a character is placed in a room/which trial podium they are placed in.
+
+After loading a map, use this to place characters around the scene.
+No clear indication as to where they might be placed so documentation may be needed for this. !!!
+
+During dialogue, this seems to alternate between 0 and 1 when a new character is speaking. ???
+
+During trials, each podium has a position ID which corresponds to the ID of the character who stands there.
+i.e. Sonia's ID is 10. Setting the Position to 10 will put that sprite into Sonia's trial position.		
+e.g. Sprite|10, 12, 0, 1, 2
+Put Mahiru default sprite into Sonia's trial position.
+
+
+Character ID
+---
+Specifies which character's sprites to use and who is shown speaking in the textbox too.
+
+Expression
+---
+Which sprite of that character to use.
+
+Fade-in type ???
+---
+How a sprite fades into view
+
+0 - No fade in
+1 - Fast fade-in
+2 - Slow fade-in
+!!!
+
+Slide-in type ???
+---
+How a sprite slides into view. Used for dialogue between multiple characters outside of trials.
+
+0 - No slide-in
+1 and 2 for the rest. ???
+!!!
 
 e.g. Sprite|0, 0, 16, 1, 2
 This shows Hajime's sprite with expression 16 with a fast fade in and sliding in from the left. ???
 
-In the base game, the last two parameters are always set to 0.
-
-IMPORTANT - defining which character's sprite also determines who is shown speaking in the textbox too.
-
-(positionID, characterID, spriteID, spriteState, spriteEntryTransition)
-
-Position
---- 	
-During dialogue outside of trials, use 0 for the first NPC to speak. ???
-Alternate between using 0 and 1 every time a new NPC speaks. ???
-If the same character has a second text box after the first, keep using the same number???
-
-e.g. (I've simplified just to Sprite and Text below where there would usually be more.)
-Sprite|1, 6, 5, 1, 2
-Text|ANYTHING IS POSSIBLE WITH A FIGHTING SPIRIT!!!\n
-
-Sprite|0, 3, 1, 1, 0
-Text|A bold boast... However, let me give you some advice.\n
-
-Sprite|0, 3, 18, 1, 0
-Text|The truly strong...do not raise their voice so\nrecklessly.\n
-
-Sprite|1, 11, 1, 1, 1
-Text|Hey, hey! Let's start talking already!\n
-
-Here, Nekomaru speaks (with position 1), then Gunhdam speaks twice (position is set to 0 both times), then Hiyoko speaks (with position 1).
-
-
-When standing in a room, the Position ID determines where in that room they stand.
-No clear indication as to where they might be placed so documentation may be needed for this. !!!
-
-For trials, the number will match the character ID and put them in that character's podium.
-i.e. Sonia's ID is 10. Setting the Position to 10 will put that sprite into Sonia's trial position.
-			
-e.g. Sprite|10, 12, 16, 1, 2
-Put Mahiru sprite 16 into Sonia's trial position.
-
 ------------------------------------------------------------------------------------------------------------------------
 
 Screen Flash - 0x1f
----
+---------
 Screen Flash|Red, Green, Blue, Fade in duration, Hold duration, Fade out duration, Opacity
 
-Red, Green, Blue - How much red, green and blue is in the flash respectively. Use RBG to determine which colour you want. 255, 255, 255 for white.
-Fade in duration - How long the flash takes to reach its full opacity in frames
-Hold duration - How long the flash stays at full opacity in frames
-Fade out duration - How long the flash takes to disappear in frames
-Opacity - How transparent the flash is when it reaches its maximum. 0 to 255. 0 for invisible, 255 for opaque.
-
+The durations are counted in frames.
 The games runs at 60 frames per second so setting 60 as the duration will take 1 second to complete that action.
+
+Red, Green, Blue
+---
+How much red, green and blue is in the flash respectively. Use RBG to determine which colour you want. 255, 255, 255 for white.
+
+Fade in duration
+---
+How long the flash takes to reach its full opacity in frames
+
+Hold duration
+---
+How long the flash stays at full opacity in frames
+
+Fade out duration
+---
+How long the flash takes to disappear in frames
+
+Opacity
+---
+How transparent the flash is when it reaches its maximum. 0 to 255. 0 for invisible, 255 for opaque.
+
+
 
 e.g. Screen Flash|255, 255, 255, 4, 0, 30, 255
 Flashes the screen completely white. It takes 4 frames to reach full opacity and immediately fades out. It has completely faded after 30 frames (1/2 a second).
 ------------------------------------------------------------------------------------------------------------------------
 
 Speaker - 0x21
----
+---------
 Speaker|x
 e.g. Speaker|39
 
@@ -423,7 +500,7 @@ Speaker|0 for Hajime ???
 ------------------------------------------------------------------------------------------------------------------------
 
 Screen Fade - 0x22
----
+---------
 Screen Fade|Fade Type, Colour, Duration
 
 Fade Type - 0 for fade in from colour, 1 for fade out to colour
@@ -440,13 +517,228 @@ Fades the screen out to black in 24 frames (around 1/2 a second).
 ------------------------------------------------------------------------------------------------------------------------
 
 Change UI - 0x25
----
+---------
 Change UI|Element, State
 
-Element - What part of the UI is being specified.
-State - In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it.
+Element
+---
+What part of the UI is being specified.
 
-e.g. Change UI|1, 0
+State
+---
+In most cases, setting a UI element's state to 0 will hide/disable it, while 1 will show/enable it.
+
+------------------------------------------------
+
+Change UI|1, x
+------
+Controls the textbox.
+
+0 - Removes textbox. Used for animations such as showing 'Investigation' and for walking around.
+1 - Shows textbox. If Text opcode is called, the textbox will show with animation, making this redundant ???
+
+------------------------------------------------
+
+Change UI|3, x
+------
+Shows the HUD (what song is playing, chapter, time of day, level).
+
+0 - Remove HUD (with animation)
+1 - Show HUD (with animation)
+2 - Remove HUD (without animation)
+3 - Show HUD (without animation)
+
+------------------------------------------------
+
+Change UI|4, x
+------
+Enabling this will make no further text display and no player input is accepted. Softlocks the game.
+
+------------------------------------------------
+
+Change UI|5, 1
+------
+Used for displaying the minimap if you are in a walkaround room. Same as pressing TAB.
+
+0 - Hides minimap
+1 - Displays minimap
+
+------------------------------------------------
+
+Change UI|6, x
+------
+Controls whether the screen behind the UI is black.
+
+0 - Disables the black cover.
+1 - Makes the screen behind the UI black.
+
+------------------------------------------------
+
+Change UI|7, x
+------
+Changes the UI to be just the textbox. Removes all other HUD elements.
+Use for flashbacks and CGs. 
+
+Disabling this UI will set the textbox back to where it would be for non-CG dialogue.
+However, the rest of the UI won't appear and the script will need to be set to call those UI elements again.
+
+------------------------------------------------
+
+Change UI|8, x
+------
+Shows Class Trial UI.
+When used outside of class trial, it brings player straight to Case 6 preperation screen. Would like to explore this function more ???
+
+0 - Get rid of textbox
+1 - Load Trial preperation.
+2 - Show Class trial. 
+3 - Load Trial preperation. 
+
+------------------------------------------------
+
+Change UI|9, x
+------
+Is used to show a sprite bust for dialogue.
+If not set to 1, any sprite changes are applied to the sprites in the room instead.
+If not set to 1, these sprite changes won't update the speaker name.
+If not set to 1 and sprites are changed in the room, they automatically bounce ??? This doesn't seem to be consistent though.
+
+Advisable to enable this to 1 for any dialogue for an NPC, then set to 0 outside of that dialogue (along with Change UI|1, 0).
+
+------------------------------------------------
+
+Change UI|11, x
+------
+Makes the screen behind the HUD black.
+No discernable difference between this and Change UI|6, x ???
+
+------------------------------------------------
+
+Change UI|12, x
+------
+When x is 1, this shows the Save prompt.
+Saying no to this will make all of the UI go away but the text can still be advanced so will need to recall UI elements. ???
+
+------------------------------------------------
+
+Change UI|13, x
+------
+Used for rumbling the screen behind the HUD.
+
+0 - Disable rumble.
+1 - Rumbles the screen.
+2 - Bigger rumble.
+!!!
+
+------------------------------------------------
+
+Change UI|14, x
+------
+Camera animation to look across.
+This is used mostly just for lookaround rooms. However, it does work for walkaround rooms too but can look weird.
+Which direction the camera pans for its animation seems to be chosen at random.
+If the UI is not correct, no text is displayed and no player input is accepted. Softlocks the game. (Was this referring to State) ???
+
+0 - Nothing
+1 - Camera pans across room horizontally. All sprites bounce up before settling. Camera then return to orignal position. Used for entering a room.
+2 - Camera pans from left to right across the room. Camera stays pointing towards a direction at the end of animation.
+
+------------------------------------------------
+
+Change UI|15, x
+------
+
+0 - Zooms in on camera for lookaround rooms. Zooms in on door for walkaround rooms. Most likely zooms in on a particular object ???
+1 - Different angle on camera, pans down and then fades the whole screen to black. Similar to walkaround rooms. Not sure what this is for ???
+2+ - Plays animation and then displays name of map. Usually, a new script would be loaded after this command. Otherwise, the game is unplayable.
+Seems to play an animation dependent on the room you're in. Perhaps this is why the glitched Hope's Peak halls are separated?
+However, State 90 played a giltchy one used for chapter 6 when in old dining hall.
+
+------------------------------------------------
+
+States 16, 18, 19, 20 and 21 freeze or crash the game when run during non-trials.
+Perhaps used for trials???
+
+------------------------------------------------
+
+Change UI|23, x
+------
+0 - ???
+1 - Causes a beep, specifically sound with ID 390 (SFX A 390 ???), to play for every letter that is shown using the Text opcode. 
+
+------------------------------------------------
+
+Change UI|26, 4
+------
+Pans the camera over ???
+
+------------------------------------------------
+
+Change UI|27, x
+------
+Access 'sub-area' of room.
+e.g. Under the table in the dining room
+e.g. The door to Hope's Peak.
+
+If no sub-area exists in that room, the camera pans though unsure what specifically to.
+Sometimes it pans slightly, sometimes it pans enough to show the edge of the skybox.
+
+0 - Reset camera to original position.
+1 - Zoom in on a 'sub-area' of the current room.
+	
+------------------------------------------------
+
+States 31, 32, 33, 34, 35 freeze or crash the game when run during non-trials.
+Perhaps used for trials???
+
+------------------------------------------------
+
+Change UI|37, x
+------
+0 - Distorts the speaker name on the left hand size, stretching it out. Does not advance text nor allow more inputs. Perhaps used for Trial 6 though not advised.
+1 - Crashes the game.
+
+------------------------------------------------
+
+Change UI|39, x
+------
+0 - Nothing 
+1 - Does not advance text nor allow more inputs. Softlocks game.
+Perhaps used for trials ???
+
+------------------------------------------------
+
+Change UI|41, x
+For state 1, this shows MonoMono Machine. Operational. Does not get rid of other UI elements.
+Exiting without any kind of screen makes the whole screen black. Can still advance text but unplayable.
+This is probably called when running a different script. Then when exiting, the player is brought back to other script. ???
+
+For state 2, MonoMono Machine did not appear. However, text did not appear in textbox but still could advance.
+
+------------------------------------------------
+
+Change UI|44, 1
+------
+Shows Vending Machine. Operational. Does not get rid of other UI elements.
+Like MonoMono Machine, exiting will make whole screen black and unplayable..
+
+State 2 also seems to show this. ???
+
+------------------------------------------------
+
+Change UI|50, x
+---
+UI used for Island mode. Enabling this removes all other UI elements.
+
+0 - ???
+1 - Changes the textbox to be the Island mode version.
+
+------------------------------------------------
+
+Change UI|51, x
+------
+Minimal UI. Enabling this removes all other UI elements. 
+Seems to be used for dialogue that doesn't use the sidebar (CGs and the like?)
 
 https://wiki.spiralframework.info/UI_Elements
 !!!
@@ -456,31 +748,86 @@ Set Flag - 0x26
 ------------
 Set Flag|Group, ID, State
 
-Group - ??? 1 seems to be for unlocking maps. 17 for whether a character should be dead for a trial?
-ID - ID within group. Depends on what group.
-State - Presumably, 0 and 1 ???
+Used to perform many different actions.
 
-These were present for unlocking map_001 and map_002
+Group
+---
+Determines what kind of Flag to set. There are many used throughout the game.
+
+ID
+---
+Used to call particular parts of the Group. This could be character IDs, certain options in the Handbook, etc.
+
+State
+---
+Determines how the flag should be set. Often, this is just 0 or 1, off or on respetively.
+
+------------------------------------------------
+
+Set Flag|0, Option, State
+------
+Controls a lot of the Handbook options.
+When State is set to 0, the Option is disabled. This means that in the Handbook, greyed out and inaccessible.
+When State is set to 1, the Option is enabled. 
+Below are the known values for Option. 
+
+4 - Controls if the Handbook and Transcript can be brought up (this is usually done by pressing F1 or F2 respectively).
+5 - Map option in the handbook. If disabled, the option is greyed out and inaccessible.
+6 - Truth Bullets option in the Handbook. If no Truth Bullets have been added yet, the option is still greyed out.
+7 - Save option under System in the Handbook.
+19 - Truth Bullets option in the Handbook. If State is set to 0, the option will appear as ??? as if the player hasn't unlocked it yet. 
+
+------------------------------------------------
+
+Set Flag|1, Map ID, State
+------
+Seems to be for unlocking maps in the Handbook according to documentation. ???
+
+Map
+---
+Determines which map to unlock.
+
+State
+---
+0 - Locks map.
+1 - Unlocks map.
+
+Apparently, these were present for unlocking map_001 and map_002
 Set Flag|1, 1, 1
 Set Flag|1, 2, 1
 
+------------------------------------------------
 
+Set Flag|15, ID, State
+---
+Seems to be determine if you have spoken to a character in that scene already.
+After setting the State 1, talking to the character will bring up their 'secondary' dialogue, implying you have already talked to them.
+Need to check what the ID is ??? Most likely relates to why swapping two sprites in a sprite does not change the dialogue that is initiated.
+
+------------------------------------------------
 
 Set Flag|17, Character ID, State
+---
+Determines whether a character is shown as dead or alive in the Handbook. The report card shows them as dead and the map crosses out their icon.
 
-Sets whether a character shows as dead within the handbook. Both report cards and the map show this.
+Character ID
+---
+Determines which character to show as dead or alive.
+
+State
+---
+0 - Alive
+1 - Dead
 
 e.g. Set Flag|17, 0, 0
 This shows as Hajime alive in the handbook.
 Set Flag|17, 1, 1
 This shows as Nagito dead in the handbook.
 
-(Set Flag|$group, $id, $state)
-
 ------------------------------------------------------------------------------------------------------------------------
 
 Check Character - 0x27
----
+---------
 Check Character|Character ID
 
 ???
@@ -489,7 +836,7 @@ Check Character|Character ID
 ------------------------------------------------------------------------------------------------------------------------
 
 Check Object - 0x29
----
+---------
 Check Object|Object ID
 ???
 
@@ -498,7 +845,7 @@ Check Object|Object ID
 ------------------------------------------------------------------------------------------------------------------------
 
 Set Label - 0x2a
----
+---------
 Set Label|ID
 
 ???
@@ -508,7 +855,7 @@ Set Label|ID
 ------------------------------------------------------------------------------------------------------------------------
 
 Choice - 0x2b
----
+---------
 Choice|???
 
 (Choice|$arg1)
@@ -516,7 +863,7 @@ Choice|???
 ------------------------------------------------------------------------------------------------------------------------
 
 Show Background - 0x30
----
+---------
 Show Background|Background, State
 
 ???
@@ -528,7 +875,7 @@ Show Background|Background, State
 ------------------------------------------------------------------------------------------------------------------------
 
 Truth bullets Loaded ??? - 0x32
----
+---------
 0x32|x - Truth bullets loaded. Must include 0x32|255 at the end? (Perhaps to validate 'incorrect' weak points that don't have truth bullets)
 
 e.g.
@@ -541,14 +888,14 @@ Loads truth bullets 1, 2 and 3
 ------------------------------------------------------------------------------------------------------------------------
 
 Go to Label - 0x34
----
+---------
 Go To Label|ID, ???
 
 (Go To Label|${labelID % 256}, ${labelID shr 8})
 ------------------------------------------------------------------------------------------------------------------------
 
 Check Flag A - 0x35
----
+---------
 Check Flag A|???, Nonstop Debate Text ID
 
 Nonstop Debate Text ID - Used to determine which line to check in a nonstop debate.
@@ -558,27 +905,78 @@ Nonstop Debate Text ID - Used to determine which line to check in a nonstop deba
 ------------------------------------------------------------------------------------------------------------------------
 
 Show CG - 0x37
----
-0x37|???, CG ID, ???
+---------
+0x37|???, CG ID, State
+
+Screen Fades may be needed load up a scene and show a CG ???
+
 
 First parameter is most likely a shr 8. However, there's only 206 CGs anyway.
 
-Last parameter seems to determine whether or not CG should be shown.
-0 loads the CG but does not show it ???
-1 loads the CG and shows it as a foreground image.
-2 Shows the CG on 'bottom layer', serving as a background image. 
-3 does not show the CG but unloads the CG.
+
+CG ID
+---
+Determines which CG to display.
+
+
+State
+---
+This parameter determinse how to show the CG.
+0 - Loads the CG but does not show it ???
+1 - Loads the CG and shows it as a foreground image.
+2 - Shows the CG on 'bottom layer', serving as a background image. 
+3 - Does not show the CG but unloads the CG.
 
 e.g. 0x37|0, 6, 1 
 Show's Twogami dead CG.
 
-List of CGs can be found in dr2_data\Dr2\data\all\cg !!!
-
+This opcode calls its CGs from
+dr2_data\Dr2\data\all\cg
 ------------------------------------------------------------------------------------------------------------------------
 
 Set Game State - 0x3a
----
+---------
 0x3a|State, Operation, Variable shr 8, Variable
+
+There are up to 32 states. Some are still unknown ???
+
+0x3a|0, 0, 0, x
+------
+Sets the time of day. This will update the UI automatically.
+Chaning the Operation value for this seems to change the UI as well but not in any new ways. Perhaps there are placeholder IDs used.
+
+Variable
+---
+0 - Daytime
+1 - Nighttime
+2 - Morning
+3 - Midnight
+4 - Time unknown
+255 - Time unknown (Just the time and music. Textbox and sidebar don't update.)
+
+
+0x3a|2, 0, 0, 100
+0x3a|3, 0, 0, 100
+------
+Not sure what these do but are often initialised after the time of day is set. ???
+
+
+0x3a|5, 0, 0, x
+------
+Wait function, where x is the amount of frames to wait. Useful to let camera animations play out.
+
+
+0x3a|6, 0, 0, x
+---
+According to previous documentation, this is 'Wait Force'. Both this State and the previous are used in the scripts.
+Perhaps this one cannot be skipped by user input or when speeding through dialogue. ???
+
+
+0x3a|8, 0, 0, x
+---
+Determines the position the player will be in after loading a new map where x is the position ID.
+Use before the Load Map opcode.
+
 
 
 https://wiki.spiralframework.info/Set_Game_State
@@ -586,7 +984,7 @@ https://wiki.spiralframework.info/Set_Game_State
 ------------------------------------------------------------------------------------------------------------------------
 
 Check difficulty ??? - 0x3b
----
+---------
 0x3b|1, Difficulty 
 
 Difficulty - 245 for Mean, 247 for Fair, 249 for Gentle (all of these are for the Logic difficulty) ???
@@ -597,7 +995,7 @@ Check if difficulty is set to Mean ???
 ------------------------------------------------------------------------------------------------------------------------
 
 End Flag Check - 0x3c
----
+---------
 No parameters are used for this function.
 
 e.g. End Flag Check|
@@ -606,7 +1004,7 @@ e.g. End Flag Check|
 ------------------------------------------------------------------------------------------------------------------------
 
 Wait for Input - 0x4b
----
+---------
 No parameters are used for this function.
 
 e.g. Wait for Input|
@@ -614,7 +1012,7 @@ Waits until user clicks or presses button to advance text
 ------------------------------------------------------------------------------------------------------------------------
 
 Wait Frame - 0x4c
----
+---------
 No parameters are used for this function.
 
 e.g. Wait Frame|
