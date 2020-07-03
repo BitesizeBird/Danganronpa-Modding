@@ -29,3 +29,13 @@ def extract_from_metadata(wad_header, file, meta):
         return {k: extract_from_metadata(wad_header, file, v) for k, v in meta.items()}
     else:
         raise ValueError
+
+from .report_card import report_card
+from .presents import presents
+from .truth_bullets import truth_bullets
+
+files = {
+        'report_card.toml': report_card,
+        'presents.toml': presents,
+        'truth_bullets.toml': truth_bullets,
+}
