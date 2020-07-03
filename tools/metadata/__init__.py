@@ -30,9 +30,25 @@ def extract_from_metadata(wad_header, file, meta):
     else:
         raise ValueError
 
-import report_card
-import presents
-import truth_bullets
+def extract_all(wad_header, wad, outdir):
+    import os
+    import toml
+
+    if not os.path.exists(outdir): os.makedirs(outdir)
+    for fname, meta in files.items():
+        fpath = os.path.join(outdir, fname)
+        print('writing {}'.format(fpath))
+
+        if fname.endswith('.toml'):
+            file = open(fpath, 'w')
+            toml.dump(extract_from_metadata(wad_header, wad, meta), file)
+        else:
+            raise ValueError('unimplemented')
+        file.close()
+
+import metadata.report_card
+import metadata.presents
+import metadata.truth_bullets
 
 files = {
         'report_card.toml': report_card.report_card,
