@@ -30,12 +30,12 @@ def extract_from_metadata(wad_header, file, meta):
     else:
         raise ValueError
 
-from .report_card import report_card
-from .presents import presents
-from .truth_bullets import truth_bullets
+import report_card
+import presents
+import truth_bullets
 
 files = {
-        'report_card.toml': report_card,
-        'presents.toml': presents,
-        'truth_bullets.toml': truth_bullets,
+        'report_card.toml': report_card.report_card,
+        'presents.toml': presents.presents,
+        'truth_bullets.toml': truth_bullets.truth_bullets,
 }
