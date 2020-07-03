@@ -57,6 +57,11 @@ def extract(wads, outdir, prefix=''):
     import os
     import toml
 
+    # read sync file, if it exists
+    sync_path = os.path.join(outdir, '.sync.toml')
+    if not os.path.exists(sync_path): open(sync_path, 'a').close()
+    sync_data = toml.load(sync_path)
+
     for fname, meta in files.items():
         if not fname.startswith(prefix): continue
 
@@ -73,6 +78,13 @@ def extract(wads, outdir, prefix=''):
             file = open(fpath, 'wb')
             meta.extract_to(wads, file)
         file.close()
+        sync_data[fname] = os.path.getmtime(fpath)
+
+    # rewrite sync file
+    print('writing sync file')
+    sync_file = open(sync_path, 'w')
+    toml.dump(sync_data, sync_file)
+    sync_file.close()
 
 import metadata.report_card
 import metadata.presents
