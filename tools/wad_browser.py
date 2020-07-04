@@ -37,18 +37,22 @@ class Application(tk.Frame):
         self.tree_view.bind('<<TreeviewSelect>>', self.on_tree_item_select)
         self.tree_view.pack(side='left', expand=True, fill='both')
 
-        self.file_view = ttk.Frame(self)
+        self.file_view = ttk.Notebook(self)
         self.file_view.pack(side='right', fill='both', expand=True)
 
-        self.hex_view = tk.Text(self.file_view)
-        self.hex_view['bg'] = '#fff'
+        self.hex_view = ttk.Frame(self.file_view)
+        self.hex_view.pack(fill='both', expand=True)
+        self.file_view.add(self.hex_view, text='Hex view')
 
-        self.hex_view.pack(side='left', expand=True, fill='both')
+        self.hex_text = tk.Text(self.hex_view)
+        self.hex_text['bg'] = '#fff'
+        self.hex_text.pack(side='left', expand=True, fill='both')
 
-    def open_wad(self):
-        # open a popup dialog
-        import tkinter.filedialog as filedialog
-        path = filedialog.askopenfilename(filetypes=[('.wad', '*.wad')])
+    def open_wad(self, path=None):
+        if path is None:
+            # open a popup dialog
+            import tkinter.filedialog as filedialog
+            path = filedialog.askopenfilename(filetypes=[('.wad', '*.wad')])
 
         # load .wad header
         self.wad = open(path, 'rb')
@@ -80,7 +84,7 @@ class Application(tk.Frame):
                 self.populate_tree(subfiles, subpath)
 
     def on_tree_item_select(self, event):
-        self.hex_view.delete('1.0', 'end')
+        self.hex_text.delete('1.0', 'end')
 
         path = self.tree_view.focus()
         if path not in self.files: return
@@ -98,29 +102,42 @@ class Application(tk.Frame):
     def update_hex_view(self):
         import string
 
-        ROWS = 64
+        ROWS = 128
         COLUMNS = 16
         byte_count = min(ROWS*COLUMNS, self.view_size - self.view_offset)
 
         self.wad.seek(self.view_base_offset + self.view_offset)
-        data = self.wad.read(ROWS*COLUMNS)
+        data = self.wad.read(byte_count)
 
         for r in range(ROWS):
+            if r*16 >= byte_count: break
+
             # write offset
-            self.hex_view.insert('end', '{:04x} | '.format(self.view_offset + r*16))
+            self.hex_text.insert('end', '{:04x} | '.format(self.view_offset + r*16))
             # write bytes
             for c in range(COLUMNS):
-                self.hex_view.insert('end', '{:02x} '.format(data[r*16 + c]))
-            self.hex_view.insert('end', '   ')
+                if r*16 + c < byte_count:
+                    self.hex_text.insert('end', '{:02x} '.format(data[r*16 + c]))
+                else:
+                    self.hex_text.insert('end', '   ')
+            self.hex_text.insert('end', '   ')
             # write ascii
             for c in range(COLUMNS):
-                byte = chr(data[r*16 + c])
-                if byte in string.printable and (byte not in string.whitespace or byte == ' '):
-                    self.hex_view.insert('end', byte)
+                if r*16 + c < byte_count:
+                    byte = chr(data[r*16 + c])
+                    if byte in string.printable and (byte not in string.whitespace or byte == ' '):
+                        self.hex_text.insert('end', byte)
+                    else:
+                        self.hex_text.insert('end', '.')
                 else:
-                    self.hex_view.insert('end', '.')
-            self.hex_view.insert('end', '\n')
+                    self.hex_text.insert('end', ' ')
+            self.hex_text.insert('end', '\n')
 
 root = tk.Tk()
 app = Application(root)
+
+import sys
+if len(sys.argv) > 1:
+    app.open_wad(sys.argv[1])
+
 app.mainloop()
