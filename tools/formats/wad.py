@@ -57,7 +57,7 @@ class Wad:
         self.file.seek(self.files[path][0])
         return self.file.read(self.files[path][1])
 
-    def update_file(self, path, data):
+    def quick_repack_file(self, path, data):
         old_size = self.files[path][1]
         new_size = len(data)
         self.files[path][1] = new_size
