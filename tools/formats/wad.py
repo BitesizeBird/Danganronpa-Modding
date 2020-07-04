@@ -22,7 +22,8 @@ class WadHeader:
             self.files.append({
                 'path': file_path,
                 'size': file_size,
-                'offset': file_offset})
+                'offset': file_offset,
+                'metadata_offset': file_metadata_offset})
 
         # read directory metadata
         self.dirs = []
@@ -44,40 +45,46 @@ class WadHeader:
                 'subfiles': dir_subfiles})
         self.header_size = file.tell() - header_begin
 
-#    def update_file(self, path, name, data):
-#        assert name in self.files
-#
-#        old_size = self.files[name]['size']
-#        new_size = len(data)
-#        self.files[name]['size'] = new_size
-#
-#        file = open(path, 'rb+')
-#        file.seek(self.files[name]['metadata_offset'])
-#        file_name_length = read_u32(file)
-#        file_name = file.read(file_name_length).decode()
-#        assert file_name == name
-#        # write new size
-#        write_u64(file, new_size)
-#
-#        if new_size <= old_size:
-#            # don't write new offset
-#            file.seek(self.files[name]['offset'])
-#            file.write(data)
-#        else:
-#            # write new offset (file end)
-#            old_file_size = os.path.getsize(path)
-#            write_u64(file, old_file_size - self._base_offset)
-#            # reallocate
-#            file.close()
-#            file = open(path, 'ab')
-#            file.write(data)
-#        file.close()
-#
-#    def read_file(self, path, name):
-#        assert name in self.files
-#
-#        file = open(path, 'rb')
-#        file.seek(self.files[name]['offset'])
-#        buffer = file.read(self.files[name]['size'])
-#        file.close()
-#        return buffer
+class Wad:
+    def __init__(self, path):
+        self.path = path
+        self.file = open(path, 'rb')
+        self.header = WadHeader(self.file)
+
+        self.files = {file['path']: (self.header.header_size + file['offset'], file['size'], idx) for idx, file in enumerate(self.header.files)}
+
+    def read_file(self, path):
+        self.file.seek(self.files[path][0])
+        return self.file.read(self.files[path][1])
+
+    def update_file(self, path, data):
+        old_size = self.files[path][1]
+        new_size = len(data)
+        self.files[path][1] = new_size
+
+        self.file.close()
+        file = open(self.path, 'rb+')
+        metadata_offset = self.header.files[self.files[path][2]]['metadata_offset']
+        file.seek(metadata_offset)
+        # read and compare path length
+        assert read_u32(file) == len(path)
+        # read and compare path
+        assert file.read(len(path)).decode() == path
+        # write new size
+        write_u64(file, new_size)
+
+        if new_size <= old_size:
+            # don't write new offset
+            file.seek(self.files[path][0])
+            file.write(data)
+        else:
+            # write new offset (file end)
+            old_file_size = os.path.getsize(self.path)
+            write_u64(file, old_file_size - self.header.header_size)
+            # reallocate
+            file.close()
+            file.open(self.path, 'ab')
+            file.write(data)
+        file.close()
+        
+        self.file = open(self.path, 'rb')

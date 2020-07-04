@@ -10,15 +10,13 @@ parser.add_argument('output')
 parser.add_argument('--prefix', default='')
 args = vars(parser.parse_args())
 
-data = open(args['dr2_data'], 'rb')
-data_header = wad.WadHeader(data)
+dr2_data = wad.Wad(args['dr2_data'])
+dr2_data_us = wad.Wad(args['dr2_data_us'])
 
-data_us = open(args['dr2_data_us'], 'rb')
-data_us_header = wad.WadHeader(data_us)
 
 wads = {
-    'dr2_data': [data, data_header],
-    'dr2_data_us': [data_us, data_us_header],
+    'dr2_data': dr2_data,
+    'dr2_data_us': dr2_data_us,
 }
 
 metadata.extract(wads, args['output'], args['prefix'])

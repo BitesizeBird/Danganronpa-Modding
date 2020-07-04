@@ -9,16 +9,16 @@ class PakString:
 
     # assumes the file refers to self.wad_name
     def extract_string(self, wads):
-        [wad, wad_header] = wads[self.wad_name]
+        wad = wads[self.wad_name]
 
-        offset = wad_header.header_size + next(entry['offset'] for entry in wad_header.files if entry['path'] == self.pak_path)
+        offset = wad.files[self.pak_path][0]
 
         for index in self.pak_indices:
-            pak_header = pak.PakHeader(wad, offset)
+            pak_header = pak.PakHeader(wad.file, offset)
             offset = pak_header.base_offset + pak_header.offsets[index]
 
-        wad.seek(offset)
-        value = read_string(wad)
+        wad.file.seek(offset)
+        value = read_string(wad.file)
         return value
 
 import tempfile
@@ -32,13 +32,13 @@ class Tga:
         import formats.tga
         import png
         import io
-        [wad, wad_header] = wads[self.wad_name]
+        wad = wads[self.wad_name]
 
-        entry = next(entry for entry in wad_header.files if entry['path'] == self.path)
-        offset = wad_header.header_size + entry['offset']
-        size = entry['size']
+        entry = wad.files[self.path]
+        offset = entry[0]
+        size = entry[1]
 
-        (color_map, pixel_data, width, height) = formats.tga.read_tga(wad, offset)
+        (color_map, pixel_data, width, height) = formats.tga.read_tga(wad.file, offset)
         w = png.Writer(width, height, palette=color_map)
         w.write(output, pixel_data)
 
@@ -56,6 +56,8 @@ def extract_from_metadata(wads, meta):
 def extract(wads, outdir, prefix=''):
     import os
     import toml
+
+    if not os.path.exists(outdir): os.makedirs(outdir)
 
     # read sync file, if it exists
     sync_path = os.path.join(outdir, '.sync.toml')
