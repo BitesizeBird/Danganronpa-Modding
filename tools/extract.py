@@ -1,6 +1,5 @@
 import formats.wad as wad
 import metadata
-from metadata.presents import presents
 import argparse
 
 parser = argparse.ArgumentParser(description='extracts data from dr2_data.wad and dr2_data_us.wad')

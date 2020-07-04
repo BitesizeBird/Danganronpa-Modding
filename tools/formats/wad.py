@@ -51,7 +51,7 @@ class Wad:
         self.file = open(path, 'rb')
         self.header = WadHeader(self.file)
 
-        self.files = {file['path']: (self.header.header_size + file['offset'], file['size'], idx) for idx, file in enumerate(self.header.files)}
+        self.files = {file['path']: [self.header.header_size + file['offset'], file['size'], idx] for idx, file in enumerate(self.header.files)}
 
     def read_file(self, path):
         self.file.seek(self.files[path][0])

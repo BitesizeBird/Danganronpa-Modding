@@ -7,7 +7,6 @@ class PakString:
         self.pak_path = pak_path
         self.pak_indices = pak_indices
 
-    # assumes the file refers to self.wad_name
     def extract_string(self, wads):
         wad = wads[self.wad_name]
 
@@ -38,11 +37,10 @@ class Tga:
         offset = entry[0]
         size = entry[1]
 
-        (color_map, pixel_data, width, height) = formats.tga.read_tga(wad.file, offset)
-        w = png.Writer(width, height, palette=color_map)
+        color_map, pixel_data = formats.tga.read_tga(wad.file, offset)
+        w = png.Writer(len(pixel_data[0]), len(pixel_data), palette=color_map)
         w.write(output, pixel_data)
 
-# assumes there is only dr2_data_us.wad
 def extract_from_metadata(wads, meta):
     if isinstance(meta, PakString):
         return meta.extract_string(wads)
@@ -103,3 +101,5 @@ files = {
 presents.add_files(files)
 backgrounds.add_files(files)
 sprites.add_files(files)
+
+_file_to_meta = {}

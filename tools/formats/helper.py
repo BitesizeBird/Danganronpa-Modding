@@ -33,3 +33,9 @@ def read_u8(file):
 
 def write_u64(file, value):
     file.write(struct.pack('<Q', value))
+def write_u32(file, value):
+    file.write(struct.pack('<I', value))
+def write_u16(file, value):
+    file.write(struct.pack('<H', value))
+def write_u8(file, value):
+    file.write(struct.pack('<B', value))
