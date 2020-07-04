@@ -20,8 +20,6 @@ class PakString:
         value = read_string(wad.file)
         return value
 
-import tempfile
-_tmp_tga = tempfile.NamedTemporaryFile(suffix='.tga', mode='wb')
 class Tga:
     def __init__(self, wad_name, path):
         self.wad_name = wad_name
@@ -40,6 +38,19 @@ class Tga:
         color_map, pixel_data = formats.tga.read_tga(wad.file, offset)
         w = png.Writer(len(pixel_data[0]), len(pixel_data), palette=color_map)
         w.write(output, pixel_data)
+
+    def repack(self, wads, input):
+        import formats.tga
+        import png
+        import io
+        wad = wads[self.wad_name]
+
+        input = png.Reader(input)
+        output = io.BytesIO()
+        _, _, rows, info = input.read()
+        formats.tga.write_tga(output, info['palette'], list(rows))
+
+        return output.getbuffer()
 
 def extract_from_metadata(wads, meta):
     if isinstance(meta, PakString):

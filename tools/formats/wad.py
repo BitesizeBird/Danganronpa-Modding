@@ -83,7 +83,7 @@ class Wad:
             write_u64(file, old_file_size - self.header.header_size)
             # reallocate
             file.close()
-            file.open(self.path, 'ab')
+            file = open(self.path, 'ab')
             file.write(data)
         file.close()
         
