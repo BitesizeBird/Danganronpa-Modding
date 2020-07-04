@@ -109,6 +109,7 @@ files = {
         'truth_bullets.toml': truth_bullets.truth_bullets,
 }
 
+report_card.add_files(files)
 presents.add_files(files)
 backgrounds.add_files(files)
 sprites.add_files(files)

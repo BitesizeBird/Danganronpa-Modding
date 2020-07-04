@@ -15,7 +15,7 @@ def read_tga(file, offset=None):
     assert color_map_type == 1
 
     color_map_offset = read_u16(file)
-    assert color_
+    assert color_map_offset == 0
     color_map_length = read_u16(file)
     color_map_entry_size = read_u8(file)
     assert color_map_entry_size in [24, 32]

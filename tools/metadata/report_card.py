@@ -1,4 +1,4 @@
-from metadata import PakString
+from metadata import PakString, Tga
 
 report_card = {}
 _wad = 'dr2_data_us'
@@ -27,3 +27,9 @@ for i in range(16):
 
     if i > 0:
         report_card[key]['fte_summaries'] = [PakString(_wad, _pak, [9, 5*(i-1)+j]) for j in range(5)]
+
+def add_files(files):
+    files.update({
+        'report_card/pictures/{:02}.png'.format(i):
+            Tga('dr2_data', 'Dr2/data/all/cg/report/tsushimbo_chara_{:03}.tga'.format(i))
+        for i in range(19)})
