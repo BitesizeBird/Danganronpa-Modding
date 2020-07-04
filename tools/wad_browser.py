@@ -80,18 +80,46 @@ class Application(tk.Frame):
                 self.populate_tree(subfiles, subpath)
 
     def on_tree_item_select(self, event):
+        self.hex_view.delete('1.0', 'end')
+
         path = self.tree_view.focus()
         if path not in self.files: return
 
         # display an hex view
-        offset = self.wad_header.header_size + self.files[path][1]
+        offset = self.wad_header.header_size + self.files[path][0]
         size = self.files[path][1]
 
-        self.wad.seek(offset)
-        data = self.wad.read(size)
+        self.view_base_offset = offset
+        self.view_offset = 0
+        self.view_size = size
 
-        self.hex_view.delete('1.0', 'end')
-        #self.hex_view.insert('1.0', data.hex())
+        self.update_hex_view()
+
+    def update_hex_view(self):
+        import string
+
+        ROWS = 64
+        COLUMNS = 16
+        byte_count = min(ROWS*COLUMNS, self.view_size - self.view_offset)
+
+        self.wad.seek(self.view_base_offset + self.view_offset)
+        data = self.wad.read(ROWS*COLUMNS)
+
+        for r in range(ROWS):
+            # write offset
+            self.hex_view.insert('end', '{:04x} | '.format(self.view_offset + r*16))
+            # write bytes
+            for c in range(COLUMNS):
+                self.hex_view.insert('end', '{:02x} '.format(data[r*16 + c]))
+            self.hex_view.insert('end', '   ')
+            # write ascii
+            for c in range(COLUMNS):
+                byte = chr(data[r*16 + c])
+                if byte in string.printable and (byte not in string.whitespace or byte == ' '):
+                    self.hex_view.insert('end', byte)
+                else:
+                    self.hex_view.insert('end', '.')
+            self.hex_view.insert('end', '\n')
 
 root = tk.Tk()
 app = Application(root)
