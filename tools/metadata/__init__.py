@@ -102,11 +102,13 @@ import metadata.presents
 import metadata.truth_bullets
 import metadata.backgrounds
 import metadata.sprites
+import metadata.dialogue_speakers
 
 files = {
         'report_card.toml': report_card.report_card,
         'presents.toml': presents.presents,
         'truth_bullets.toml': truth_bullets.truth_bullets,
+        'dialogue_speakers.toml': dialogue_speakers.dialogue_speakers,
 }
 
 report_card.add_files(files)
