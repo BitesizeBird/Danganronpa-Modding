@@ -6,8 +6,8 @@ bust_counts = [30, 31, 16, 27, 25, 22, 15, 22,
 
 full_body_counts = [30, 31, 20, 27, 25, 22, 20, 52,
         27, 25, 26, 24, 21, 24, 24, 22,
-        24, 42, 19, 10, 21, 20, 19]
-has_99 = [1, 2, 3, 5, 6, 11, 12, 13, 14, 15, 20, 21, 22]
+        24, 22, 18, 10]# #21, 20, 19]
+has_99 = [1, 2, 3, 5, 6, 11, 12, 13, 14, 15]#, 20, 21, 22]
 
 def add_files(files):
     #BUSTS
@@ -31,16 +31,21 @@ def add_files(files):
     for i, count in enumerate(full_body_counts):
         for j in range(count):
             files['sprites/full_body/{:02}/{:02}.png'.format(i, j)] = \
-                    Tga('dr2_data', 'Dr2/data/all/texture/stand_{:02}_{:02}.tga'.format(i, j))
+                    Tga('dr2_data', 'Dr2/data/all/texture/stand_{:02}_{:02}s.tga'.format(i, j))
 
         # exception for monokuma (30 to 53)
         if i == 16:
             for j in range(30, 54):
                 files['sprites/full_body/{:02}/{:02}.png'.format(i, j)] = \
-                        Tga('dr2_data', 'Dr2/data/all/texture/stand_{:02}_{:02}.tga'.format(i, j))
+                        Tga('dr2_data', 'Dr2/data/all/texture/stand_{:02}_{:02}s.tga'.format(i, j))
+        # exception for monomi (30 to 41)
+        if i == 17:
+            for j in range(30, 42):
+                files['sprites/full_body/{:02}/{:02}.png'.format(i, j)] = \
+                        Tga('dr2_data', 'Dr2/data/all/texture/stand_{:02}_{:02}s.tga'.format(i, j))
 
     for i in has_99:
         j = 99
         files['sprites/full_body/{:02}/{:02}.png'.format(i, j)] = \
-                Tga('dr2_data', 'Dr2/data/all/texture/stand_{:02}_{:02}.tga'.format(i, j))
+                Tga('dr2_data', 'Dr2/data/all/texture/stand_{:02}_{:02}s.tga'.format(i, j))
 
