@@ -45,11 +45,11 @@ class PakHeader:
 
 class Pak:
     def __init__(self, file, base_offset, size):
-        self.header = PakHeader(file, base_offset)
-        offsets = self.header.offsets + [size]
+        header = PakHeader(file, base_offset)
+        offsets = header.offsets + [size]
 
         self.entries = []
-        for i, offset in enumerate(self.header.offsets):
+        for i, offset in enumerate(header.offsets):
             file.seek(base_offset + offset)
             self.entries.append(file.read(offsets[i+1] - offset))
 
@@ -65,6 +65,9 @@ class Pak:
         return entry.get(indices[1:])
 
     def set(self, indices, value):
+        if len(indices) == 0 and isinstance(value, list):
+            self.entries = value
+            return
         if len(indices) == 0: raise ValueError
 
         if len(indices) == 1:

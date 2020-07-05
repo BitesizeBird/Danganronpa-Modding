@@ -140,13 +140,27 @@ def quick_repack(wads, indir, prefix=''):
 
     paks_to_update = {}
     def update_strings(wads, paks_to_update, data, meta):
-        if isinstance(meta, String) or isinstance(meta, Strings):
+        if isinstance(meta, String):
             wad = wads[meta.wad_name]
 
             pak_key = (meta.wad_name, meta.path)
             if pak_key not in paks_to_update:
                 paks_to_update[pak_key] = wad.read_pak(meta.path)
             paks_to_update[pak_key].set(meta.indices, data)
+        elif isinstance(meta, Strings):
+            # convert the dict to a list and proceed as before (this will only work
+            # if the format matches)
+            data_l = [None] * len(data)
+            for k, v in data.items():
+                assert int(k) not in data_l
+                data_l[int(k)] = v
+
+            wad = wads[meta.wad_name]
+
+            pak_key = (meta.wad_name, meta.path)
+            if pak_key not in paks_to_update:
+                paks_to_update[pak_key] = wad.read_pak(meta.path)
+            paks_to_update[pak_key].set(meta.indices, data_l)
         elif isinstance(data, list):
             for i in range(len(data)):
                 update_strings(wads, paks_to_update, data[i], meta[i])
