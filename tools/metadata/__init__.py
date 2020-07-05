@@ -104,6 +104,7 @@ def quick_repack(wads, indir, prefix=''):
 
     # read sync file
     sync_path = os.path.join(indir, '.sync.toml')
+    if not os.path.exists(sync_path): open(sync_path, 'a').close()
     sync_data = toml.load(sync_path)
 
     paks_to_update = {}
@@ -139,7 +140,7 @@ def quick_repack(wads, indir, prefix=''):
         fpath = os.path.join(indir, fname)
         mtime = os.path.getmtime(fpath)
         # only consider edited files
-        if mtime <= sync_data[fname]: continue
+        if fname in sync_data and mtime <= sync_data[fname]: continue
 
         print('repacking {}'.format(fpath))
 
