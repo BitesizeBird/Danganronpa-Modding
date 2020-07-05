@@ -23,7 +23,7 @@ class String:
 
 # refers to a targa image file either on its own or in the top level of a .pak
 class Tga:
-    def __init__(self, wad_name, path, indices=None):
+    def __init__(self, wad_name, path, indices=[]):
         self.wad_name = wad_name
         self.path = path
         self.indices = indices
