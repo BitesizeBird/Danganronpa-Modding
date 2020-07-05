@@ -12,7 +12,7 @@ def read_tga(file, offset=None):
     color_map_type = read_u8(file)
     assert color_map_type == 1
     image_type = read_u8(file)
-    assert color_map_type == 1
+    assert image_type == 1
 
     color_map_offset = read_u16(file)
     assert color_map_offset == 0
