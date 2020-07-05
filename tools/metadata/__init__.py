@@ -1,7 +1,7 @@
 import formats.pak as pak
 from formats.helper import read_string
 
-class PakString:
+class String:
     def __init__(self, wad_name, pak_path, pak_indices):
         self.wad_name = wad_name
         self.pak_path = pak_path
@@ -19,11 +19,13 @@ class PakString:
         wad.file.seek(offset)
         value = read_string(wad.file)
         return value
+PakString = String # temporary
 
 class Tga:
-    def __init__(self, wad_name, path):
+    def __init__(self, wad_name, path, pak_indices=[]):
         self.wad_name = wad_name
         self.path = path
+        self.pak_indices = pak_indices
 
     def extract_to(self, wads, output):
         import formats.tga
@@ -34,6 +36,10 @@ class Tga:
         entry = wad.files[self.path]
         offset = entry[0]
         size = entry[1]
+
+        for index in self.pak_indices:
+            pak_header = pak.PakHeader(wad.file, offset)
+            offset = pak_header.base_offset + pak_header.offsets[index]
 
         color_map, pixel_data = formats.tga.read_tga(wad.file, offset)
         w = png.Writer(len(pixel_data[0]), len(pixel_data), palette=color_map)
@@ -169,6 +175,7 @@ import metadata.truth_bullets
 import metadata.backgrounds
 import metadata.sprites
 import metadata.dialogue_speakers
+import metadata.title_screen
 
 files = {
         'report_card.toml': report_card.report_card,
@@ -181,5 +188,4 @@ report_card.add_files(files)
 presents.add_files(files)
 backgrounds.add_files(files)
 sprites.add_files(files)
-
-_file_to_meta = {}
+title_screen.add_files(files)

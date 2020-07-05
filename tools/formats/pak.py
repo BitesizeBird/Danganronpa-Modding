@@ -32,13 +32,13 @@ class PakHeader:
                 pass
         return(result)
 
-def strings_to_pak(strings):
+def lists_to_pak(l):
     import io
 
-    if isinstance(strings, str):
-        return b'\xff\xfe' + strings.encode('utf-16-le') + b'\x00\x00'
-    else:
-        entries = [strings_to_pak(e) for e in strings]
+    if isinstance(l, str):
+        return b'\xff\xfe' + l.encode('utf-16-le') + b'\x00\x00'
+    elif isinstance(l, list):
+        entries = [l_to_pak(e) for e in l]
         offsets = [4 + 4*len(entries)]
         for i, entry in enumerate(entries):
             offsets.append(offsets[i] + len(entry))
@@ -51,6 +51,8 @@ def strings_to_pak(strings):
             f.write(entry)
 
         return f.getbuffer()
+    else:
+        return l
 
 # data is a list of byteslikes
 def write_pak(file, data):
