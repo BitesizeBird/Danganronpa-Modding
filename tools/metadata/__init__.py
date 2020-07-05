@@ -177,18 +177,19 @@ import metadata.presents
 import metadata.truth_bullets
 import metadata.backgrounds
 import metadata.sprites
-import metadata.dialogue_speakers
+import metadata.character_names
 import metadata.title_screen
 
 files = {
         'report_card.toml': report_card.report_card,
         'presents.toml': presents.presents,
         'truth_bullets.toml': truth_bullets.truth_bullets,
-        'dialogue_speakers.toml': dialogue_speakers.dialogue_speakers,
+        'character_names.toml': character_names.character_names,
 }
 
 report_card.add_files(files)
 presents.add_files(files)
 backgrounds.add_files(files)
 sprites.add_files(files)
+character_names.add_files(files)
 title_screen.add_files(files)
