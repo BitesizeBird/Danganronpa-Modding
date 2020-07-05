@@ -1,4 +1,4 @@
-from metadata import PakString
+from metadata import String
 
 truth_bullets = {}
 _wad = 'dr2_data_us'
@@ -8,10 +8,10 @@ for i in range(200):
     key = '{:03}'.format(i)
 
     truth_bullets[key] = {
-            'name': PakString(_wad, _pak, [4, i]),
+            'name': String(_wad, _pak, [4, i]),
             'descriptions': [
-                PakString(_wad, _pak, [5, i]),
-                PakString(_wad, _pak, [6, i]),
-                PakString(_wad, _pak, [7, i]),
+                String(_wad, _pak, [5, i]),
+                String(_wad, _pak, [6, i]),
+                String(_wad, _pak, [7, i]),
             ],
     }

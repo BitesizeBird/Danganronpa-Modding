@@ -13,6 +13,15 @@ class PakHeader:
         for _ in range(count):
             self.offsets.append(read_u32(file))
 
+    def extract_list(self, file, size):
+        result = []
+        for i, offset in enumerate(self.offsets):
+            begin = self.base_offset + offset
+            end = self.base_offset + (self.offsets[i+1] if i < len(self.offsets)-1 else size)
+            file.seek(begin)
+            result.append(file.read(end - begin))
+        return result
+
     # only works when the pak only contains strings nested inside paks
     def extract_strings(self, file):
         result = []
@@ -38,7 +47,7 @@ def lists_to_pak(l):
     if isinstance(l, str):
         return b'\xff\xfe' + l.encode('utf-16-le') + b'\x00\x00'
     elif isinstance(l, list):
-        entries = [l_to_pak(e) for e in l]
+        entries = [lists_to_pak(e) for e in l]
         offsets = [4 + 4*len(entries)]
         for i, entry in enumerate(entries):
             offsets.append(offsets[i] + len(entry))

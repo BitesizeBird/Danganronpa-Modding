@@ -1,4 +1,4 @@
-from metadata import PakString, Tga
+from metadata import String, Tga
 
 COUNT = 140
 
@@ -11,8 +11,8 @@ for i in range(COUNT):
     key = '{:03}'.format(i)
 
     presents[key] = {
-            'name':        PakString(_wad, _pak, [2, i]),
-            'description': PakString(_wad, _pak, [3, i]),
+            'name':        String(_wad, _pak, [2, i]),
+            'description': String(_wad, _pak, [3, i]),
     }
 
 def add_files(files):
