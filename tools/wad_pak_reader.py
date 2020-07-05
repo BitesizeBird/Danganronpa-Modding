@@ -27,11 +27,11 @@ for file in wad_header.files:
             
             in_ = input.read(2)
             assert in_ == b'\xff\xfe'
+            in_ = input.read(2)
             while in_ != b'\0\0':
                 str_data.extend(in_)
                 in_ = input.read(2)
 
-            print(str_data.decode('utf-16-le'))
-            print()
+            print(repr(str_data.decode('utf-16-le')))
         sys.exit(0)
 print("path not found :(")

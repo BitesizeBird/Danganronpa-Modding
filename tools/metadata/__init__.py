@@ -8,7 +8,7 @@ class String:
         self.path = path
         self.indices = indices
 
-    def extract_string(self, wads):
+    def extract(self, wads):
         wad = wads[self.wad_name]
 
         offset = wad.files[self.path][0]
@@ -20,6 +20,29 @@ class String:
         wad.file.seek(offset)
         value = read_string(wad.file)
         return value
+
+# refers to an entire pak of the latter (serialized as a map)
+class Strings:
+    def __init__(self, wad_name, path, indices, key_width):
+        self.wad_name = wad_name
+        self.path = path
+        self.indices = indices
+        self.key_width = key_width
+
+    def extract(self, wads):
+        wad = wads[self.wad_name]
+        offset = wad.files[self.path][0]
+
+        pak_header = pak.PakHeader(wad.file, offset)
+        for index in self.indices:
+            offset = pak_header.base_offset + pak_header.offsets[index]
+            pak_header = pak.PakHeader(wad.file, offset)
+
+        values = {}
+        for i, offset in enumerate(pak_header.offsets):
+            wad.file.seek(pak_header.base_offset + offset)
+            values[str(i).zfill(self.key_width)] = read_string(wad.file)
+        return values
 
 # refers to a targa image file either on its own or in the top level of a .pak
 class Tga:
@@ -60,8 +83,8 @@ class Tga:
         return output.getbuffer()
 
 def extract_from_metadata(wads, meta):
-    if isinstance(meta, String):
-        return meta.extract_string(wads)
+    if isinstance(meta, String) or isinstance(meta, Strings):
+        return meta.extract(wads)
     elif isinstance(meta, list):
         return [extract_from_metadata(wads, v) for v in meta]
     elif isinstance(meta, dict):
@@ -117,7 +140,7 @@ def quick_repack(wads, indir, prefix=''):
 
     paks_to_update = {}
     def update_strings(wads, paks_to_update, data, meta):
-        if isinstance(data, str):
+        if isinstance(meta, String) or isinstance(meta, Strings):
             wad = wads[meta.wad_name]
 
             pak_key = (meta.wad_name, meta.path)
@@ -179,12 +202,14 @@ import metadata.backgrounds
 import metadata.sprites
 import metadata.character_names
 import metadata.title_screen
+import metadata.maps
 
 files = {
         'report_card.toml': report_card.report_card,
         'presents.toml': presents.presents,
         'truth_bullets.toml': truth_bullets.truth_bullets,
         'character_names.toml': character_names.character_names,
+        'map_names.toml': maps.map_names,
 }
 
 report_card.add_files(files)
