@@ -1,4 +1,6 @@
 from formats.helper import *
+import io
+
 
 class PakHeader:
     def __init__(self, file, base_offset=None):
@@ -41,14 +43,50 @@ class PakHeader:
                 pass
         return(result)
 
-def lists_to_pak(l):
-    import io
+class Pak:
+    def __init__(self, file, base_offset, size):
+        self.header = PakHeader(file, base_offset)
+        offsets = self.header.offsets + [size]
 
-    if isinstance(l, str):
-        return b'\xff\xfe' + l.encode('utf-16-le') + b'\x00\x00'
-    elif isinstance(l, list):
-        entries = [lists_to_pak(e) for e in l]
-        offsets = [4 + 4*len(entries)]
+        self.entries = []
+        for i, offset in enumerate(self.header.offsets):
+            file.seek(base_offset + offset)
+            self.entries.append(file.read(offsets[i+1] - offset))
+
+    def get(self, indices):
+        if len(indices) == 0: return self
+
+        entry = self.entries[indices[0]]
+        if len(indices) == 1: return entry
+
+        if not isinstance(entry, Pak):
+            entry = Pak(io.BytesIO(entry), 0, len(entry))
+            self.entries[indices[0]] = entry
+        return entry.get(indices[1:])
+
+    def set(self, indices, value):
+        if len(indices) == 0: raise ValueError
+
+        if len(indices) == 1:
+            self.entries[indices[0]] = value
+        else:
+            entry = self.entries[indices[0]]
+            if not isinstance(entry, Pak):
+                entry = Pak(io.BytesIO(entry), 0, len(entry))
+                self.entries[indices[0]] = entry
+            entry.set(indices[1:], value)
+
+    def repack(self):
+        entries = []
+        for entry in self.entries:
+            if isinstance(entry, Pak):
+                entries.append(entry.repack())
+            elif isinstance(entry, str):
+                entries.append(b'\xff\xfe' + entry.encode('utf-16-le') + b'\x00\x00')
+            else:
+                entries.append(entry)
+
+        offsets = [4 + 4*len(self.entries)]
         for i, entry in enumerate(entries):
             offsets.append(offsets[i] + len(entry))
 
@@ -60,17 +98,3 @@ def lists_to_pak(l):
             f.write(entry)
 
         return f.getbuffer()
-    else:
-        return l
-
-# data is a list of byteslikes
-def write_pak(file, data):
-    offsets = [4 + len(data)*4]
-    for i, entry in enumerate(data):
-        offsets.push(offsets[i] + len(data))
-
-    write_u32(file, len(data))
-    for i in range(len(data)):
-        write_u32(file, offsets[i])
-    for i in range(len(data)):
-        file.write(data[i])

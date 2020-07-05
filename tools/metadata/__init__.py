@@ -3,17 +3,17 @@ from formats.helper import read_string
 
 # refers to a zero terminated, utf-16-le string nested inside a .pak
 class String:
-    def __init__(self, wad_name, path, pak_indices):
+    def __init__(self, wad_name, path, indices):
         self.wad_name = wad_name
         self.path = path
-        self.pak_indices = pak_indices
+        self.indices = indices
 
     def extract_string(self, wads):
         wad = wads[self.wad_name]
 
         offset = wad.files[self.path][0]
 
-        for index in self.pak_indices:
+        for index in self.indices:
             pak_header = pak.PakHeader(wad.file, offset)
             offset = pak_header.base_offset + pak_header.offsets[index]
 
@@ -23,10 +23,10 @@ class String:
 
 # refers to a targa image file either on its own or in the top level of a .pak
 class Tga:
-    def __init__(self, wad_name, path, pak_index=None):
+    def __init__(self, wad_name, path, indices=None):
         self.wad_name = wad_name
         self.path = path
-        self.pak_index = pak_index
+        self.indices = indices
 
     def extract_to(self, wads, output):
         import formats.tga
@@ -38,9 +38,9 @@ class Tga:
         offset = entry[0]
         size = entry[1]
 
-        if self.pak_index is not None:
+        for index in self.indices:
             pak_header = pak.PakHeader(wad.file, offset)
-            offset = pak_header.base_offset + pak_header.offsets[self.pak_index]
+            offset = pak_header.base_offset + pak_header.offsets[index]
 
         color_map, pixel_data = formats.tga.read_tga(wad.file, offset)
         w = png.Writer(len(pixel_data[0]), len(pixel_data), palette=color_map)
@@ -115,24 +115,15 @@ def quick_repack(wads, indir, prefix=''):
     if not os.path.exists(sync_path): open(sync_path, 'a').close()
     sync_data = toml.load(sync_path)
 
-    string_paks_to_update = {}
+    paks_to_update = {}
     def update_strings(wads, paks_to_update, data, meta):
         if isinstance(data, str):
             wad = wads[meta.wad_name]
 
             pak_key = (meta.wad_name, meta.path)
             if pak_key not in paks_to_update:
-                pak_header = pak.PakHeader(wad.file, wad.files[meta.path][0])
-                strings = pak_header.extract_strings(wad.file)
-                paks_to_update[pak_key] = strings
-            else:
-                strings = paks_to_update[pak_key]
-
-            indices = meta.pak_indices.copy()
-            while len(indices) > 1:
-                strings = strings[indices[0]]
-                indices.pop(0)
-            strings[indices[0]] = data
+                paks_to_update[pak_key] = wad.read_pak(meta.path)
+            paks_to_update[pak_key].set(meta.indices, data)
         elif isinstance(data, list):
             for i in range(len(data)):
                 update_strings(wads, paks_to_update, data[i], meta[i])
@@ -141,7 +132,6 @@ def quick_repack(wads, indir, prefix=''):
                 update_strings(wads, paks_to_update, data[k], meta[k])
         else:
             raise ValueError
-    data_paks_to_update = {}
 
     for fname, meta in files.items():
         if not fname.startswith(prefix): continue
@@ -155,31 +145,26 @@ def quick_repack(wads, indir, prefix=''):
 
         if fname.endswith('.toml'):
             data = toml.load(fpath)
-            update_strings(wads, string_paks_to_update, data, meta)
+            update_strings(wads, paks_to_update, data, meta)
         else:
             file = open(fpath, 'rb')
             data = meta.repack(wads, file)
 
-            if meta.pak_index is None:
+            if meta.indices == []:
                 wads[meta.wad_name].quick_repack_file(meta.path, data)
             else:
                 wad = wads[meta.wad_name]
+
                 pak_key = (meta.wad_name, meta.path)
-                if pak_key not in data_paks_to_update:
-                    pak_header = pak.PakHeader(wad.file, wad.files[meta.path][0])
-                    l = pak_header.extract_list(wad.file, wad.files[meta.path][1])
-                    data_paks_to_update[pak_key] = l
-                else:
-                    l = data_paks_to_update[pak_key]
-                l[meta.pak_index] = data
+                if pak_key not in paks_to_update:
+                    paks_to_update[pak_key] = wad.read_pak(meta.path)
+                paks_to_update[pak_key].set(meta.indices, data)
 
         sync_data[fname] = mtime
 
     # repack paks
-    for (wad, path), lists in string_paks_to_update.items():
-        wads[wad].quick_repack_file(path, pak.lists_to_pak(lists))
-    for (wad, path), lists in data_paks_to_update.items():
-        wads[wad].quick_repack_file(path, pak.lists_to_pak(lists))
+    for (wad, path), pak in paks_to_update.items():
+        wads[wad].quick_repack_file(path, pak.repack())
 
     # update sync file
     print('writing sync file')

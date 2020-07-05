@@ -1,4 +1,5 @@
 from formats.helper import *
+import formats.pak as pak
 import os
 
 class WadHeader:
@@ -56,6 +57,10 @@ class Wad:
     def read_file(self, path):
         self.file.seek(self.files[path][0])
         return self.file.read(self.files[path][1])
+
+    def read_pak(self, path):
+        entry = self.files[path]
+        return pak.Pak(self.file, entry[0], entry[1])
 
     def quick_repack_file(self, path, data):
         old_size = self.files[path][1]
