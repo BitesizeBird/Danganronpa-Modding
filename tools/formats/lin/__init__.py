@@ -28,13 +28,14 @@ class LinScript:
             parameters = bytearray()
 
             byte = read_u8(wad.file)
-            while byte != 0x70:
+            while byte != 0x70 and wad.file.tell() < entry[0] + text_data_offset:
                 parameters.append(byte)
                 byte = read_u8(wad.file)
 
             op = ops.opcodes.get(opcode)
+            opname = op.name if op is not None else '?'
 
-            print(op.name if op is not None else '?', parameters.hex())
+            print('{} [{:02x}]'.format(opname, opcode), parameters.hex())
 
         # READ TEXT DATA
         if lin_type == WITH_TEXT:
