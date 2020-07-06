@@ -1,6 +1,7 @@
 from formats.helper import *
 import formats.lin.ops
 import formats.pak as pak
+import struct
 
 NO_TEXT = 1
 WITH_TEXT = 2
@@ -21,24 +22,19 @@ class LinScript:
             text_data_offset = entry[1]
 
         # READ SCRIPT DATA
+        self.script = []
         wad.file.seek(entry[0] + script_data_offset)
-        assert read_u8(wad.file) == 0x70 # opcode marker
         while wad.file.tell() < entry[0] + text_data_offset:
-            opcode = read_u8(wad.file)
-            parameters = bytearray()
-
-            byte = read_u8(wad.file)
-            while byte != 0x70 and wad.file.tell() < entry[0] + text_data_offset:
-                parameters.append(byte)
-                byte = read_u8(wad.file)
-
-            op = ops.opcodes.get(opcode)
-            opname = op.name if op is not None else '?'
-
-            print('{} [{:02x}]'.format(opname, opcode), parameters.hex())
+            self.script.append(ops.read_op(wad.file))
 
         # READ TEXT DATA
         if lin_type == WITH_TEXT:
             self.strings = pak.Pak(wad.file, entry[0] + text_data_offset, entry[1] - text_data_offset).strings()
+
+        for op in self.script:
+            if isinstance(op, ops.Text):
+                print('{} [{:02x}] {}'.format(op.name, op.code, repr(self.strings[op.index])))
+            else:
+                print('{} [{:02x}]'.format(op.name, op.code), op.parameters.hex())
 
         return self
