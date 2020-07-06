@@ -223,7 +223,7 @@ files = {
         'presents.toml': presents.presents,
         'truth_bullets.toml': truth_bullets.truth_bullets,
         'character_names.toml': character_names.character_names,
-        'map_names.toml': maps.map_names,
+        'maps.toml': maps.maps,
 }
 
 report_card.add_files(files)
