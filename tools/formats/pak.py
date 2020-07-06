@@ -1,7 +1,6 @@
 from formats.helper import *
 import io
 
-
 class PakHeader:
     def __init__(self, file, base_offset=None):
         if base_offset is not None:
@@ -23,25 +22,6 @@ class PakHeader:
             file.seek(begin)
             result.append(file.read(end - begin))
         return result
-
-    # only works when the pak only contains strings nested inside paks
-    def extract_strings(self, file):
-        result = []
-        for offset in self.offsets:
-            file.seek(self.base_offset + offset)
-            # determine whether it's a string or another pak
-            bom = file.read(2)
-            if bom == b'\xff\xfe':
-                # string
-                file.seek(self.base_offset + offset)
-                result.append(read_string(file))
-                pass
-            else:
-                # pak
-                header = PakHeader(file, self.base_offset + offset)
-                result.append(header.extract_strings(file))
-                pass
-        return(result)
 
 class Pak:
     def __init__(self, file, base_offset, size):
@@ -101,3 +81,6 @@ class Pak:
             f.write(entry)
 
         return f.getbuffer()
+
+    def strings(self):
+        return [read_string(io.BytesIO(entry)) for entry in self.entries]
