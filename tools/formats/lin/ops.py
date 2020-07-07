@@ -7,27 +7,50 @@ def read_op(file):
     byte = read_u8(file)
     assert byte == 0x70 # opcode marker
     opcode = read_u8(file)
-    op = copy.copy(opcodes.get(opcode)) or Op(opcode, '???')
+    op = copy.copy(opcodes.get(opcode)) or Op(opcode, '???', False)
     op.read_parameters(file)
     return op
 
 # .lin script operation
 class Op:
-    def __init__(self, code, name):
+    def __init__(self, code, name, register=True):
         self.code = code
         self.name = name
 
-        assert code not in opcodes
-        opcodes[code] = self
+        if register:
+            assert code not in opcodes
+            opcodes[code] = self
 
     def read_parameters(self, file):
         self.parameters = bytearray()
         while file.peek(1)[0] != 0x70:
             self.parameters.append(read_u8(file))
 
+    def __str__(self):
+        return '{} [{:02x}] {}'.format(self.name, self.code, self.format_parameters())
+    def format_parameters(self):
+        return self.parameters.hex()
+
+class NoParams(Op):
+    def read_parameters(self, file):
+        pass
+    def format_parameters(self):
+        return ''
+
 class Text(Op):
     def read_parameters(self, file):
-        self.index = read_u8(file)*256 + read_u8(file) # big endian, for some reason
+        self.index = read_u16_be(file)
+    def format_parameters(self):
+        return str(self.index)
+
+# both goto and jump
+class SwitchScript(Op):
+    def read_parameters(self, file):
+        self.chapter = read_u8(file)
+        self.scene = read_u16_be(file)
+        self.room = read_u16_be(file)
+    def format_parameters(self):
+        return '{} {} {}'.format(self.chapter, self.scene, self.room)
 
 Op(0x00, 'Text Count')
 Text(0x02, 'Text')
@@ -45,9 +68,9 @@ Op(0x0f, 'Set Title')
 Op(0x10, 'Set Report Info')
 Op(0x14, 'Trial Camera')
 Op(0x15, 'Load Map')
-Op(0x19, 'Load Script')
-Op(0x1a, 'Stop Script')
-Op(0x1b, 'Run Script')
+SwitchScript(0x19, 'Go To Script')
+NoParams(0x1a, 'Stop Script')
+SwitchScript(0x1b, 'Call Script')
 Op(0x1c, 'Restart Script')
 Op(0x1e, 'Sprite')
 Op(0x1f, 'Flash')
@@ -72,5 +95,5 @@ Op(0x3b, 'Difficulty ???')
 Op(0x3c, 'End Flag Check')
 
 
-Op(0x4b, 'Wait For Input')
-Op(0x4c, 'Wait Frame')
+NoParams(0x4b, 'Wait For Input')
+NoParams(0x4c, 'Wait Frame')

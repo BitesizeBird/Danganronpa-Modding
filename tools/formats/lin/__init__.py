@@ -25,6 +25,7 @@ class LinScript:
         self.script = []
         wad.file.seek(entry[0] + script_data_offset)
         while wad.file.tell() < entry[0] + text_data_offset:
+            if wad.file.peek(2).startswith(b'\00\00'): break
             self.script.append(ops.read_op(wad.file))
 
         # READ TEXT DATA
@@ -35,6 +36,6 @@ class LinScript:
             if isinstance(op, ops.Text):
                 print('{} [{:02x}] {}'.format(op.name, op.code, repr(self.strings[op.index])))
             else:
-                print('{} [{:02x}]'.format(op.name, op.code), op.parameters.hex())
+                print(op)
 
         return self
