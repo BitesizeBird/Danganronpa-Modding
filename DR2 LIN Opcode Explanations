@@ -92,6 +92,7 @@ Opcodes
 0x29 - Check Object
 0x2a - Set Label
 0x2b - Choice
+0x2c - End of Jump
 0x2d - Camera Flash
 
 0x30 - Show Background
@@ -100,11 +101,13 @@ Opcodes
 0x35 - Check Flag A
 0x37 - Show CG
 0x3a - Set Game State
-0x3b - Difficulty ???
+0x3b - Start of Jump
 0x3c - End Flag Check
 
+0x46 - Jump Flag
 0x4b - Wait for Input
 0x4c - Wait Frame
+0x4d - Terminator
 
 ========================================================================================================================
 
@@ -931,6 +934,15 @@ Choice|???
 
 ------------------------------------------------------------------------------------------------------------------------
 
+End of Jump - 0x2c
+---------
+0x2c|Parameter shr8, Parameter
+
+Marks the end of where the script will jump to after reading a 0x3b of the same parameter.
+See 0x3b for more details.
+
+------------------------------------------------------------------------------------------------------------------------
+
 Camera Flash - 0x2d
 ---------
 0x2d|State, Horizontal shr 8, Horizontal, Vertical shr 8, Vertical, Size, Red, Green, Blue, Opacity, Frames (maybe swap Opacity and Frames around), ???
@@ -1102,14 +1114,38 @@ https://wiki.spiralframework.info/Set_Game_State
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Check difficulty ??? - 0x3b
+Start of Jump - 0x3b
 ---------
-0x3b|1, Difficulty 
+0x3b|Paramter shr8, Parameter
 
-Difficulty - 245 for Mean, 247 for Fair, 249 for Gentle (all of these are for the Logic difficulty) ???
+Marks the start of where the script will jump from.
+When 0x3b is met, the script will then jump to the first instance of 0x2c with the same parameters in the script.
+This is regardless of whether or not the first 0x2c with the same parameters is before or after the 0x3b.
 
-e.g. 0x3b|1, 245
-Check if difficulty is set to Mean ???
+e.g.
+0x3b|0, 0
+Text|Example.\n
+0x2c|0, 0
+
+This will skip the Text part.
+
+This will also skip other Start of Jump functions too.
+
+e.g.
+0x3b|0, 0
+Text|Example 1.\n
+
+0x3b|0, 1
+
+0x2c|0, 0
+Text|Example 2.\n
+
+0x2c|0, 1
+
+Here, the first 0x3b is read and jumps to 0x2c|0, 0. It will then display the text `Example 2.`
+While this seems redundant, this can be used in conjuction with 0x46 and a Set Flag in order to run different commands when the same script is run again.
+This is useful for displaying different dialogue when revisiting the same area.
+See 0x46 for more details.
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1122,6 +1158,83 @@ e.g. End Flag Check|
 
 ------------------------------------------------------------------------------------------------------------------------
 
+Jump Flag - 0x46
+---------
+0x46|Paramter, Parameter, ???, ???
+0x4d|
+
+The first and second parameters can be anything. They are used to match with Set Flag (see below).
+
+Used in conjuction with the Start of Jump function.
+Defining this before a Start of Jump will not run the Start of Jump function.
+
+e.g. 0x46|12, 10, 0, 0
+0x4d|
+0x3b|0, 0
+Text|Example.\n
+0x2c|0, 0
+
+This will display the text 'Example.'
+However, any further Jumps will be performed.
+
+The Jump Flag is used in conjuction with the Set Flag to run different commands when the same script is run again.
+The Set Flag must have the same first two paramters as the Jump Flag's.
+
+e.g. 0x46|12, 10, 0, 0
+0x4d|
+0x3b|0, 0
+Text|Example.\n
+Set Flag|12, 10, 1
+0x2c|0, 0
+
+On the first run of the script, this will display the text 'Example.' 
+However, on the second run, as Set Flag has been set and it shares 12, 10 with 0x46, the text will not be displayed.
+
+(Will need to test this more to see if the opposite is true. e.g. setting Set Flag|12, 10, 0 to always run functions the second time) ???
+
+Make sure to not use Set Flag with the same parameters as pre-exsting commands. e.g. Set Flag|1, 1, 1
+Set Flag|12, x, 1 appears to be a safe set to use.
+Also, make sure NOT to set the Set Flag before any 0x3b but after 0x46 as it softlocks the game.
+Always Set Flag in between 0x3b and 0x2c.
+
+Using set flag only works to make a second unique runthrough of the script. You can't do a unique third runthrough of the script, it will just be the same as before.
+
+
+The parameters of 0x46 come in sets of four, with every fifth parameter separated by a 6.
+Then 0x4d is used to signify the end of the parameters.
+
+e.g. 0x46|15, 0, 0, 1, 6, 15, 1, 0, 1, 6, 15, 2, 0, 1, 6, 15, 3, 0, 1, 6, 15, 4, 0, 1, 6, 15, 5, 0, 1, 6, 15, 6, 0, 1
+
+Theoritcally, this would be used in conjuction with multiple Set Flags but I have not been able to get any expected results from this so far. ???
+
+
+Multiple uses of 0x46 can be used.
+However, be careful as arranging these incorrectly will softlock the game.
+
+These DO softlock the game
+0x46|12, 10, 0, 0
+0x4d|
+0x46|0, 0, 0, 0
+0x4d|
+
+0x46|12, 10, 0, 0
+0x46|0, 0, 0, 0
+0x4d|
+0x4d|
+
+These do not softlock the game
+0x46|12, 10, 0, 0
+0x46|0, 0, 0, 0
+0x4d|
+
+0x46|12, 10, 0, 0
+0x4d|
+Text|Text\n
+0x46|0, 0, 0, 0
+0x4d|
+
+------------------------------------------------------------------------------------------------------------------------
+
 Wait for Input - 0x4b
 ---------
 No parameters are used for this function.
@@ -1129,6 +1242,7 @@ No parameters are used for this function.
 Waits until user clicks or presses button to advance text
 
 e.g. Wait for Input|
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Wait Frame - 0x4c
@@ -1138,3 +1252,16 @@ No parameters are used for this function.
 Waits a frame ???
 
 e.g. Wait Frame|
+
+------------------------------------------------------------------------------------------------------------------------
+
+Terminator - 0x4d
+---------
+No parameters are used for this function.
+
+Used to terminate certain functions that have a varied amount of parameters such as 0x46 and 0x47.
+
+e.g. 0x46|15, 0, 0, 1
+0x4d|
+
+
