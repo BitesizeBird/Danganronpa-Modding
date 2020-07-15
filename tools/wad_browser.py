@@ -62,9 +62,20 @@ class Application(tk.Frame):
         self.file_hex_view = tk.Text(self.file_hex_top, bg='#fff')
         self.file_hex_view.pack(side='left', expand=True, fill='both')
 
-        self.file_tga_view = tk.Canvas(self.file_view)
-        self.file_tga_view.pack(fill='both', expand=True)
-        self.file_view.add(self.file_tga_view, text='TGA') 
+        self.file_tga_top = ttk.Frame(self.file_view)
+        self.file_tga_top.pack(fill='both', expand=True)
+        self.file_view.add(self.file_tga_top, text='TGA') 
+
+        self.file_tga_view = tk.Canvas(self.file_tga_top)
+
+        self.file_tga_hsb = tk.Scrollbar(self.file_tga_top, orient='horizontal', command=self.file_tga_view.xview)
+        self.file_tga_hsb.pack(side='bottom', fill='x')
+
+        self.file_tga_vsb = tk.Scrollbar(self.file_tga_top, orient='vertical', command=self.file_tga_view.yview)
+        self.file_tga_vsb.pack(side='right', fill='y')
+
+        self.file_tga_view.configure(yscrollcommand=self.file_tga_vsb.set, xscrollcommand=self.file_tga_hsb.set)
+        self.file_tga_view.pack(side='left', expand=True, fill='both')
 
     def on_wad_tree_right_click(self, event):
         path = self.wad_tree.identify_row(event.y)
@@ -129,7 +140,7 @@ class Application(tk.Frame):
             self.tga_view_image = ImageTk.PhotoImage(Image.open(data))
 
             self.file_tga_view.create_image(0, 0, image=self.tga_view_image, anchor=tk.NW)
-            self.file_tga_view.update()
+            self.file_tga_view.configure(scrollregion=self.file_tga_view.bbox('all'))
         except:
             pass
 
