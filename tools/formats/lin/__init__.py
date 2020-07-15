@@ -31,9 +31,8 @@ class LinScript:
         # READ TEXT DATA
         if lin_type == WITH_TEXT:
             self.strings = pak.Pak(wad.file, entry[0] + text_data_offset, entry[1] - text_data_offset).strings()
-        
-        import pprint
-        pprint.pprint(self.strings)
+            import pprint
+            pprint.pprint(self.strings)
 
         for op in self.script:
             if isinstance(op, ops.Text):
