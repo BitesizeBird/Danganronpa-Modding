@@ -11,8 +11,11 @@ class PakHeader:
 
         self.offsets = []
         count = read_u32(file)
-        for _ in range(count):
+        for i in range(count):
             self.offsets.append(read_u32(file))
+            
+            if i > 0 and self.offsets[i-1] >= self.offsets[i]:
+                raise ValueError('not a .pak')
 
     def extract_list(self, file, size):
         result = []

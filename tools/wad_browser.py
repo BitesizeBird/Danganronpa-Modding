@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 
-from formats.wad import WadHeader
+from formats.wad import Wad
+from formats.pak import PakHeader
+from formats.tga import read_tga
 
 def sizeof_fmt(num, suffix='B'):
     for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
@@ -23,30 +25,49 @@ class Application(tk.Frame):
         self.top = tk.Frame(self)
         self.top.pack(fill='x')
             
-        self.file = tk.Menubutton(self.top, text='File')
-        self.file.pack(anchor='nw')
-        self.file.menu = tk.Menu(self.file)
-        self.file.menu['tearoff'] = 0
-        self.file['menu'] = self.file.menu
+        self.file_mb = tk.Menubutton(self.top, text='File', bg='#fff')
+        self.file_mb.pack(anchor='nw')
+        self.file_mb.menu = tk.Menu(self.file_mb)
+        self.file_mb.menu['tearoff'] = 0
+        self.file_mb['menu'] = self.file_mb.menu
 
-        self.file.menu.add_command(label='Open .wad', command=self.open_wad)
+        self.file_mb.menu.add_command(label='Open .wad', command=self.open_wad)
 
-        self.tree_view = ttk.Treeview(self)
-        self.tree_view['columns'] = ['size']
-        self.tree_view.heading('size', text='Size')
-        self.tree_view.bind('<<TreeviewSelect>>', self.on_tree_item_select)
-        self.tree_view.pack(side='left', expand=True, fill='both')
+        self.wad_tree = ttk.Treeview(self)
+        self.wad_tree['columns'] = ['size']
+        self.wad_tree.heading('size', text='Size')
+        self.wad_tree.bind('<<TreeviewSelect>>', self.on_wad_tree_select)
+        self.wad_tree.pack(side='left', expand=True, fill='both')
+
+        self.wad_tree.menu = tk.Menu(self.wad_tree, bg='#fff')
+        self.wad_tree.menu['tearoff'] = 0
+        self.wad_tree.bind('<Button-3>', self.on_wad_tree_right_click)
+
+        self.wad_tree.menu.add_command(label='Decode as .pak (TODO)')
 
         self.file_view = ttk.Notebook(self)
         self.file_view.pack(side='right', fill='both', expand=True)
 
-        self.hex_view = ttk.Frame(self.file_view)
-        self.hex_view.pack(fill='both', expand=True)
-        self.file_view.add(self.hex_view, text='Hex view')
+        self.file_hex_top = ttk.Frame(self.file_view)
+        self.file_hex_top.pack(fill='both', expand=True)
+        self.file_view.add(self.file_hex_top, text='Hex')
 
-        self.hex_text = tk.Text(self.hex_view)
-        self.hex_text['bg'] = '#fff'
-        self.hex_text.pack(side='left', expand=True, fill='both')
+        self.file_hex_view = tk.Text(self.file_hex_top, bg='#fff')
+        self.file_hex_view.pack(side='left', expand=True, fill='both')
+
+        self.file_tga_view = tk.Canvas(self.file_view)
+        self.file_tga_view.pack(fill='both', expand=True)
+        self.file_view.add(self.file_tga_view, text='TGA') 
+
+    def on_wad_tree_right_click(self, event):
+        path = self.wad_tree.identify_row(event.y)
+        if path:
+            self.wad_tree.selection_set(path)
+            self.wad_tree.focus(path)
+
+            self.wad_tree.menu.entryconfigure(0, state = 'normal' if path in self.wad.files else tk.DISABLED)
+
+            self.wad_tree.menu.tk_popup(event.x_root, event.y_root, 0)
 
     def open_wad(self, path=None):
         if path is None:
@@ -55,83 +76,92 @@ class Application(tk.Frame):
             path = filedialog.askopenfilename(filetypes=[('.wad', '*.wad')])
 
         # load .wad header
-        self.wad = open(path, 'rb')
-        self.wad_header = WadHeader(self.wad)
-
-        # build file path to metadata mapping
-        self.files = {}
-        for file in self.wad_header.files:
-            self.files[file['path']] = (file['offset'], file['size'])
-
-        # build directory path to subfiles mapping
-        subfiles = {}
-        for dir in self.wad_header.dirs:
-            subfiles[dir['path']] = dir['subfiles']
+        self.wad = Wad(path)
 
         # clear current tree
-        self.tree_view.delete(*self.tree_view.get_children())
+        self.wad_tree.delete(*self.wad_tree.get_children())
 
         # populate tree view with directory structure
-        self.populate_tree(subfiles, '')
+        self.populate_tree(self.wad.subfiles, '')
 
     def populate_tree(self, subfiles, path):
         for subfile in subfiles[path]:
             subpath = path + ('/' if path else '') + subfile['name']
-            self.tree_view.insert(path, 'end', iid=subpath, text=subfile['name'])
-            if subpath in self.files:
-                self.tree_view.item(subpath, values=[sizeof_fmt(self.files[subpath][1])])
+            self.wad_tree.insert(path, 'end', iid=subpath, text=subfile['name'])
+            if subpath in self.wad.files:
+                self.wad_tree.item(subpath, values=[sizeof_fmt(self.wad.files[subpath][1])])
             if subfile['is_directory']:
                 self.populate_tree(subfiles, subpath)
 
-    def on_tree_item_select(self, event):
-        self.hex_text.delete('1.0', 'end')
+    def on_wad_tree_select(self, event):
+        self.file_hex_view.delete('1.0', 'end')
 
-        path = self.tree_view.focus()
-        if path not in self.files: return
+        path = self.wad_tree.focus()
+        if path not in self.wad.files: return
 
         # display an hex view
-        offset = self.wad_header.header_size + self.files[path][0]
-        size = self.files[path][1]
+        self.file_offset = self.wad.files[path][0]
+        self.file_size = self.wad.files[path][1]
 
-        self.view_base_offset = offset
-        self.view_offset = 0
-        self.view_size = size
+        self.hex_view_offset = 0
 
         self.update_hex_view()
+
+        # try to parse it as tga
+        self.file_tga_view.delete('all')
+        try:
+            import png
+            import io
+            from PIL import Image, ImageTk
+
+            color_map, pixel_data = read_tga(self.wad.file, self.file_offset)
+            data = io.BytesIO()
+            w = png.Writer(len(pixel_data[0]), len(pixel_data), palette=color_map)
+            w.write(data, pixel_data)
+
+            self.tga_view_image = ImageTk.PhotoImage(Image.open(data))
+
+            self.file_tga_view.create_image(0, 0, image=self.tga_view_image, anchor=tk.NW)
+            self.file_tga_view.update()
+        except:
+            pass
 
     def update_hex_view(self):
         import string
 
         ROWS = 128
         COLUMNS = 16
-        byte_count = min(ROWS*COLUMNS, self.view_size - self.view_offset)
+        byte_count = min(ROWS*COLUMNS, self.file_size - self.hex_view_offset)
 
-        self.wad.seek(self.view_base_offset + self.view_offset)
-        data = self.wad.read(byte_count)
+        self.wad.file.seek(self.file_offset + self.hex_view_offset)
+        data = self.wad.file.read(byte_count)
 
         for r in range(ROWS):
             if r*16 >= byte_count: break
 
             # write offset
-            self.hex_text.insert('end', '{:04x} | '.format(self.view_offset + r*16))
+            self.file_hex_view.insert('end', '{:04x} | '.format(self.hex_view_offset + r*16))
             # write bytes
             for c in range(COLUMNS):
                 if r*16 + c < byte_count:
-                    self.hex_text.insert('end', '{:02x} '.format(data[r*16 + c]))
+                    self.file_hex_view.insert('end', '{:02x} '.format(data[r*16 + c]))
                 else:
-                    self.hex_text.insert('end', '   ')
-            self.hex_text.insert('end', '   ')
+                    self.file_hex_view.insert('end', '   ')
+            self.file_hex_view.insert('end', '   ')
             # write ascii
             for c in range(COLUMNS):
                 if r*16 + c < byte_count:
                     byte = chr(data[r*16 + c])
                     if byte in string.printable and (byte not in string.whitespace or byte == ' '):
-                        self.hex_text.insert('end', byte)
+                        self.file_hex_view.insert('end', byte)
                     else:
-                        self.hex_text.insert('end', '.')
+                        self.file_hex_view.insert('end', '.')
                 else:
-                    self.hex_text.insert('end', ' ')
-            self.hex_text.insert('end', '\n')
+                    self.file_hex_view.insert('end', ' ')
+            self.file_hex_view.insert('end', '\n')
+
+    def on_pak_tree_select(self, event):
+        pass
 
 root = tk.Tk()
 app = Application(root)
