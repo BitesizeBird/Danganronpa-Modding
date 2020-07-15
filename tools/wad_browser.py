@@ -46,7 +46,7 @@ class Application(tk.Frame):
         self.wad_tree.menu['tearoff'] = 0
         self.wad_tree.bind('<Button-3>', self.on_wad_tree_right_click)
 
-        self.wad_tree.menu.add_command(label='Decode as .pak (TODO)')
+        self.wad_tree.menu.add_command(label='Decode as .pak', command=self.decode_as_pak)
 
         self.wad_tree_vsb = ttk.Scrollbar(self.wad_tree_top, orient='vertical', command=self.wad_tree.yview)
         self.wad_tree_vsb.pack(side='right', fill='y')
@@ -83,7 +83,7 @@ class Application(tk.Frame):
             self.wad_tree.selection_set(path)
             self.wad_tree.focus(path)
 
-            self.wad_tree.menu.entryconfigure(0, state = 'normal' if path in self.wad.files else tk.DISABLED)
+            self.wad_tree.menu.entryconfigure(0, state = 'normal' if path in self.files else tk.DISABLED)
 
             self.wad_tree.menu.tk_popup(event.x_root, event.y_root, 0)
 
@@ -95,6 +95,7 @@ class Application(tk.Frame):
 
         # load .wad header
         self.wad = Wad(path)
+        self.files = self.wad.files.copy()
 
         # clear current tree
         self.wad_tree.delete(*self.wad_tree.get_children())
@@ -106,21 +107,38 @@ class Application(tk.Frame):
         for subfile in subfiles[path]:
             subpath = path + ('/' if path else '') + subfile['name']
             self.wad_tree.insert(path, 'end', iid=subpath, text=subfile['name'])
-            if subpath in self.wad.files:
-                self.wad_tree.item(subpath, values=[sizeof_fmt(self.wad.files[subpath][1])])
+            if subpath in self.files:
+                self.wad_tree.item(subpath, values=[sizeof_fmt(self.files[subpath][1])])
             if subfile['is_directory']:
                 self.populate_tree(subfiles, subpath)
+
+    def decode_as_pak(self):
+        path = self.wad_tree.focus()
+        if path not in self.files: return
+
+        try:
+            pak_header = PakHeader(self.wad.file, self.file_offset)
+            offsets = pak_header.offsets + [self.file_size]
+
+            for i, offset in enumerate(pak_header.offsets):
+                iid = '{}:{}'.format(path, offset)
+                self.wad_tree.insert(path, 'end', iid=iid, text='{:02}'.format(i))
+                self.files[iid] = [
+                        pak_header.base_offset + offset,
+                        offsets[i+1] - offsets[i]]
+        except ValueError:
+            pass
 
     def on_wad_tree_select(self, event):
         self.file_hex_view.delete('1.0', 'end')
         self.file_tga_view.delete('all')
 
         path = self.wad_tree.focus()
-        if path not in self.wad.files: return
+        if path not in self.files: return
 
         # display an hex view
-        self.file_offset = self.wad.files[path][0]
-        self.file_size = self.wad.files[path][1]
+        self.file_offset = self.files[path][0]
+        self.file_size = self.files[path][1]
 
         self.hex_view_offset = 0
 
@@ -177,9 +195,6 @@ class Application(tk.Frame):
                 else:
                     self.file_hex_view.insert('end', ' ')
             self.file_hex_view.insert('end', '\n')
-
-    def on_pak_tree_select(self, event):
-        pass
 
 root = tk.Tk()
 app = Application(root)
