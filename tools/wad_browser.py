@@ -126,6 +126,7 @@ class Application(tk.Frame):
                 self.files[iid] = [
                         pak_header.base_offset + offset,
                         offsets[i+1] - offsets[i]]
+                self.wad_tree.item(iid, values=[sizeof_fmt(offsets[i+1] - offsets[i])])
         except ValueError:
             pass
 
