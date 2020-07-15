@@ -33,7 +33,10 @@ class Application(tk.Frame):
 
         self.file_mb.menu.add_command(label='Open .wad', command=self.open_wad)
 
-        self.wad_tree = ttk.Treeview(self)
+        self.wad_tree_top = ttk.Frame(self)
+        self.wad_tree_top.pack(side='left', expand=True, fill='both')
+
+        self.wad_tree = ttk.Treeview(self.wad_tree_top)
         self.wad_tree['columns'] = ['size']
         self.wad_tree.heading('size', text='Size')
         self.wad_tree.bind('<<TreeviewSelect>>', self.on_wad_tree_select)
@@ -44,6 +47,10 @@ class Application(tk.Frame):
         self.wad_tree.bind('<Button-3>', self.on_wad_tree_right_click)
 
         self.wad_tree.menu.add_command(label='Decode as .pak (TODO)')
+
+        self.wad_tree_vsb = ttk.Scrollbar(self.wad_tree_top, orient='vertical', command=self.wad_tree.yview)
+        self.wad_tree_vsb.pack(side='right', fill='y')
+        self.wad_tree.configure(yscrollcommand=self.wad_tree_vsb.set)
 
         self.file_view = ttk.Notebook(self)
         self.file_view.pack(side='right', fill='both', expand=True)
@@ -95,6 +102,7 @@ class Application(tk.Frame):
 
     def on_wad_tree_select(self, event):
         self.file_hex_view.delete('1.0', 'end')
+        self.file_tga_view.delete('all')
 
         path = self.wad_tree.focus()
         if path not in self.wad.files: return
@@ -108,7 +116,6 @@ class Application(tk.Frame):
         self.update_hex_view()
 
         # try to parse it as tga
-        self.file_tga_view.delete('all')
         try:
             import png
             import io
