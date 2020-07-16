@@ -1,7 +1,6 @@
 from .helper import *
-from PIL import Image, ImagePalette, ImageOps
 
-# returns a Pillow Image
+# returns (RGBA8 data, width, height)
 def read_tga(file, offset=None):
     if offset is not None:
         file.seek(offset)
@@ -33,35 +32,26 @@ def read_tga(file, offset=None):
     idfield = file.read(idfield_length)
 
     # read color data
-    color_map = bytearray(color_map_length * color_map_entry_size//8)
-    for i in range(color_map_length):
+    color_map = []
+    for _ in range(color_map_length):
         if color_map_entry_size == 24:
-            bgr = file.read(3)
-
-            color_map[i] = bgr[2]
-            color_map[i + color_map_length] = bgr[1]
-            color_map[i + color_map_length*2] = bgr[0]
+            color = file.read(3)
+            color_map.append((color[2], color[1], color[0]))
         elif color_map_entry_size == 32:
-            bgra = file.read(4)
-
-            color_map[i] = bgra[2]
-            color_map[i + color_map_length] = bgra[1]
-            color_map[i + color_map_length*2] = bgra[0]
-            color_map[i + color_map_length*3] = bgra[3]
-
-    if color_map_entry_size == 24:
-        palette_mode = 'RGB'
-    elif color_map_entry_size == 32:
-        palette_mode = 'RGBA'
-    palette = ImagePalette.raw(palette_mode+';L', bytes(color_map))
+            color = file.read(4)
+            color_map.append((color[2], color[1], color[0], color[3]))
 
     # read image data
-    image_data = file.read(height * width)
+    image_data = []
+    for _ in range(height):
+        row = []
+        for _ in range(width):
+            row.append(read_u8(file))
+        image_data.append(row)
+    # fix row ordering
+    image_data.reverse()
 
-    image = Image.frombytes('P', (width, height), image_data)
-    image = ImageOps.flip(image) # fix row ordering
-    image.palette = palette
-    return image.convert()
+    return color_map, image_data
 
 def write_tga(file, color_map, image_data):
     height = len(image_data)

@@ -146,14 +146,22 @@ class Application(tk.Frame):
         self.update_hex_view()
 
         # try to parse it as tga
-        import io
-        from PIL import Image, ImageTk
+        try:
+            import png
+            import io
+            from PIL import Image, ImageTk
 
-        image = read_tga(self.wad.file, self.file_offset)
-        self.tga_view_image = ImageTk.PhotoImage(image)
+            color_map, pixel_data = read_tga(self.wad.file, self.file_offset)
+            data = io.BytesIO()
+            w = png.Writer(len(pixel_data[0]), len(pixel_data), palette=color_map)
+            w.write(data, pixel_data)
 
-        self.file_tga_view.create_image(0, 0, image=self.tga_view_image, anchor=tk.NW)
-        self.file_tga_view.configure(scrollregion=self.file_tga_view.bbox('all'))
+            self.tga_view_image = ImageTk.PhotoImage(Image.open(data))
+
+            self.file_tga_view.create_image(0, 0, image=self.tga_view_image, anchor=tk.NW)
+            self.file_tga_view.configure(scrollregion=self.file_tga_view.bbox('all'))
+        except:
+            pass
 
     def update_hex_view(self):
         import string
