@@ -49,7 +49,7 @@ Has a type of `0x0007`, and is a child of a model surface entry. This entry defi
 
 The previous data is followed by 8 32-bit floating point values for each vertex:
 * U coordinate
-* V coordinate
+* V coordinate (reversed? or maybe using OpenGL mapping)
 * Normal vector X coordinate
 * Normal vector Y coordinate
 * Normal vector Z coordinate
