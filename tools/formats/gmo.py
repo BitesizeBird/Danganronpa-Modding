@@ -113,10 +113,11 @@ class GmoObject:
             print('vn {} {} {}'.format(*vertex.norm), file = obj)
         print(file=obj)
 
-        for mesh in self.meshes:
+        for i, mesh in enumerate(self.meshes):
+            print('g {}'.format(i), file=obj)
             print('usemtl {}'.format(mesh.material_index), file=obj)
             for face in mesh.faces:
-                print('f {a}/{a}/{a} {b}/{b}/{b} {c}/{c}/{c} {d}/{d}/{d}'.format(a=face[0]+1, b=face[0]+1, c=face[0]+1, d=face[0]+1), file=obj)
+                print('f {a}/{a}/{a} {b}/{b}/{b} {c}/{c}/{c} {d}/{d}/{d}'.format(a=face[0]+1, b=face[1]+1, c=face[2]+1, d=face[3]+1), file=obj)
 
 class GmoMesh:
     def __init__(self, header, data):
