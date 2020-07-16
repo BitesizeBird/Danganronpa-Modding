@@ -53,6 +53,8 @@ class Tga:
 
     def extract_to(self, wads, output):
         import formats.tga
+        import png
+        import io
         wad = wads[self.wad_name]
 
         entry = wad.files[self.path]
@@ -63,8 +65,9 @@ class Tga:
             pak_header = pak.PakHeader(wad.file, offset)
             offset = pak_header.base_offset + pak_header.offsets[index]
 
-        image = formats.tga.read_tga(wad.file, offset)
-        image.save(output, 'png')
+        color_map, pixel_data = formats.tga.read_tga(wad.file, offset)
+        w = png.Writer(len(pixel_data[0]), len(pixel_data), palette=color_map)
+        w.write(output, pixel_data)
 
     def repack(self, wads, input):
         import formats.tga
