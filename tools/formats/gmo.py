@@ -27,6 +27,7 @@ class Gmo:
 
 class GmoSubfile:
     def __init__(self, header, data):
+        self.bones = []
         self.objects = []
         self.materials = []
         self.textures = []
@@ -35,7 +36,9 @@ class GmoSubfile:
         while len(data) > 0:
             chunk_type, header_size, chunk_size = read_chunk_header(data)
 
-            if chunk_type == 5: # object
+            if chunk_type == 4: # bone
+                self.bones.append(GmoBone(data[8:header_size], data[header_size:chunk_size]))
+            elif chunk_type == 5: # object
                 self.objects.append(GmoObject(data[8:header_size], data[header_size:chunk_size]))
             elif chunk_type == 8: # material
                 self.materials.append(GmoMaterial(data[8:header_size], data[header_size: chunk_size]))
@@ -66,6 +69,15 @@ class GmoSubfile:
             print('newmtl {}'.format(i), file=mtl)
             print('map_Kd {}', self.textures[material.texture_index], file=mtl)
             print(file=mtl)
+
+class GmoBone:
+    def __init__(self, header, data):
+        while len(data) > 0:
+            chunk_type, header_size, chunk_size = read_chunk_header(data)
+
+            print('# TODO: bone chunk type {:04x}'.format(chunk_type))
+
+            data = data[chunk_size:]
 
 class GmoVertex:
     def __init__(self, uv, norm, pos):
