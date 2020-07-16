@@ -1,5 +1,5 @@
 # GMO format
-Stores 3D model data. It appears to be a modified form of the PSP GMO format, which is documented [here][http://web.archive.org/web/20090922200620/http://www.richwhitehouse.com/index.php?postid=34].
+Stores 3D model data. It appears to be a modified form of the PSP GMO format, which is documented [here](http://web.archive.org/web/20090922200620/http://www.richwhitehouse.com/index.php?postid=34).
 
 ## Header
 
