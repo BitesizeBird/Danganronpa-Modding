@@ -42,12 +42,9 @@ def read_tga(file, offset=None):
             color_map.append((color[2], color[1], color[0], color[3]))
 
     # read image data
-    image_data = []
-    for _ in range(height):
-        row = []
-        for _ in range(width):
-            row.append(read_u8(file))
-        image_data.append(row)
+    image_data = file.read(width*height)
+    image_data = [image_data[width*i:width*(i+1)] for i in range(height)]
+
     # fix row ordering
     image_data.reverse()
 
