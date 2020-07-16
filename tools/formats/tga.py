@@ -61,7 +61,8 @@ def read_tga(file, offset=None):
     image = Image.frombytes('P', (width, height), image_data)
     image = ImageOps.flip(image) # fix row ordering
     image.palette = palette
-    return image.convert()
+    image.load()
+    return image
 
 def write_tga(file, color_map, image_data):
     height = len(image_data)
