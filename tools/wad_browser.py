@@ -46,6 +46,7 @@ class Application(tk.Frame):
         self.wad_tree.menu['tearoff'] = 0
         self.wad_tree.bind('<Button-3>', self.on_wad_tree_right_click)
 
+        self.wad_tree.menu.add_command(label='Extract to', command=self.extract_to)
         self.wad_tree.menu.add_command(label='Decode as .pak', command=self.decode_as_pak)
 
         self.wad_tree_vsb = ttk.Scrollbar(self.wad_tree_top, orient='vertical', command=self.wad_tree.yview)
@@ -84,6 +85,7 @@ class Application(tk.Frame):
             self.wad_tree.focus(path)
 
             self.wad_tree.menu.entryconfigure(0, state = 'normal' if path in self.files else tk.DISABLED)
+            self.wad_tree.menu.entryconfigure(1, state = 'normal' if path in self.files else tk.DISABLED)
 
             self.wad_tree.menu.tk_popup(event.x_root, event.y_root, 0)
 
@@ -129,6 +131,20 @@ class Application(tk.Frame):
                 self.wad_tree.item(iid, values=[sizeof_fmt(offsets[i+1] - offsets[i])])
         except ValueError:
             pass
+
+    def extract_to(self):
+        path = self.wad_tree.focus()
+        if path not in self.files: return
+
+        # open a popup dialog
+        import tkinter.filedialog as filedialog
+        output_path = filedialog.asksaveasfilename()
+        output = open(output_path, 'wb')
+
+        self.wad.file.seek(self.file_offset)
+        data = self.wad.file.read(self.file_size)
+        output.write(data)
+        output.close()
 
     def on_wad_tree_select(self, event):
         self.file_hex_view.delete('1.0', 'end')

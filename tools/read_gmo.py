@@ -4,7 +4,9 @@ import os
 
 gmo = Gmo(open(sys.argv[1], 'rb').read())
 
-mtl = open('test.mtl', 'w')
-gmo.subfiles[0].write_mtl(mtl)
-obj = open('test.obj', 'w')
-gmo.subfiles[0].objects[0].write_obj(obj, 'test.mtl')
+for i, subfile in enumerate(gmo.subfiles):
+    mtl = open('test{}.mtl'.format(i), 'w')
+    gmo.subfiles[i].write_mtl(mtl)
+    for j, object in enumerate(subfile.objects):
+        obj = open('test{}_{}.obj'.format(i, j), 'w')
+        gmo.subfiles[i].objects[j].write_obj(obj, 'test{}.mtl'.format(i))
