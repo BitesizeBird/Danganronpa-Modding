@@ -1,0 +1,165 @@
+BSS:
+0xab4858: pointer to something
+	[]+0x60 points to a qword
+
+_: this is the procedure containing the below code (so it parses lin files maybe????)
+│   0x5814a0    push   r15							; pushes previous state
+│   0x5814a2    push   r14
+│   0x5814a4    push   r13
+│   0x5814a6    push   r12
+│   0x5814a8    push   rbp
+│   0x5814a9    push   rbx
+│   0x5814aa    sub    rsp,0x68							; allocates stack frame
+│   0x5814ae    test   BYTE PTR [rip+0x5335a0],0x20        # 0xab4a55		; tests the byte [0xab4a55] with 0x20
+│   0x5814b5    jne    0x581ab0							; jumps to 0x581ab0 if it's set
+│   0x5814bb    mov    edi,0x1d							; sets edi to 0x1d
+│   0x5814c0    call   0x44a4f0							; calls _(0x1d)
+│   0x5814c5    test   eax,eax							; checks if eax has any bits set
+│   0x5814c7    mov    rax,QWORD PTR [rip+0x5bd1aa]        # 0xb3e678		; sets rax to the qword [0xb3e678]
+│   0x5814ce    jne    0x5814da							; jump to 0x5814da if any bits are set
+│   0x5814d0    cmp    WORD PTR [rax+0xfc7e],0x0
+│   0x5814d8    jne    0x581510
+│   0x5814da    cmp    DWORD PTR [rax+0xfcac],0x1
+│   0x5814e1    je     0x581580
+│   0x5814e7    cmp    BYTE PTR [rip+0x509623],0x1        # 0xa8ab11
+│   0x5814ee    je     0x581bf0
+│   0x5814f4    call   0x507260							; calls _
+│   0x5814f9    test   al,al
+│   0x5814fb    jne    0x5815b8
+│   0x581501    add    rsp,0x68							; free stack frame
+│   0x581505    pop    rbx							; pop state
+│   0x581506    pop    rbp
+│   0x581507    pop    r12
+│   0x581509    pop    r13
+│   0x58150b    pop    r14
+│   0x58150d    pop    r15
+=   0x58150f    ret								; return!
+
+in these procedures, rcx seems to refer to a location in memory. probably a heap allocated struct
+0x68: string pak offset (qword). is null if the lin has no strings present
+0x70: string pointers are stored here (qwords)
+0x1fb0: string amount
+
+the lin data is first accessed here. rax points to the lin data
+│   0x581ba7    cmp    DWORD PTR [rax],0x2					; compares the first dword of the lin to 2 (presence of strings)
+│   0x581baa    mov    QWORD PTR [rcx+0x60],rdx					; stores rdx (?) in memory
+│   0x581bae    je     0x582606							; if there are strings, jump to read_strings
+│   0x581bb4    mov    QWORD PTR [rcx+0x68],0x0					; stores a zero in memory (string pak offset). probably used to check whether there are strings
+│  >0x581bbc    movzx  edi,WORD PTR [rip+0x532c95]        # 0xab4858		; STRING SUBROUTINE RETURNS HERE! sets edi (FIRST ARGUMENT) to [0xab4858] <- bss data (static word variable)
+│   0x581bc3    xor    edx,edx							; sets edx to zero (THIRD ARGUMENT)
+│   0x581bc5    mov    esi,0x20							; sets esi/rsi to 0x20 (SECOND ARGUMENT)
+│   0x581bca    call   0x57bd70							; calls _
+│   0x581bcf    mov    rax,QWORD PTR [rip+0x5bcaa2]        # 0xb3e678
+│   0x581bd6    mov    BYTE PTR [rax+0xf7fd],0x0
+│   0x581bdd    mov    BYTE PTR [rax+rbp*1+0x54],0x0
+│   0x581be2    jmp    0x581501
+│   0x581be7    nop    WORD PTR [rax+rax*1+0x0]
+│   0x581bf0    call   0x42aa20
+│   0x581bf5    cmp    eax,0x1
+│   0x581bf8    jne    0x5814f4
+│   0x581bfe    mov    rax,QWORD PTR [rip+0x5bca73]        # 0xb3e678
+│   0x581c05    cmp    BYTE PTR [rax+0xfc94],0x1
+│   0x581c0c    jne    0x5814f4
+│   0x581c12    mov    esi,DWORD PTR [rax+0xfcac]
+│   0x581c18    test   esi,esi
+│   0x581c1a    jne    0x581f70
+│   0x581c20    movzx  edi,BYTE PTR [rax+0xfc93]
+│   0x581c27    call   0x549860
+│   0x581c2c    mov    rax,QWORD PTR [rip+0x5bca45]        # 0xb3e678
+│   0x581c33    mov    BYTE PTR [rax+0xfc94],0x2
+│   0x581c3a    jmp    0x5814f4
+│   0x581c3f    nop
+│   0x581c40    mov    edx,DWORD PTR [rax+0x8]
+│   0x581c43    add    rdx,rax
+│   0x581c46    mov    eax,DWORD PTR [rdx]
+
+read_strings: when the first dword is 2, it means there are strings. in this case it jumps to the following routine:
+	this writes a pointer to each lin string sequentially from the memory address [rdx+0x70]
+│   0x582606    mov    edx,DWORD PTR [rax+0x8]					; reads the string pak offset to edx
+│  >0x582609    add    rdx,rax							; adds the base offset (rax) to rdx. rdx now points to the string pak
+│   0x58260c    mov    eax,DWORD PTR [rdx]					; reads the amt of strings to eax
+│   0x58260e    mov    QWORD PTR [rcx+0x68],rdx					; stores the string pak offset in memory?
+│   0x582612    mov    WORD PTR [rcx+0x1fb0],ax					; stores the amt of strings (16bit) in memory?
+│   0x582619    movzx  eax,ax							; discards all but the 16 lowest bits of eax (string amt)
+│   0x58261c    test   eax,eax							; checks if eax is zero
+│   0x58261e    je     0x581bbc							; jumps back if it is
+│   0x582624    sub    eax,0x1							; subtracts 1 from eax
+│   0x582627    lea    rdi,[rax*4+0x4]						; stores the address to the offset of the first string, relative to the string pak, in rdi
+│   0x58262f    xor    eax,eax							; sets eax/rax to 0
+│ ->0x582631    mov    esi,DWORD PTR [rdx+rax*1+0x4]				; STORE_STR: stores the offset of the string in question (relative to the string pak) in esi
+│ | 0x582635    add    esi,0x2							; adds 2 to esi (SKIPS BOM)
+│ | 0x582638    add    rsi,rdx							; adds rdx (string pak offset) to rsi/esi, which points to the beginning of the string
+│ | 0x58263b    mov    QWORD PTR [rcx+rax*2+0x70],rsi				; stores the pointer to the actual string in memory
+│ | 0x582640    add    rax,0x4							; adds 4 to rax (moving to the next offset)
+│ | 0x582644    cmp    rax,rdi							; compares rax (current entry offset) to rdi (end of entry offsets)
+│ --0x582647    jne    0x582631							; if they aren't equal, jump back to STORE_STR
+│   0x582649    jmp    0x581bbc							; when they finally are (done processing offsets), jump back
+
+
+_: has three arguments (_arg0 in rdi, _arg1 in rsi, _arg2 in rdx)
+	previous call has _arg0=[0xab4858], _arg1=0x20, _arg2=0
+stack variables: (size of stack is 0x38)
+0x18: _var0
+0x0c: _var1
+│  >0x57bd70    push   r15							; SAVES THE PREVIOUS STATE
+│   0x57bd72    mov    r15d,esi							; sets r15 to _arg1
+│   0x57bd75    push   r14
+│   0x57bd77    mov    r14d,esi							; sets r14 to _arg1
+│   0x57bd7a    push   r13
+│   0x57bd7c    push   r12
+│   0x57bd7e    push   rbp
+│   0x57bd7f    push   rbx
+│   0x57bd80    mov    ebx,edi							; sets ebx to _arg0
+│   0x57bd82    sub    rsp,0x38							; decrements the stack pointer
+│   0x57bd86    and    r15d,0x20						; ands r15/_arg1 with 0x20
+│   0x57bd8a    mov    rax,QWORD PTR [rip+0x5c28e7]        # 0xb3e678		; sets rax to [0xb3e678]
+│   0x57bd91    mov    DWORD PTR [rsp+0x18],edx					; sets _var0 to _arg2
+│   0x57bd95    je     0x57bda0							; jumps to _ if r15 (_arg1 && 0x20) is zero (NOT in previous call)
+│   0x57bd97    xor    edx,edx							; sets edx to 0
+│   0x57bd99    mov    WORD PTR [rax+0xfc7e],dx					; sets a memory location to dx (lower 16 bits of _arg2)
+│   0x57bda0    mov    esi,DWORD PTR [rip+0x538cae]        # 0xab4a54		; sets esi to [0xab4a54]
+│   0x57bda6    mov    r8d,r14d							; sets r8d to r14d (lower 32 bits of _arg1)
+│   0x57bda9    mov    r9d,r14d							; sets r9d to the same
+│   0x57bdac    mov    r11d,r14d						; sets r11d to the same
+│   0x57bdaf    mov    r10d,r14d						; sets r10d to the same
+│   0x57bdb2    xor    r13d,r13d						; sets r13d to 0
+│   0x57bdb5    and    r8d,0x10							; masks r8d (_arg1) with 0x10 (bit 4)
+│   0x57bdb9    and    r9d,0x1							; masks r9d (_arg1) with 0x1 (bit 0)
+│   0x57bdbd    and    r11d,0x2							; masks r11d (_arg1) with 0x2 (bit 1)
+│   0x57bdc1    mov    DWORD PTR [rsp+0xc],esi					; sets _var1 to esi ([0xab4a54])
+│   0x57bdc5    shr    DWORD PTR [rsp+0xc],0x9					; logical shifts _var1 9 bits to the right (divide by 512/0x20)
+│   0x57bdca    and    r10d,0x8							; masks r10d (_arg1) with 0x8 (bit 3)
+│   0x57bdce    and    DWORD PTR [rsp+0xc],0x1					; masks _var1 with 1 (bit 9 of esi)
+│   0x57bdd3    nop    DWORD PTR [rax+rax*1+0x0]				; nop
+│   0x57bdd8    mov    rcx,QWORD PTR [rax+0x60]					; sets rcx to [rax+0x60] ([[0xb3e678]+0x60], whatever that is)
+|   0x57bddc    nop    DWORD PTR [rax+0x0]					; nop
+│  >0x57bde0    movzx  edx,bx							; sets edx to the lower 16 bits of _arg0
+│   0x57bde3    add    ebx,0x2							; adds 2 to ebx (lower 16 bits of _arg0)
+│   0x57bde6    movzx  eax,BYTE PTR [rcx+rdx*1]					; sets eax to the byte in rcx+rdx
+│   0x57bdea    movzx  edx,BYTE PTR [rcx+rdx*1+0x1]				; sets edx to the byte in rcx+rdx+1
+│   0x57bdef    shl    eax,0x8							; logical shifts eax 8 bits to the left (multiply by 256)
+│   0x57bdf2    add    eax,edx							; adds edx to eax (this reads a big endian 16-bit value)
+│   0x57bdf4    lea    r12d,[rax-0x7000]					; sets r12d to the address 0x7000 bytes before rax
+│   0x57bdfb    cmp    r12d,0x4d						; compare r12d to 0x4d
+│   0x57bdff    ja     0x57bde0							; jump to _ if r12d > 0x4d
+│   0x57be01    mov    ebp,eax							; if r12d <= 0x4d: set ebp to eax
+│   0x57be03    lea    eax,[rax-0x701a]						; set eax to the address 0x701a bytes before rax (0x1a bytes after the prev value)
+│   0x57be09    cmp    eax,0x2							; compare eax to 0x2
+│   0x57be0c    jbe    0x57bfe0							; jump to _ if below or equal
+│   0x57be12    cmp    ebp,0x7032						; if eax > 0x2: compare ebp to 0x7032
+│   0x57be18    je     0x57bfe0							; if ebp (prev eax) == 0x7032, jump to _
+│   0x57be1e    cmp    ebp,0x7035						; if ebp == ebp,0x7035, jump to _
+│   0x57be24    je     0x57bfe0							; if ebp == 0x57bfe0, jump to _
+│   0x57be2a    mov    eax,ebp							; im skipping the rest for now because i have. no idea what it could mean
+│   0x57be2c    and    eax,0xffffffef
+│   0x57be2f    cmp    eax,0x702b
+│   0x57be34    je     0x57bfe0
+│   0x57be3a    cmp    ebp,0x7005
+│   0x57be40    je     0x57bfe0
+│   0x57be46    cmp    ebp,0x704d
+│   0x57be4c    je     0x57bfe0
+│   0x57be52    lea    eax,[rbp-0x7046]
+│   0x57be58    cmp    eax,0x4
+│   0x57be5b    jbe    0x57bfe0
+│   0x57be61    cmp    ebp,0x7025
+│   0x57be67    je     0x57bfb0
