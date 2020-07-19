@@ -163,3 +163,128 @@ stack variables: (size of stack is 0x38)
 │   0x57be5b    jbe    0x57bfe0
 │   0x57be61    cmp    ebp,0x7025
 │   0x57be67    je     0x57bfb0
+
+and heres the code that reads the actual .lin instructions:
+	probably safe to assume rcx is the base instruction offset
+│   0x57bde3    add    ebx,0x2
+│   0x57bde6    movzx  eax,BYTE PTR [rcx+rdx*1]			; reads the 0x70 marker byte to eax from [rcx+rdx]
+│  >0x57bdea    movzx  edx,BYTE PTR [rcx+rdx*1+0x1]		; reads the opcode to edx from [rcx+rdx+1]
+│   0x57bdef    shl    eax,0x8					; logical shift eax (marker byte) 8 bits to the left (0x0070 -> 0x7000)
+│   0x57bdf2    add    eax,edx					; add edx to eax (0x00?? -> 0x70??) OHHHHHHH idk
+│   0x57bdf4    lea    r12d,[rax-0x7000]			; set r12d to rax - 0x7000 (so basically the opcode alone????)
+│   0x57bdfb    cmp    r12d,0x4d				; compare r12d (im just gonna say opcode) to 0x4d
+│   0x57bdff    ja     0x57bde0					; jump to 0x57bde0 if opcode > 0x4d
+│   0x57be01    mov    ebp,eax					; set ebp to eax (0x70??)
+│   0x57be03    lea    eax,[rax-0x701a]				; set eax to rax - 0x701a (so basically opcode-0x1a)
+│   0x57be09    cmp    eax,0x2					; compare eax to 0x02 (which could be equiv to cmp opcode 0x1c)
+│   0x57be0c    jbe    0x57bfe0					; jump to 0x57bfe0 if eax <= 0x02 (opcode <= 0x1c)
+│   0x57be12    cmp    ebp,0x7032				; compare ebp to 0x7032 (opcode to 0x32)
+│   0x57be18    je     0x57bfe0					; jump to 0x57bfe0 if ebp == 0x7032 (opcode == 0x32)
+│   0x57be1e    cmp    ebp,0x7035				; compare ebp to 0x7035 (opcode to 0x35)
+│   0x57be24    je     0x57bfe0					; jump to 0x57bfe0 if ebp == 0x7035 (opcode == 0x35)
+│   0x57be2a    mov    eax,ebp					; set eax to ebp
+│   0x57be2c    and    eax,0xffffffef				; mask eax with 0xffffffef (okay then) <- leaves opcode bits 1110.1111
+│   0x57be2f    cmp    eax,0x702b				; compare eax to 0x702b (opcode in [0x2b, 0x3b])
+│   0x57be34    je     0x57bfe0					; jump to 0x57bfe0 if equal
+│   0x57be3a    cmp    ebp,0x7005				; compare eax to 0x7005 (opcode in [0x05, 0x15]) (what???)
+│   0x57be40    je     0x57bfe0
+│   0x57be46    cmp    ebp,0x704d
+│   0x57be4c    je     0x57bfe0
+│   0x57be52    lea    eax,[rbp-0x7046]
+│   0x57be58    cmp    eax,0x4
+│   0x57be5b    jbe    0x57bfe0
+│   0x57be61    cmp    ebp,0x7025
+│   0x57be67    je     0x57bfb0
+│   0x57be6d    test   r15d,r15d
+  57be70:	je     57be84 <std::ios_base::Init::~Init()@plt+0x172e34>
+  57be72:	test   r13b,0x20
+  57be76:	jne    57be84 <std::ios_base::Init::~Init()@plt+0x172e34>
+  57be78:	cmp    ebp,0x7008
+  57be7e:	je     57c2a4 <std::ios_base::Init::~Init()@plt+0x173254>
+  57be84:	test   r8d,r8d
+  57be87:	je     57bf30 <std::ios_base::Init::~Init()@plt+0x172ee0>
+  57be8d:	test   r13b,0x10
+  57be91:	jne    57bf30 <std::ios_base::Init::~Init()@plt+0x172ee0>
+  57be97:	cmp    ebp,0x7002
+  57be9d:	je     57bf23 <std::ios_base::Init::~Init()@plt+0x172ed3>
+  57bea3:	cmp    ebp,0x701e
+  57bea9:	je     57bffd <std::ios_base::Init::~Init()@plt+0x172fad>
+  57beaf:	cmp    ebp,0x7021
+  57beb5:	jne    57bf30 <std::ios_base::Init::~Init()@plt+0x172ee0>
+  57beb7:	mov    rcx,QWORD PTR [rip+0x5c27ba]        # b3e678 <__glewUniform2fv+0xbcb58>
+  57bebe:	movzx  eax,bx
+  57bec1:	mov    rdx,QWORD PTR [rcx+0x60]
+  57bec5:	movzx  eax,BYTE PTR [rdx+rax*1]
+  57bec9:	cmp    al,0x3e
+  57becb:	je     57bf30 <std::ios_base::Init::~Init()@plt+0x172ee0>
+  57becd:	cmp    al,0x3f
+  57becf:	je     57c47c <std::ios_base::Init::~Init()@plt+0x17342c>
+  57bed5:	mov    BYTE PTR [rip+0x538bc9],al        # ab4aa4 <__glewUniform2fv+0x32f84>
+  57bedb:	movzx  edx,al
+  57bede:	test   BYTE PTR [rip+0x538b75],0x8        # ab4a5a <__glewUniform2fv+0x32f3a>
+  57bee5:	mov    DWORD PTR [rsp+0x24],r10d
+  57beea:	mov    DWORD PTR [rsp+0x20],r11d
+  57beef:	mov    DWORD PTR [rsp+0x1c],r9d
+  57bef4:	mov    DWORD PTR [rsp+0x10],r8d
+  57bef9:	je     57c438 <std::ios_base::Init::~Init()@plt+0x1733e8>
+  57beff:	mov    edi,DWORD PTR [rcx+0xf818]
+  57bf05:	mov    esi,0x7a4455
+  57bf0a:	call   427e40 <std::ios_base::Init::~Init()@plt+0x1edf0>
+  57bf0f:	mov    r8d,DWORD PTR [rsp+0x10]
+  57bf14:	mov    r9d,DWORD PTR [rsp+0x1c]
+  57bf19:	mov    r11d,DWORD PTR [rsp+0x20]
+  57bf1e:	mov    r10d,DWORD PTR [rsp+0x24]
+  57bf23:	or     r13d,0x10
+  57bf27:	nop    WORD PTR [rax+rax*1+0x0]
+  57bf30:	test   r9d,r9d
+  57bf33:	je     57bf50 <std::ios_base::Init::~Init()@plt+0x172f00>
+  57bf35:	test   r13b,0x1
+  57bf39:	jne    57bf50 <std::ios_base::Init::~Init()@plt+0x172f00>
+  57bf3b:	cmp    ebp,0x701e
+  57bf41:	je     57c08b <std::ios_base::Init::~Init()@plt+0x17303b>
+  57bf47:	nop    WORD PTR [rax+rax*1+0x0]
+  57bf50:	test   r11d,r11d
+  57bf53:	je     57bf70 <std::ios_base::Init::~Init()@plt+0x172f20>
+  57bf55:	test   r13b,0x2
+  57bf59:	jne    57bf70 <std::ios_base::Init::~Init()@plt+0x172f20>
+  57bf5b:	cmp    ebp,0x7006
+  57bf61:	je     57c10a <std::ios_base::Init::~Init()@plt+0x1730ba>
+  57bf67:	nop    WORD PTR [rax+rax*1+0x0]
+  57bf70:	test   r10d,r10d
+  57bf73:	je     57bf90 <std::ios_base::Init::~Init()@plt+0x172f40>
+  57bf75:	test   r13b,0x8
+  57bf79:	jne    57bf90 <std::ios_base::Init::~Init()@plt+0x172f40>
+  57bf7b:	cmp    ebp,0x7015
+  57bf81:	je     57c075 <std::ios_base::Init::~Init()@plt+0x173025>
+  57bf87:	nop    WORD PTR [rax+rax*1+0x0]
+  57bf90:	cmp    r14d,r13d
+  57bf93:	je     57bfe0 <std::ios_base::Init::~Init()@plt+0x172f90>
+  57bf95:	movsxd r12,r12d
+  57bf98:	movzx  eax,BYTE PTR [r12+0xa72980]
+  57bfa1:	add    ebx,eax
+  57bfa3:	mov    rax,QWORD PTR [rip+0x5c26ce]        # b3e678 <__glewUniform2fv+0xbcb58>
+  57bfaa:	jmp    57bdd8 <std::ios_base::Init::~Init()@plt+0x172d88>
+  57bfaf:	nop
+  57bfb0:	movzx  edx,bx
+  57bfb3:	movzx  eax,BYTE PTR [rcx+rdx*1]
+  57bfb7:	cmp    al,0x9
+  57bfb9:	je     57bfef <std::ios_base::Init::~Init()@plt+0x172f9f>
+  57bfbb:	cmp    al,0x10
+  57bfbd:	je     57bfe0 <std::ios_base::Init::~Init()@plt+0x172f90>
+  57bfbf:	lea    edx,[rax-0x12]
+  57bfc2:	cmp    dl,0x2
+  57bfc5:	jbe    57bfe0 <std::ios_base::Init::~Init()@plt+0x172f90>
+  57bfc7:	lea    edx,[rax-0x1f]
+  57bfca:	cmp    dl,0x4
+  57bfcd:	jbe    57bfe0 <std::ios_base::Init::~Init()@plt+0x172f90>
+  57bfcf:	cmp    al,0x25
+  57bfd1:	jne    57be6d <std::ios_base::Init::~Init()@plt+0x172e1d>
+  57bfd7:	nop    WORD PTR [rax+rax*1+0x0]
+  57bfe0:	add    rsp,0x38							; deallocate stack
+  57bfe4:	pop    rbx							; restore state
+  57bfe5:	pop    rbp
+  57bfe6:	pop    r12
+  57bfe8:	pop    r13
+  57bfea:	pop    r14
+  57bfec:	pop    r15
+  57bfee:	ret    								; return

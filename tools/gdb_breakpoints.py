@@ -92,14 +92,19 @@ class WadRead(gdb.Breakpoint):
 
             if fds[fd] == 'dr2_data.wad':
                 idx = bisect.bisect_right(data_offsets, offset)-1
+                file = data_files[idx]
 
-                print('read {} bytes from dr2_data:{} (offset {}) to ptr {}'.format(bytes_, data_files[idx][1], offset - data_files[idx][0], ptr))
+                if file[1].endswith('.ogg'): # ignore music files
+                    return False
+
+                print('read {} bytes from dr2_data:{} (offset {}) to ptr {}'.format(bytes_, file[1], offset - file[0], ptr))
             elif fds[fd] == 'dr2_data_us.wad':
                 idx = bisect.bisect_right(data_us_offsets, offset)-1
+                file = data_us_files[idx]
 
-                print('read {} bytes from dr2_data_us:{} (offset {}) to ptr {}'.format(bytes_, data_us_files[idx][1], offset - data_us_files[idx][0], ptr))
+                print('read {} bytes from dr2_data_us:{} (offset {}) to ptr {}'.format(bytes_, file[1], offset - file[0], ptr))
 
-                if data_us_files[idx][1].endswith('.dat'):
+                if data_us_files[idx][1].endswith('.lin'):
                     print('found a lin! stopping')
                     return True
 
