@@ -1,5 +1,26 @@
 import formats.pak as pak
-from formats.helper import read_string
+from formats.helper import *
+
+# a file, as-is
+class Raw:
+    def __init__(self, wad_name, path):
+        self.wad_name = wad_name
+        self.path = path
+
+    def extract_to(self, wads, output):
+        wad = wads[self.wad_name]
+
+        entry = wad.files[self.path]
+        offset = entry[0]
+        size = entry[1]
+
+        wad.file.seek(offset)
+        data = wad.file.read(size)
+
+        output.write(data)
+
+    def repack(self, wads, input):
+        return input.read()
 
 # refers to a zero terminated, utf-16-le string nested inside a .pak
 class String:
@@ -44,6 +65,23 @@ class Strings:
             values[str(i).zfill(self.key_width)] = read_string(wad.file)
         return values
 
+# used for bgm loop files
+SAMPLE_RATE = 44100.0
+class LoopPoint:
+    def __init__(self, bgm_idx, offset):
+        self.wad_name = 'dr2_data'
+        self.path = 'Dr2/data/all/bgm/dr2_bgm_hca.awb.{:05}.loop'.format(bgm_idx)
+        self.offset = offset
+
+    def extract(self, wads):
+        print(self.path)
+        wad = wads[self.wad_name]
+        offset = wad.files[self.path][0]
+
+        wad.file.seek(offset + self.offset)
+        point = read_u32(wad.file) / SAMPLE_RATE # in seconds
+        return point
+
 # refers to a targa image file either on its own or in the top level of a .pak
 class Tga:
     def __init__(self, wad_name, path, indices=[]):
@@ -83,7 +121,7 @@ class Tga:
         return output.getbuffer()
 
 def extract_from_metadata(wads, meta):
-    if isinstance(meta, String) or isinstance(meta, Strings):
+    if hasattr(meta, 'extract'):
         return meta.extract(wads)
     elif isinstance(meta, list):
         return [extract_from_metadata(wads, v) for v in meta]
@@ -161,6 +199,14 @@ def quick_repack(wads, indir, prefix=''):
             if pak_key not in paks_to_update:
                 paks_to_update[pak_key] = wad.read_pak(meta.path)
             paks_to_update[pak_key].set(meta.indices, data_l)
+        elif isinstance(meta, LoopPoint): # loop offsets are handled differently
+            wad = wads[meta.wad_name]
+
+            file = io.BytesIO(wad.read_file(meta.path))
+            file.seek(meta.offset)
+            write_u32(file, int(data * SAMPLE_RATE))
+
+            wad.quick_repack_file(meta.path, file.getbuffer())
         elif isinstance(data, list):
             for i in range(len(data)):
                 update_strings(wads, paks_to_update, data[i], meta[i])
@@ -187,7 +233,7 @@ def quick_repack(wads, indir, prefix=''):
             file = open(fpath, 'rb')
             data = meta.repack(wads, file)
 
-            if meta.indices == []:
+            if not hasattr(meta, 'indices') or meta.indices == []:
                 wads[meta.wad_name].quick_repack_file(meta.path, data)
             else:
                 wad = wads[meta.wad_name]
@@ -217,6 +263,7 @@ import metadata.sprites
 import metadata.character_names
 import metadata.title_screen
 import metadata.maps
+import metadata.music
 
 files = {
         'report_card.toml': report_card.report_card,
@@ -232,3 +279,4 @@ backgrounds.add_files(files)
 sprites.add_files(files)
 character_names.add_files(files)
 title_screen.add_files(files)
+music.add_files(files)
