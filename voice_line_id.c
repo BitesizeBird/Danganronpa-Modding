@@ -18,30 +18,30 @@ int16_t voice_file_id(uint8_t speaker, uint8_t chapter, int16_t line) {
 
 		// fetch base id
 		id = table[speaker][chapter];
-	} else if (chapter == 8 || chapter == 63) {
+	} else if (chapter == 8 || chapter == 99) {
 		if (line <= 0) {
 			return -1;
-		} else if (line < 0x65) {
+		} else if (line < 101) {
 			id = table[speaker][6];
 			line -= 1;
-		} else if (line < 0x191) {
+		} else if (line < 401) {
 			id = table[speaker][7];
-			line -= 0x65;
-		} else if (line < 0x259) {
+			line -= 101;
+		} else if (line < 601) {
 			id = table[speaker][8];
-			line -= 0x191;
-		} else if (line < 0x321) {
+			line -= 401;
+		} else if (line < 801) {
 			id = table[speaker][9];
-			line -= 0x259;
+			line -= 601;
 		} else {
 			id = table[speaker][10];
-			line -= 0x321;
+			line -= 801;
 		}
 	} else return -1;
 
 	if (id == -1) return -1;
 	id += line;
 
-	if (id > 0x2305) return -1;
+	if (id > 8965) return -1;
 	return id;
 }
