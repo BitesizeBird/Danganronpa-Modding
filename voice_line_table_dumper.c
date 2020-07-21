@@ -35,17 +35,17 @@ int main(int argc, char** argv) {
 		"27: Narrator",
 	};
 	char* cats[11] = {
-		"0: Chapter 1 (1)",
-		"1: Chapter 2 (2)",
-		"2: Chapter 3 (3)",
-		"3: Chapter 4 (4)",
-		"4: Chapter 5 (5)",
-		"5: Chapter 6 (6)",
-		"6: Chapters 8 and 99 (from 1)",
-		"7: Chapters 8 and 99 (from 101)",
-		"8: Chapters 8 and 99 (from 401)",
-		"9: Chapters 8 and 99 (from 601)",
-		"10: Chapters 8 and 99 (from 801)",
+		"0: Chapter 1",
+		"1: Chapter 2",
+		"2: Chapter 3",
+		"3: Chapter 4",
+		"4: Chapter 5",
+		"5: Chapter 6",
+		"6: Chapters 8/99 (from 1)",
+		"7: Chapters 8/99 (from 101)",
+		"8: Chapters 8/99 (from 401)",
+		"9: Chapters 8/99 (from 601)",
+		"10: Chapters 8/99 (from 801)",
 	};
 
 	FILE* file = fopen(argv[1], "rb");
@@ -55,8 +55,7 @@ int main(int argc, char** argv) {
 	assert(count == 28*11);
 
 	for(int cat = 0; cat < 10; ++cat) {
-		if (cat > 0) printf(",");
-		printf("%s", cats[cat]);
+		printf(",%s", cats[cat]);
 	}
 	printf("\n");
 
