@@ -26,7 +26,9 @@ class LinScript:
         wad.file.seek(entry[0] + script_data_offset)
         while wad.file.tell() < entry[0] + text_data_offset:
             if wad.file.peek(2).startswith(b'\00\00'): break
-            self.script.append(ops.read_op(wad.file))
+            op = ops.read_op(wad.file)
+            if op is None: break
+            self.script.append(op)
 
         # READ TEXT DATA
         if lin_type == WITH_TEXT:

@@ -68,9 +68,10 @@ class WadSeek(gdb.Breakpoint):
         fd = int(gdb.parse_and_eval('((FILE*)$rdi)->_fileno'))
         offset = gdb.parse_and_eval('(unsigned long long)$rsi')
         whence = gdb.parse_and_eval('(int)$rdx')
-        assert whence == 0
-
-        offsets[fd] = offset
+        if whence == 0:
+            offsets[fd] = offset
+        elif whence == 1 and fd in offsets:
+            offsets[fd] += offset
 
         return False
 
@@ -94,7 +95,7 @@ class WadRead(gdb.Breakpoint):
                 idx = bisect.bisect_right(data_offsets, offset)-1
                 file = data_files[idx]
 
-                if file[1].endswith('.ogg'): # ignore music files
+                if 'bgm' in file[1] and file[1].endswith('.ogg'): # ignore music files
                     return False
 
                 print('read {} bytes from dr2_data:{} (offset {}) to ptr {}'.format(bytes_, file[1], offset - file[0], ptr))

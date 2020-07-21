@@ -5,7 +5,8 @@ opcodes = {}
 
 def read_op(file):
     byte = read_u8(file)
-    assert byte == 0x70 # opcode marker
+    if byte != 0x70: # opcode marker
+        return None
     opcode = read_u8(file)
     op = copy.copy(opcodes.get(opcode)) or Op(opcode, '???', False)
     op.read_parameters(file)
