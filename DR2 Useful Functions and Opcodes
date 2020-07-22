@@ -1,19 +1,31 @@
 Effects during dialogue
 ------------
 
-DING
+For these effects, I would recommend putting any Sprite commands first before the effects (especially for Sprite Flash).
+
+DING (Protagonist just heard something important/surprising. 'Eh?' Other character said something with confidence.)
 ---
 SFX A|0, 19, 100
 Screen Flash|255, 255, 255, 4, 0, 30, 255
+
+BOMbomdin (Dumbfounded)
+---
+SFX A|0, 22, 100
+Screen Flash|255, 255, 255, 4, 0, 30, 255
+
+Sprite Flash ('Listen closely.')
+---
+SFX A|0, 21, 100
+0x20|4, 0, 30, 4, 2
 
 Door squeak
 ---
 SFX A|0, 208, 100
 				
-Screen Shake
+Screen Shake (Shock.)
 ---
-SFX A|0, x, 100 - (where x is any number. I would recommend 18 or 22 for screen shake)
-0x20|4, 0, 30, 4, 2
+SFX A|0, x, 100 - (where x is any number. I would recommend 18 (CRONCH more for anger) or 20 (BOM for shock) for screen shake)
+Screen Flash|255, 255, 255, 4, 0, 30, 255
 Change UI|13, 1
 Text|Dialogue goes here\n
 Wait Frame|
@@ -26,6 +38,11 @@ Wait Frame|
 SFX A|0, 201, 100
 Sprite|0, X, X, 5, 2
 0x3a|6, 0, 0, 60
+
+
+<CLT 04>Text<CLT>\n for thoughts. Blue.
+<CLT 04>Text<CLT>\n for sound effects. Green.
+<CLT 17>Text<CLT> for weakpoints. Yellow.
 
 ========================================================================================================================
 
