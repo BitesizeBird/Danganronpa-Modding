@@ -212,7 +212,7 @@ Play animation 752 (at frame 1 ???)
 
 Voice lines - 0x08
 ---------
-Voice Line|Character ID, Chapter, ???, Line, Volume
+Voice Line|Character ID, Chapter, shr 8 Line Line, Volume
 
 Chapter -  1 to 6 will be lines from trials 1 to 6 respectively, 99 for general sounds and CG lines ???
 Line (starts from 1)
