@@ -35,6 +35,7 @@ SFX A|0, 23, 100
 Bwing! (Joy. 'Yay!')
 ---
 SFX A|0, 25, 100
+Screen Flash|255, 255, 255, 4, 0, 30, 255
 
 Door squeak
 ---
