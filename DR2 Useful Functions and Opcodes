@@ -18,9 +18,9 @@ Sprite Flash ('Listen closely.')
 SFX A|0, 21, 100
 0x20|4, 0, 30, 4, 2
 				
-Screen Shake (Shock.)
+Screen Shake (Shock.) (where x is any number. I would recommend 18 (CRONCH more for anger) or 20 (BOM for shock) for screen shake)
 ---
-SFX A|0, x, 100 - (where x is any number. I would recommend 18 (CRONCH more for anger) or 20 (BOM for shock) for screen shake)
+SFX A|0, x, 100
 Screen Flash|255, 255, 255, 4, 0, 30, 255
 Change UI|13, 1
 Text|Dialogue goes here\n
