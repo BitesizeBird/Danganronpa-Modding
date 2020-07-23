@@ -17,10 +17,6 @@ Sprite Flash ('Listen closely.')
 ---
 SFX A|0, 21, 100
 0x20|4, 0, 30, 4, 2
-
-Door squeak
----
-SFX A|0, 208, 100
 				
 Screen Shake (Shock.)
 ---
@@ -31,6 +27,18 @@ Text|Dialogue goes here\n
 Wait Frame|
 0x3a|6, 0, 0, 10
 Change UI|13, 0
+
+Bowowowowow (Dissapointment. 'Aw man')
+---
+SFX A|0, 23, 100
+
+Bwing! (Joy. 'Yay!')
+---
+SFX A|0, 25, 100
+
+Door squeak
+---
+SFX A|0, 208, 100
 				
 Walk Away
 ---
