@@ -146,6 +146,7 @@ Always end dialogue with \n
 
 Use certain <CLT> numbers for different colours/sizes.
 Surround particular words like this: <CLT XX>Text goes here.<CLT>
+<CLT 03> for highlighted text. Yellow.
 <CLT 04> for thoughts. Blue.
 <CLT 06> for sound effects. Green.
 <CLT 17> for Weakpoints. Big and yellow.
