@@ -89,8 +89,10 @@ Opcodes
 0x1e - Sprite
 0x1f - Screen Flash
 
+0x20 - Sprite Flash ???
 0x21 - Speaker
 0x22 - Screen Fade
+0x23 - Object State ???
 0x25 - Change UI
 0x26 - Set Flag
 0x27 - Check Character
@@ -447,25 +449,33 @@ e.g. 0x1c|
 
 Sprite - 0x1e
 ---------
-Sprite|Position ID, Character ID, Expression, Fade-in type ???, slide-in type ???
-(positionID, characterID, spriteID, spriteState, spriteEntryTransition)
+Sprite|Position ID, Character ID, Expression, State, Entry Transition
 
 Used to place particular character sprites down, either into a map, trial or during dialogue.
 
 Position ID
 ---
-Sets where a character is placed in a room/which trial podium they are placed in.
-
-After loading a map, use this to place characters around the scene.
-No clear indication as to where they might be placed so documentation may be needed for this. !!!
-
-During dialogue, this seems to alternate between 0 and 1 when a new character is speaking. ???
+Sets where a character is placed in a room or which trial podium they are placed in.
 
 During trials, each podium has a position ID which corresponds to the ID of the character who stands there.
 i.e. Sonia's ID is 10. Setting the Position to 10 will put that sprite into Sonia's trial position.		
 e.g. Sprite|10, 12, 0, 1, 2
 Put Mahiru default sprite into Sonia's trial position.
+For these positions, see Class Trial Positions.png
 
+After loading a map, use this to place characters around the scene.
+No clear indication as to where they might be placed so documentation may be needed for this. !!!
+
+
+During dialogue with a bust sprite, Position ID is more like a Fade Out Type.
+This alternates between 0 and 1 whenever a new character speaks.
+e.g.
+Sprite|0, 10, 0, 1, 2
+Sprite|0, 10, 3, 1, 2
+Sprite|1, 5, 0, 1, 2
+Sprite|0, 7, 0, 1, 2
+If the Character ID changes, change the Position ID.
+If this isn't followed, it just looks bad as sprites overlap briefly and disappear too quickly.
 
 Character ID
 ---
@@ -530,6 +540,16 @@ e.g. Screen Flash|255, 255, 255, 4, 0, 30, 255
 Flashes the screen completely white. It takes 4 frames to reach full opacity and immediately fades out. It has completely faded after 30 frames (1/2 a second).
 ------------------------------------------------------------------------------------------------------------------------
 
+Sprite Flash - 0x20
+---------
+0x20|???, ???, Frames ???, ???, ???
+
+e.g.
+0x20|4, 0, 30, 4, 2
+I've only found 0x20 used with these parameters so far which makes the sprite flash.
+
+------------------------------------------------------------------------------------------------------------------------
+
 Speaker - 0x21
 ---------
 Speaker|Character ID
@@ -559,6 +579,52 @@ Duration - Time to perform action in frames. The games runs at 60 frames per sec
 
 e.g. Screen Fade|1, 1, 24
 Fades the screen out to black in 24 frames (around 1/2 a second).
+
+------------------------------------------------------------------------------------------------------------------------
+
+Object State - 0x23
+---------
+0x23|Object, ???, ???, ???, ???
+
+Seems to control whether certain objects appear in a room.
+It seems like by default, all objects appear in a room and that you need to use this command to hide them.
+
+The four unknown values seem to be states.
+One of the parameters might control whether something is clickable.
+Another parameter might control whether the object shows or not.
+
+e.g.
+0x23|29, 0, 0, 0, 0
+0x23|30, 0, 0, 0, 0
+0x23|31, 0, 0, 0, 0
+0x23|32, 0, 0, 0, 0
+0x23|34, 0, 0, 0, 0
+0x23|36, 0, 0, 0, 0
+0x23|37, 1, 0, 1, 0
+0x23|38, 0, 0, 0, 0
+0x23|39, 1, 0, 1, 0
+0x23|40, 0, 0, 0, 0
+0x23|41, 0, 0, 0, 0
+Removed these and it showed Mahiru's body in the Beach House along with the blood, mask and metal bat.
+
+e.g.
+Changing
+0x23|39, 1, 0, 1, 0
+to
+0x23|39, 0, 0, 0, 0
+removed the light shining through the door in the Beach House (supposedly for night time).
+
+e.g.
+Changing
+0x23|x, 0, 0, 0
+for x = 0 to 28
+and removing other instances of 0x23 made no other object in the Beach House clickable. They still appeared as normal though
+Except from the Beach House exit door but it did not have its name appear.
+Clicking on it selected it but then returned player back to state beforehand, refusing to exit and making it unusable (could still exit by hitting R).
+
+Just speculation but perhaps Hidden Monokumas use this too.
+
+Much more testing is needed.
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -742,11 +808,10 @@ x values
 
 ------------------------------------------------
 
-Change UI|26, Position ID ???
+Change UI|26, Character ID
 ------
-Pans the camera towards a certain position. Used for when a certain cahracter initiates a conversation when no bust sprites are showing.
-Not sure if it actually uses Position ID like the other opcodes but this parameter does go at least up to 15.
-
+Pans the camera towards a character's position in the map.
+Used for when a certain cahracter initiates a conversation when no bust sprites are showing.
 
 ------------------------------------------------
 
