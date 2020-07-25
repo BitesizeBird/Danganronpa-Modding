@@ -60,29 +60,29 @@ These IDs are referenced for voice lines, sprites trial podium positions, etc.
 24 = Alter Ego
 25 = Minimaru
 26 = Monokuma & Monomi
-27 = Narrator
-28 = (Unused.)
-29 = (Unused.)
-30 = (Unused.)
-31 = (Unused.)
-32 = (Unused.)
-33 = (Unused.)
-34 = 
-35 = '?
-36 = '?
-37 = '?
-38 = '?
+27 = '?'
+28 = '?'
+29 = '?'
+30 = '?'
+31 = '?'
+32 = '?'
+33 = '?'
+34 = '?'
+35 = '?'
+36 = '?'
+37 = '?'
+38 = '?'
 39 = Usami
 40 = Sparkling Justice
 41 = ???
-42 = '?
-43 = '?
-44 = '?
-45 = '?
+42 = '?'
+43 = '?'
+44 = '?'
+45 = '?'
 46 = '?'
 47 = '?'
 48 = Junko Enoshima
-49 = '?
+49 = '?'
 50 = Girl A
 51 = Girl B
 52 = Girl C
@@ -711,6 +711,10 @@ This will first show Sonia's sprite (without any camera movement).
 Then the camera will pan right to show Nagito.
 Then the camera will pan all the way to the left to show Gundham.
 
+
+NOTE: The Sprite function automatically does the same thing as the Speaker function.
+Use Speaker when a new character speaks but you don't want to change any sprites, such as when the player character speaks, someone off-screen speaks, or during CGs.
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Screen Flash - 0x1f
@@ -760,15 +764,31 @@ Speaker - 0x21
 ---------
 Speaker|Character ID
 
-0 - 15 - See Character IDs.
+Displays who is talking. See Character IDs for which value relates to which character.
+
+If the HUD is activated (using Change UI|9, 1), then an image of the character's name will be displayed on the left-hand side of the HUD.
+
+Characters 0 to 27 all have these images as well as:
+Usami (39)
+Sparkling Justice (40)
+??? (41) (but not the ??? with ID 56)
+Junko Enoshima (48) (unsure why she has two)
+
+Characters not in the list above will display their name but in ASCII. It looks pretty bad so it is recommended not to use them.
+
 63 - Displays no speaker. Good for Truth Bullets added and other general information to the player.
 
-e.g. Speaker|39
-For off-screen speakers ???
+e.g. Speaker|1
+Shows Nagito's full name to show that he is talking.
 
-Speaker|0 for Hajime ???
+NOTE: 
+Speaker|0 will make the textbox a lighter shade of grey to indicate that the player character is talking.
 
-(Find out what numbers make what speaker show !!! x may just be character ID)
+Speaker|24 (which is Alter Ego) automatically causes a beep to play for each letter displayed, much like Change UI|23, 1
+
+The Sprite function automatically does the same thing as the Speaker function.
+Use Speaker when a new character speaks but you don't want to change any sprites, such as when the player character speaks, someone off-screen speaks, or during CGs.
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Screen Fade - 0x22
@@ -905,6 +925,9 @@ Use for flashbacks and CGs.
 
 Disabling this UI will set the textbox back to where it would be for non-CG dialogue.
 However, the rest of the UI won't appear and the script will need to be set to call those UI elements again.
+
+Seems to be used more for when 
+Otherwise, Change UI|51, x appears to be used instead.
 
 ------------------------------------------------
 
