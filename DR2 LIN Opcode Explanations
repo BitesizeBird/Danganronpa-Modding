@@ -33,34 +33,70 @@ Scripts do not have to be named this way but it's good to follow convention (tho
 Character IDs
 ---
 These IDs are referenced for voice lines, sprites trial podium positions, etc.
-0 - Hajime
-1 - Nagito
-2 - Twogami
-3 - Gundam
-4 - Kazuichi
-5 - Teruteru
-6 - Nekomaru
-7 - Fuyuhiko
-8 - Akane
-9 - Chiaki
-10 - Sonia 
-11 - Hiyoko
-12 - Mahiru
-13 - Mikan
-14 - Ibuki
-15 - Peko
-16 - Monokuma
-17 - Monomi
-18 - Junko
-19 - Mechamaru
-20 - Naegi
-21 - Kiyoko
-22 - Byakuya
-23 - Mrs Hanamura
-24 - Alter Ego
-25 - Minimaru
-26 - Monokuma & Monomi
-27 - Narrator
+0 = Hajime Hinata
+1 = Nagito Komaeda
+2 = Byakuya Togami
+3 = Gundham Tanaka
+4 = Kazuichi Soda
+5 = Teruteru Hanamura
+6 = Nekomaru Nidai
+7 = Fuyuhiko Kuzuryu
+8 = Akane Owari
+9 = Chiaki Nanami
+10 = Sonia Nevermind
+11 = Hiyoko Saionji
+12 = Mahiru Koizumi
+13 = Mikan Tsumiki
+14 = Ibuki Mioda
+15 = Peko Pekoyama
+16 = Monokuma
+17 = Monomi
+18 = Junko Enoshima
+19 = Nekomaru Nidai
+20 = Makoto Naegi
+21 = Kyoko Kirigiri
+22 = Byakuya Togami
+23 = ''Teruteru's Mom''
+24 = Alter Ego
+25 = Minimaru
+26 = Monokuma & Monomi
+27 = Narrator
+28 = (Unused.)
+29 = (Unused.)
+30 = (Unused.)
+31 = (Unused.)
+32 = (Unused.)
+33 = (Unused.)
+34 = 
+35 = '?
+36 = '?
+37 = '?
+38 = '?
+39 = Usami
+40 = Sparkling Justice
+41 = ???
+42 = '?
+43 = '?
+44 = '?
+45 = '?
+46 = '?'
+47 = '?'
+48 = Junko Enoshima
+49 = '?
+50 = Girl A
+51 = Girl B
+52 = Girl C
+53 = Girl D
+54 = Girl E
+55 = Guy F
+56 = '???
+57 = '?'
+58 = '?'
+59 = '?'
+60 = '?'
+61 = '?'
+62 = '?'
+63 = ' ' (Displays no speaker. Used for sound effects and such as notifying the player when a Report Card updates, etc.)
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -234,12 +270,23 @@ Adds sepia tone filter.
 
 Movie - 0x05
 ---------
-Movie|Seems to be which actual movie ???, ID ???
+Movie|ID, End State
+
+ID
+---
+Which movie to play. (Document which movies are which !!!)
+
+
+End State
+---
+0 - The movie ends on a black screen.
+1 - The movie freezes on its last frame when it ends.
 
 e.g. Movie|2, 1
 Plays Usami appearing movie.
 
 (Movie|${id shr 8}, ${id % 256}")
+(Check to see if Movie|258, 0 is the same as Movie|2, 1)
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -888,6 +935,7 @@ Change UI|11, x
 ------
 Makes the screen behind the HUD black.
 No discernable difference between this and Change UI|6, x ???
+However, this does seem to be used at the start of scripts before a map is loaded as well as before Movie is used.
 
 ------------------------------------------------
 
