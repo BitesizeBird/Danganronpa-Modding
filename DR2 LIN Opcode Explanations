@@ -260,9 +260,11 @@ Voice lines - 0x08
 ---------
 Voice Line|Character ID, Chapter, shr 8 Line, Line, Volume
 
-Please download Voice - documented by Chen.xlsx
+Please download DR2 Voice Line Transcripts.xlsx
 This file has all of the voice lines in the game transcribed along with the Voice Line parameters to use.
 
+Voice lines can overflow into other character's though how they overflow depends on the voice line table.
+See voice_line_table.csv for this info though it is recommended to simply avoid overflow whenever possible by sticking to the Transcripts file.
 
 Character ID
 ---
@@ -279,6 +281,9 @@ Used to select voice line from a particular trial.
 Line
 ---
 Which line from that chapter and character to use.
+Starts from value 1.
+e.g. Voice Line|12, 99, 0, 1, 100
+NOT  Voice Line|12, 99, 0, 0, 100
 
 
 Volume
