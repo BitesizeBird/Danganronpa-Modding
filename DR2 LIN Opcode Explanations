@@ -26,6 +26,10 @@ where X is the chapter number (can go up to 99 at least)
 	YYY is the scene
 	ZZZ is the Map ID
 	
+e.g. e02_002_030
+This is the script for Chapter 2's scene with Map 30.
+This is where Chiaki brings Hajime in front of the ruined building on the 2nd Island.
+	
 Scripts do not have to be named this way but it's good to follow convention (though they do have to follow the same structure ???)
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -96,7 +100,7 @@ Opcodes
 0x3a - Set Game State
 0x3b - Start of Jump
 0x3c - End Flag Check
-0x3d - ???
+0x3d - Screen Effect
 0x3e - ???
 0x3f - ???
 
@@ -119,7 +123,7 @@ Opcodes
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Text Count - 0x00
+0x00 - Text Count
 ---------
 Text Count|x, shr 8 
 
@@ -133,13 +137,13 @@ Doesn't seem to be necessary ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x01
+0x01 - ???
 ---
 0x1|???, ???, ???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Text - 0x02
+0x02 - Text
 ---------
 Text|Dialogue goes here\n
 
@@ -168,7 +172,7 @@ Text|<CLT 04>I have to remember how I got here...<CLT>\n
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Format - 0x03
+0x03 - Format
 ---------
 Format|Type
 
@@ -198,7 +202,7 @@ Adds sepia tone filter.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Movie - 0x05
+0x05 - Movie
 ---------
 Movie|ID, End State
 
@@ -220,7 +224,7 @@ Plays Usami appearing movie.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Animation - 0x06
+0x06 - Animation
 ---------
 Animation|ID shr 8, ID, ???, ???, ???, ???, ???, Frame
 
@@ -231,7 +235,7 @@ Play animation 752 (at frame 1 ???)
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Spot Selection ??? - 0x07 
+0x07 - Spot Selection ???
 ---
 0x07|ID, ???, ???, ???, ???
 
@@ -256,7 +260,7 @@ For spot_002_sel.tga, Twogami's body is a yellow silhouette, the binoculars are 
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Voice lines - 0x08
+0x08 - Voice lines
 ---------
 Voice Line|Character ID, Chapter, shr 8 Line, Line, Volume
 
@@ -296,12 +300,18 @@ This plays Hajime's 5th line from Trial 2 which is "Girl C is Ibuki." at full vo
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Music - 0x09
+0x09 - Music
 ---------
-Music|Song, Volume, ???
+Music|Song ID, Volume, ???
+
+Plays a song from the BGM.
+
+Songs 1 to 61 and songs 92 and 95 have .loop files associated with them.
+If a song has a .loop file associated with it, it will start playing from the specified start time once it reaches the specified end time.
+A song loop from start to end automatically if they don't have a specified loop file.
 
 
-Song
+Song ID
 ---
 Determine which song to play (!!! create list of songs with ID)
 Song values go from 0 to 101. No more songs can be added. (However, there are a lot of placeholder songs that can be replaced.)
@@ -309,16 +319,29 @@ Song values go from 0 to 101. No more songs can be added. (However, there are a 
 
 Volume
 ---
-Adjust volume from 0 to 100
+Adjust volume of song playing.
+Conventionally, this goes from 0 to 100.
+This can be set higher (presumably to 255). However, it is recommended to keep it to 100 for maximum volume.
 
 
 e.g Music|25, 100, 0
 Play song 25 at full volume.
 
+
+NOTE: This command won't do anything if the song is the same as the current song playing.
+e.g.
+Music|4, 100, 0
+Music|4, 60, 0
+Song 4 will start to play at 100 volume. However, it won't then play at 60 volume nor start over as if ignoring the second command.
+
+
+When Music|255, x, 0 is called, the current song playing fades out.
+x seems to be how many frames it takes for the current song to fade out.
+
 !!!
 ------------------------------------------------------------------------------------------------------------------------
 
-SFX A - 0x0a
+0x0a - SFX A
 ---------
 SFX A|shr 8 Sound Effect, Sound effect, Volume
 
@@ -329,7 +352,7 @@ Need to gather and describe sound effects !!!
 
 ------------------------------------------------------------------------------------------------------------------------
 
-SFX B - 0x0b
+0x0b - SFX B
 ---------
 SFX B|???, ???
 
@@ -337,7 +360,7 @@ SFX B|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Add Truth Bullet - 0x0c
+ 0x0c - Add Truth Bullet
 ---------
 Truth Bullet|Truth Bullet ID, State
 
@@ -346,6 +369,7 @@ Set Flag|0, 6, 1 needs to be set first to access these Truth Bullets.
 
 Each Truth Bullet has 3 descriptions. The 2nd and 3rd descriptions are usually empty.
 These later descriptions are used to update the description when new information is gathered in-game (e.g. Remnants of Despair Truth Bullet).
+
 
 Truth Bullet ID
 ---
@@ -357,6 +381,7 @@ This also means that there are a lot of empty slots with the placeholder name â€
 
 Setting the ID to 255 and State to 0  removes all Truth Bullets from the Handbook. (Test to see if State = 1 for this will add Truth Bullets ???)
 
+
 State
 ---
 0 - Removes the Truth Bullet from the Truth Bullet section of the handbook.
@@ -365,6 +390,7 @@ State
 3 - Adds the Truth Bullet with the 3rd description.
 
 Going over 3 for this parameter can cause overflow, bringing text from other descriptions (e.g. report cards) or crashing the game.
+
 
 e.g.
 Truth Bullet|0, 1
@@ -377,19 +403,19 @@ Would like to document all of the truth bullets !!!
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x0d
+0x0d - ???
 ---
 0xd|???, ???, ???,
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x0e
+0x0e - ???
 ---
 0xe|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Student Title Entry - 0x0f
+0x0f - Student Title Entry
 ---------
 Set Title|Character ID, ???, State
 
@@ -405,7 +431,7 @@ If x is higher than 2, their talent will just show as a long white box so it's n
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Student Report Info - 0x10
+0x10 - Student Report Info
 ---------
 Set Report Info|Character ID, ???, State
 
@@ -416,25 +442,25 @@ Set Report Info|$characterID, $arg2, $state"
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x11
+0x11 - ???
 ---
 0x11|???, ???, ???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x12
+0x12 - ???
 ---
 0x12|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x13
+0x13 - ???
 ---
 0x13|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Trial Camera - 0x14
+0x14 - Trial Camera
 ---------
 Trial Camera|Character ID, Motion shr 8, Motion, ???, ???, Position on screen
 
@@ -449,7 +475,7 @@ Point towards Hajime's spot using camera motion 116.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Load Map - 0x15
+0x15 - Load Map
 ---------
 Load Map|Room, State, Padding, Time of Day
 
@@ -487,25 +513,25 @@ Need to check if Time of Day is just 0 and 1 or if there are more such as above.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x16
+0x16 - ???
 ---
 0x16|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x17
+0x17 - ???
 ---
 0x17|???, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x18
+0x18 - ???
 ---
 0x18|???, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Script - 0x19
+0x19 - Script
 ---------
 Script|Chapter, Scene shr 8, Scene, Room shr 8, Room
 This is more for heading onto the next script, leaving the current one behind.
@@ -527,7 +553,7 @@ This also applies to the Run Script opcode.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Stop Script - 0x1a
+0x1a - Stop Script
 ---------
 No parameters are used for this function.
 
@@ -539,7 +565,7 @@ You MUST include this in each script or else the game will softlock.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Run Script - 0x1b
+0x1b - Run Script
 ---------
 Run Script|Chapter, Scene shr 8, Scene, Room shr 8, Room
 
@@ -554,7 +580,7 @@ IMPORTANT: You MUST run the 0x1c opcode just before the end of the script or els
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Restart Script - 0x1c
+0x1c - Restart Script
 ---------
 No parameters are used for this function.
 
@@ -565,13 +591,13 @@ e.g. 0x1c|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x1d
+0x1d - ???
 ---
 0x1d|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Sprite - 0x1e
+0x1e - Sprite
 ---------
 Sprite|Position ID, Character ID, Expression, State, Entry Transition
 
@@ -652,7 +678,7 @@ Use Speaker when a new character speaks but you don't want to change any sprites
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Screen Flash - 0x1f
+0x1f - Screen Flash
 ---------
 Screen Flash|Red, Green, Blue, Fade in duration, Hold duration, Fade out duration, Opacity
 
@@ -685,7 +711,7 @@ e.g. Screen Flash|255, 255, 255, 4, 0, 30, 255
 Flashes the screen completely white. It takes 4 frames to reach full opacity and immediately fades out. It has completely faded after 30 frames (1/2 a second).
 ------------------------------------------------------------------------------------------------------------------------
 
-Sprite Flash - 0x20
+0x20 - Sprite Flash
 ---------
 0x20|???, ???, Frames???, ???, ???
 
@@ -695,7 +721,7 @@ I've only found 0x20 used with these parameters so far which makes the sprite fl
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Speaker - 0x21
+0x21 - Speaker
 ---------
 Speaker|Character ID
 
@@ -726,7 +752,7 @@ Use Speaker when a new character speaks but you don't want to change any sprites
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Screen Fade - 0x22
+0x22 - Screen Fade
 ---------
 Screen Fade|Fade Type, Colour, Duration
 
@@ -743,7 +769,7 @@ Fades the screen out to black in 24 frames (around 1/2 a second).
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Object State - 0x23
+0x23 - Object State
 ---------
 0x23|Object, ???, ???, ???, ???
 
@@ -789,19 +815,21 @@ Much more testing is needed.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x24
+0x24 - ???
 ---
 0x24|???, ???, ???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Change UI - 0x25
+0x25 - Change UI
 ---------
 Change UI|Element, State
+
 
 Element
 ---
 What part of the UI is being specified.
+
 
 State
 ---
@@ -815,6 +843,12 @@ Controls the textbox.
 
 0 - Removes textbox. Used for animations such as showing 'Investigation' and for walking around.
 1 - Shows textbox. If Text opcode is called, the textbox will show with animation, making this redundant ???
+
+------------------------------------------------
+
+Change UI|2, x
+------
+Could be to hide the Help icon in the bottom left???
 
 ------------------------------------------------
 
@@ -958,8 +992,29 @@ Can enable it early but does skip over dialogue.
 
 ------------------------------------------------
 
-States 18, 19, 20 and 21 freeze or crash the game when run during non-trials.
+States 19, 20 and 21 freeze or crash the game when run during non-trials.
 Perhaps used for trials???
+
+------------------------------------------------
+
+Change UI|18, State
+------
+0 - 
+1 - Show Multiple Choice prompt. 
+
+You will need to use 0x32 to determine what available answers are.
+
+e.g.
+Change UI|18, 1
+0x32|1
+Text|Answer 1\n
+0x32|2
+Text|Answer 2\n
+0x32|3
+Text|Answer 3\n
+
+NOTE: The above code will not work.
+Please see DR2 Useful Functions and Opcodes (NOT YET UPDATED) for information on how to actually implement Multiple Choices.
 
 ------------------------------------------------
 
@@ -971,6 +1026,7 @@ Change UI|23, x
 ------------------------------------------------
 
 Change UI|25, x
+------
 Seems to determine a zoom in on a particular area of interest, i.e. Monokuma rock
 x values
 0 - Does nothing? Instead, to zoom out, the scripts seem to use Change UI|27, 0 instead.
@@ -1002,6 +1058,24 @@ Sometimes it pans slightly, sometimes it pans enough to show the edge of the sky
 
 States 31, 32, 33, 34, 35 freeze or crash the game when run during non-trials.
 Perhaps used for trials???
+
+------------------------------------------------
+
+Change UI|33, ID
+------
+Used to show Panic Talk Action???
+
+ID
+---
+1 - Trial 1 PTA against Teruteru
+2 - Trial 2 PTA against Fuyuhiko
+3 - Trial 3 PTA against Mikan
+4 - Trial 4 PTA against Gundham
+5 - Trial 5 PTA against Monomi
+6 - Trial 6 PTA against Monokuma
+7 - Trial 6 PTA against Junko
+
+Needs more testing!!!
 
 ------------------------------------------------
 
@@ -1056,9 +1130,33 @@ Seems to be used for dialogue that doesn't use the sidebar (CGs and the like?)
 
 https://wiki.spiralframework.info/UI_Elements
 !!!
+
 ------------------------------------------------------------------------------------------------------------------------
 
-Set Flag - 0x26
+Change UI|71, ID
+------
+Display Logic Dive???
+
+There are 9 Logic Dives in the game. However, there are also 3 different IDs for each Logic Dive, one for each difficulty.
+x for Gentle Logic Dives
+2x for Kind Logic Dives
+4x for Mean Logic Dives
+
+e.g.
+Change UI|71, 1
+Load first Logic Dive on Gentle Difficulty.
+
+Change UI|71, 21
+Load first Logic Dive on Kind Difficulty.
+
+Change UI|71, 41
+Load first Logic Dive on Mean Difficulty.
+
+!!!
+------------------------------------------------------------------------------------------------------------------------
+
+
+0x26 - Set Flag
 ------------
 Set Flag|Group, ID, State
 
@@ -1140,7 +1238,7 @@ This shows as Nagito dead in the handbook.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Check Character - 0x27
+0x27 - Check Character
 ---------
 Check Character|Position ID
 
@@ -1150,13 +1248,13 @@ Checks against the Position ID they were initiated into.
 (Check Character|$characterID)
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x28
+0x28 - ???
 ---
 0x28|???, ???, ???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Check Object - 0x29
+0x29 - Check Object
 ---------
 Check Object|Object ID
 ???
@@ -1165,7 +1263,7 @@ Check Object|Object ID
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Set Label - 0x2a
+0x2a - Set Label
 ---------
 Set Label|ID
 
@@ -1175,7 +1273,7 @@ Set Label|ID
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Choice - 0x2b
+0x2b - Choice
 ---------
 Choice|???
 
@@ -1183,7 +1281,7 @@ Choice|???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-End of Jump - 0x2c
+0x2c - End of Jump
 ---------
 0x2c|Parameter shr8, Parameter
 
@@ -1192,7 +1290,7 @@ See 0x3b for more details.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Camera Flash - 0x2d
+0x2d - Camera Flash
 ---------
 0x2d|State, Horizontal shr 8, Horizontal, Vertical shr 8, Vertical, Size, Red, Green, Blue, Opacity, Frames (maybe swap Opacity and Frames around), ???
 (Could do with more testing ???)
@@ -1238,23 +1336,23 @@ The base game usually sets this to 105 for its effect.
 
 
 e.g. 0x2d|1, 0, 240, 0, 136, 105, 255, 255, 255, 128, 30, 0
-The base game uses these values for its camera flash effect.
+The base game uses these values for most of its camera flash effects.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x2e
+0x2e - ???
 ---
 0x2e|???, ???, ???, ???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x2f
+0x2f - ???
 ---
 0x2f|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Show Background - 0x30
+0x30 - Show Background
 ---------
 Show Background|Background, State
 
@@ -1266,13 +1364,13 @@ Show Background|Background, State
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x31
+0x31 - ???
 ---
 0x31|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Choice - 0x32
+0x32 - Choice
 ---------
 0x32|Value
 
@@ -1294,36 +1392,38 @@ e.g. On an easier difficulty, only one Truth Bullet is loaded whereas on a harde
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x33
+0x33 - ???
 ---
 0x33|???, ???, ???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Go to Label - 0x34
+0x34 - Go to Label
 ---------
 Go To Label|ID, ???
 
 (Go To Label|${labelID % 256}, ${labelID shr 8})
 ------------------------------------------------------------------------------------------------------------------------
 
-Check Flag A - 0x35
+0x35 - Check Flag A
 ---------
-Check Flag A|???, Nonstop Debate Text ID
+Check Flag A|???, ID
 
-Nonstop Debate Text ID - Used to determine which line to check in a nonstop debate.
+ID
+---
+Usually used in Nonstop Debate scripts to determine which line to check in a nonstop debate .dat file.
 
 (Might be used for more things ???)
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x36
+0x36 - ???
 ---
 0x36|???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Show CG - 0x37
+0x37 - Show CG
 ---------
 0x37|???, CG ID, State
 
@@ -1353,23 +1453,25 @@ This opcode calls its CGs from
 dr2_data\Dr2\data\all\cg
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x38
+0x38 - ???
 ---
 0x38|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x39
+0x39 - ???
 ---
 0x39|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Set Game State - 0x3a
+0x3a - Set Game State
 ---------
 0x3a|State, Operation, Variable shr 8, Variable
 
 There are up to 32 states. Some are still unknown ???
+
+------------------------------------------------
 
 0x3a|0, 0, 0, x
 ------
@@ -1385,36 +1487,60 @@ Variable
 4 - Time unknown
 255 - Time unknown (Just the time and music. Textbox and sidebar don't update.)
 
+------------------------------------------------
 
 0x3a|2, 0, 0, 100
 0x3a|3, 0, 0, 100
 ------
 Not sure what these do but are often initialised after the time of day is set. ???
 
+------------------------------------------------
 
 0x3a|5, 0, 0, x
 ------
 Wait function, where x is the amount of frames to wait. Useful to let camera animations play out.
 
+------------------------------------------------
 
 0x3a|6, 0, 0, x
----
+------
 According to previous documentation, this is 'Wait Force'. Both this State and the previous are used in the scripts.
 Perhaps this one cannot be skipped by user input or when speeding through dialogue. ???
 
+------------------------------------------------
 
 0x3a|8, 0, 0, x
----
+------
 Determines the position the player will be in after loading a new map where x is the position ID.
 Use before the Load Map opcode.
 
+NOTE: It is important to set this for rooms you can walk around in. Otherwise, it can spawn the player inside a wall and trap them???
+
+------------------------------------------------
+
+0x3a|12, 0, 0, x
+------
+Load particular Trial Ground???
+
+Variable
+---
+0 - Trial 1 area.
+1 - Trial 2 area.
+2 - Trial 3 area.
+3 - Trial 4 area.
+4 - Trial 5 area.
+5 - Trial 6's 1st area.
+6 - Trial 6's 2nd area (the one that looks glitchy with code on the walls).
+7 - Trial 6's 3rd area (the one with Big Junko and her cell phone).
+8 - Trial 6's 4th area (the one on the beach where Hajime is hallucinating everyone alive again calling for a reset).
+9 - Trial 6's 5th area (the one in the void with all of the Izurus).
 
 
 https://wiki.spiralframework.info/Set_Game_State
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Start of Jump - 0x3b
+0x3b - Start of Jump
 ---------
 0x3b|Paramter shr8, Parameter
 
@@ -1449,7 +1575,7 @@ See 0x46 for more details.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-End Flag Check - 0x3c
+0x3c - End Flag Check
 ---------
 No parameters are used for this function.
 
@@ -1458,61 +1584,119 @@ e.g. End Flag Check|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x3d
+0x3d - Screen Effect
 ---
-0x3d|???, ???, ???, ???, ???
+0x3d|State, Effect, Frames shr 8, Frames, Intensity
+
+Displays an effect to warp the screen.
+Mostly used in late Chapter 5 and Chapter 6 to show the game as glitchy.
+
+Every effect loops endlessly until the effect is called to stop.
+Parts of the screen that are affected are chosen at random.
+The effects don't stack. If 0x3d is called again, the previous screen effect will be removed.
+
+
+State
+---
+0 - Stop effect.
+1 - Show effect.
+
+
+Effect
+---
+0 - All of effects from 1 to 8 are used randomly one after the other.
+
+1 - Shifts the screen down vertically and loops at the top.
+Intensity controls how far down the screen shifts.
+
+2 - Warps parts of the screen horizontally like a TV glitch.
+Intensity controls how thick the warps are.
+
+3 - Pixels rapidly distort colours randomly.
+Intensity controls how many pixels are affected at once.
+
+4 - Ripples the pixels of the screen (in complete lines from top to bottom or side to side).
+Intensity controls how thick the ripple lines are.
+
+5 - Black splotches appear on the screen before fading back out.
+Intensity controls how big the splotches get.
+
+6 - Pixels drop down off screen.
+Intensity controls how many pixels are affected at once.
+
+7 - Pixels displace and rapidly invert orientation.
+Intensity controls how many pixels are affected at once.
+
+8 - Ripples a block the screen.
+Intensity controls how big these blocks are.
+
+9+ - A circle wipe goes over the screen, inverting the colours wherever it reaches.
+Intensity nor frames seem to affect this effect???
+Centre of the circle wipe seems to be predetermined. Ususally it's near the centre but sometimes it's not.
+
+
+Frames
+---
+When an effect is applied, once it finishes, it applies it again.
+The maximum number of frames the effect waits before looping.
+
+
+Intensity
+---
+0 to 100 from no intensity at all (same as no effect) to full intensity (most of the screen is effected).
+100 - 255 is the same. The values will loop back around at 256+. It is recommended just to use values 0 to 100.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x3e
+0x3e - ???
 ---
 0x3e|???, ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x3f
+0x3f - ???
 ---
 0x3f|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x40
+0x40 - ???
 ---
 0x40|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x41
+0x41 - ???
 ---
 0x41|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x42
+0x42 - ???
 ---
 0x42|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x43
+0x43 - ???
 ---
 0x43|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x44
+0x44 - ???
 ---
 0x44|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x45
+0x45 - ???
 ---
 0x45|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Jump Flag - 0x46
+0x46 - Jump Flag
 ---------
 0x46|Paramter, Parameter, ???, ???
 0x4d|
@@ -1589,31 +1773,31 @@ Text|Text\n
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x47
+0x47 - ???
 ---
 0x47|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x48
+0x48 - ???
 ---
 0x48|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x49
+0x49 - ???
 ---
 0x49|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-??? - 0x4a
+0x4a - ???
 ---
 0x4a|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Wait for Input - 0x4b
+0x4b - Wait for Input
 ---------
 No parameters are used for this function.
 
@@ -1623,7 +1807,7 @@ e.g. Wait for Input|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Wait Frame - 0x4c
+0x4c - Wait Frame
 ---------
 No parameters are used for this function.
 
@@ -1633,7 +1817,7 @@ e.g. Wait Frame|
 
 ------------------------------------------------------------------------------------------------------------------------
 
-Terminator - 0x4d
+0x4d - Terminator
 ---------
 No parameters are used for this function.
 
