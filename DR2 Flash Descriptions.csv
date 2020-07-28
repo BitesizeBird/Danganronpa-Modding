@@ -1,0 +1,119 @@
+.pak name,Description
+fla_000,Game Over animation
+fla_001,Game Over animation
+fla_002,Now Loading
+fla_003,Just a white image
+fla_004,Free Time Start
+fla_005,Investigate Start
+fla_006,Make Your Argument Start
+fla_007,Panic Talk Action Start
+fla_008,Closing Argument Start
+fla_009,Hangman's Gambit Start
+fla_010,Time's Up
+fla_011,You Failed
+fla_012,Obtained Truth Bullet
+fla_013,Updated Truth Bullet
+fla_014,Obtained Monocoins
+fla_015,Obtained Present
+fla_017,Finish the Thought Start
+fla_018,Rebuttal Showdown Start
+fla_019,Logic Dive Start
+fla_020,Escape Start
+fla_021,Class Trial Start
+fla_022,Chapter names and UI pixel art???
+fla_023,Chapter names and UI pixel art???
+fla_024,Chapter names and UI pixel art???
+fla_025,Chapter names and UI pixel art???
+fla_026,Chapter names and UI pixel art???
+fla_027,Hope Fragment Complete
+fla_029,Nonstop Debate Break Screen
+fla_030,Nonstop Debate Break Text
+fla_031,Nonstop Debate Complete Text
+fla_032,Class Trial Suspended
+fla_033,Class Trial Resume
+fla_034,Class Trial End
+fla_035,Pixel art of Hope's Peak Academy logo
+fla_036,Othello
+fla_039,Island Mode Stage Select
+fla_040,Island Mode Character Task/State
+fla_041,Island Mode End of Stage
+fla_043,Island Mode Character Relationship Diagnosis
+fla_043_00,Island Mode Nagito Relationship Status
+fla_043_01,Island Mode Twogami Relationship Status
+fla_043_02,Island Mode Gundham Relationship Status
+fla_043_03,Island Mode Kazuichi Relationship Status
+fla_043_04,Island Mode Teruteru Relationship Status
+fla_043_05,Island Mode Nekomaru Relationship Status
+fla_043_06,Island Mode Fuyuhiko Relationship Status
+fla_043_07,Island Mode Akane Relationship Status
+fla_043_08,Island Mode Chiaki Relationship Status
+fla_043_09,Island Mode Sonia Relationship Status
+fla_043_10,Island Mode Hiyoko Relationship Status
+fla_043_11,Island Mode Mahiru Relationship Status
+fla_043_12,Island Mode Mikan Relationship Status
+fla_043_13,Island Mode Ibuki Relationship Status
+fla_043_14,Island Mode Peko Relationship Status
+fla_043_15,Island Mode Relationship Status Return Button
+fla_045,"Island Mode ""Where would you like to go?"""
+fla_046,Twilight Syndrome Mystery Case
+fla_047,Twilight Syndrome Mystery Case
+fla_048,Twilight Syndrome Mystery Case
+fla_049,Twilight Syndrome Mystery Case
+fla_050,Twilight Syndrome Mystery Case
+fla_051,Twilight Syndrome Mystery Case
+fla_052,Twilight Syndrome Mystery Case
+fla_053,Twilight Syndrome Mystery Case
+fla_054,Obtained Hidden Monokuma
+fla_055,Obtained Hidden Monokuma
+fla_056,Obtained Hidden Monokuma
+fla_057,Obtained Hidden Monokuma
+fla_058,Obtained Hidden Monokuma
+fla_059,Obtained Hidden Monokuma
+fla_060,Shot Through the Heart Start
+fla_061,Spot Selection Start
+fla_062,"Text for password entering (*, _, OK, ERROR, PASSWORD?)"
+fla_200,Class Trial Correct Answer
+fla_201,Class Trial Counter (No that's wrong!)
+fla_202,Class Trial Complete Minigame (!!!)
+fla_203,Class Trial Complete Minigame (!!!)
+fla_204,Class Trial Complete Hangman's Gambit
+fla_205,Class Trial Complete Minigame (!!!)
+fla_206,Class Trial Nagito Argue Cut In
+fla_207,Class Trial Gundham Argue Cut In
+fla_208,Class Trial Kazuichi Kazuichi Cut In
+fla_211,Class Trial Fuyuhiko Argue Cut In
+fla_212,Class Trial Nekomaru Argue Cut In
+fla_214,Class Trial Akane Argue Cut In
+fla_216,Class Trial Sonia Argue Cut In
+fla_218,Class Trial Mahiru Argue Cut In
+fla_221,Class Trial Peko Argue Cut In
+fla_222,Class Trial Makoto Argue Cut In
+fla_223,Class Trial Counter (Super Hajime)
+fla_224,Class Trial Counter (Super Hajime and Chiaki)
+fla_225,Class Trial Consent Nagito
+fla_226,Class Trial Consent Gundham
+fla_227,Class Trial Consent Kazuichi
+fla_228,Class Trial Consent Twogami
+fla_229,Class Trial Consent Teruteru
+fla_230,Class Trial Consent Fuyuhiko (Eyepatch)
+fla_231,Class Trial Consent Nekomaru
+fla_232,Class Trial Consent Fuyuhiko (No Eyepatch)
+fla_233,Class Trial Consent Akane
+fla_234,Class Trial Consent Chiaki
+fla_235,Class Trial Consent Sonia
+fla_236,Class Trial Consent Hiyoko
+fla_237,Class Trial Consent Mahiru
+fla_238,Class Trial Consent Mikan
+fla_239,Class Trial Consent Ibuki
+fla_240,Class Trial Consent Peko
+fla_241,Class Trial Consent Monokuma
+fla_242,Class Trial Refute (Super Hajime)
+fla_243,Class Trial Consent Makoto
+fla_244,Image of E-Handbook
+fla_245,Class Trial Break
+fla_246,Roses on floor
+fla_247,Black screen
+fla_248,Class Trial Counter (Used after countering Izuru)
+fla_286,Image of Grape House
+fla_291,Image of Strawberry House
+fla_300 - fla_329,"Character expression animations (such as angry veins, sighs, etc.)"
