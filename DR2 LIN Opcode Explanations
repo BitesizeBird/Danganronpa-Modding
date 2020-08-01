@@ -101,7 +101,7 @@ Opcodes
 0x3b - Start of Jump
 0x3c - End Flag Check
 0x3d - Screen Effect
-0x3e - ???
+0x3e - Hangman
 0x3f - ???
 
 0x40 - ???
@@ -1797,9 +1797,47 @@ Intensity
 
 ------------------------------------------------------------------------------------------------------------------------
 
-0x3e - ???
+0x3e - Hangman
 ---
-0x3e|???, ???
+0x3e|ID, Difficulty
+
+Used to load Hangman's Gambit minigame.
+Can only be used during Class Trials.
+
+
+ID
+---
+Determines which Hangman's Gambit to load.
+Goes from 0 to 11. Outside of this range makes the game crash.
+
+
+Difficulty
+---
+Determines the rate at which letters spawn in.
+Goes from 0 to 11. Outside of this range does not load the minigame and softlocks the game.
+
+In the base game, this value is always the same as the ID, presumably to scale the difficulty appropriately.
+However, these do not have to match.
+
+
+e.g.
+0x3e|0, 0
+This loads the first Hangman's Gambit minigame with the first level's difficulty.
+
+0x3e|6, 0
+This loads the 6th Hangman's Gambit with the first level's difficulty.
+
+NOTE: You will need the below functions as well to handle player difficulty or else the game will freeze.
+0x3b|1, 246
+0x32|1
+0x3b|0, 0
+0x32|2
+0x3b|0, 1
+0x32|3
+0x3b|0, 2
+0x32|255
+0x2c|1, 246
+0x2c|0, 0
 
 ------------------------------------------------------------------------------------------------------------------------
 
