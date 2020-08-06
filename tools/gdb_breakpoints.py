@@ -3,22 +3,20 @@ sys.path.append('.')
 
 import formats.wad as wad
 import bisect
+import os
 
-data = wad.Wad('../../dr2_data.wad')
-data_us = wad.Wad('../../dr2_data_us.wad')
+class Wad:
+    def __init__(self, path):
+        self.wad = wad.Wad(path)
+        #self.path = path
 
-data_files = [[0, '<header>']]
-for path, file in data.files.items():
-    data_files.append([file[0], path])
-data_files.sort()
-data_offsets = [offset for [offset, _] in data_files]
+        self.files = [[0, '<header>']]
+        for path, file in self.wad.files.items():
+            self.files.append([file[0], path])
+        self.files.sort()
+        self.offsets = [offset for [offset, _] in self.files]
 
-data_us_files = [[0, '<header>']]
-for path, file in data_us.files.items():
-    data_us_files.append([file[0], path])
-data_us_files.sort()
-data_us_offsets = [offset for [offset, _] in data_us_files]
-
+wads = {}
 fds = {}
 offsets = {}
 
@@ -80,6 +78,9 @@ class WadRead(gdb.Breakpoint):
         super().__init__('fread', type=gdb.BP_BREAKPOINT)
 
     def stop(self):
+        global show_reads
+        global break_on
+
         ptr = gdb.parse_and_eval('(void*)$rdi')
         size = gdb.parse_and_eval('(size_t)$rsi')
         count = gdb.parse_and_eval('(size_t)$rdx')
@@ -91,28 +92,33 @@ class WadRead(gdb.Breakpoint):
             offset = offsets[fd]
             offsets[fd] += bytes_
 
-            if fds[fd] == 'dr2_data.wad':
-                idx = bisect.bisect_right(data_offsets, offset)-1
-                file = data_files[idx]
+            name = fds[fd]
+            if name in wads:
+                wad = wads[name]
+                idx = bisect.bisect_right(wad.offsets, offset)-1
+                file = wad.files[idx]
+                wad_offset = file[0]
+                wad_path = file[1]
 
-                if 'bgm' in file[1] and file[1].endswith('.ogg'): # ignore music files
-                    return False
+                if show_reads:
+                    print('reading {} bytes from dr2_data:{} (offset {}) to ptr {}'.format(bytes_, wad_path, offset - wad_offset, ptr))
 
-                print('read {} bytes from dr2_data:{} (offset {}) to ptr {}'.format(bytes_, file[1], offset - file[0], ptr))
-            elif fds[fd] == 'dr2_data_us.wad':
-                idx = bisect.bisect_right(data_us_offsets, offset)-1
-                file = data_us_files[idx]
-
-                print('read {} bytes from dr2_data_us:{} (offset {}) to ptr {}'.format(bytes_, file[1], offset - file[0], ptr))
-
-                if data_us_files[idx][1].endswith('.lin'):
-                    print('found a lin! stopping')
-                    return True
+                for ext in break_on:
+                    if wad_path.endswith(ext):
+                        break_on.remove(ext)
+                        print('BREAK: reading {} bytes from dr2_data:{} (offset {}) to ptr {}'.format(bytes_, wad_path, offset - wad_offset, ptr))
+                        return True
 
         return False
-
 
 WadOpen()
 WadClose()
 WadSeek()
 WadRead()
+
+def register_wad(path):
+    name = os.path.basename(path)
+    wads[name] = Wad(path)
+
+show_reads = False
+break_on = set()
