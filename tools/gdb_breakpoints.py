@@ -17,7 +17,7 @@ class Wad:
         self.offsets = [offset for [offset, _] in self.files]
 
 wads = {}
-fds = {}
+fileptrs = {}
 offsets = {}
 
 class WadOpen(gdb.Breakpoint):
@@ -37,10 +37,10 @@ class WadFinishOpen(gdb.FinishBreakpoint):
 
     def stop(self):
         try:
-            fd = int(gdb.parse_and_eval('((FILE*)$rax)->_fileno'))
+            fileptr = int(gdb.parse_and_eval('(FILE*)$rax'))
 
-            fds[fd] = self.path
-            offsets[fd] = 0
+            fileptrs[fileptr] = self.path
+            offsets[fileptr] = 0
         except: # fuck the police
             pass
         return False
@@ -50,11 +50,11 @@ class WadClose(gdb.Breakpoint):
         super().__init__('fclose', type=gdb.BP_BREAKPOINT)
 
     def stop(self):
-        fd = int(gdb.parse_and_eval('((FILE*)$rdi)->_fileno'))
+        fileptr = int(gdb.parse_and_eval('(FILE*)$rdi'))
 
-        if fd in fds:
-            del fds[fd]
-            del offsets[fd]
+        if fileptr in fileptrs:
+            del fileptrs[fileptr]
+            del offsets[fileptr]
 
         return False
 
@@ -63,13 +63,13 @@ class WadSeek(gdb.Breakpoint):
         super().__init__('fseeko64', type=gdb.BP_BREAKPOINT)
 
     def stop(self):
-        fd = int(gdb.parse_and_eval('((FILE*)$rdi)->_fileno'))
+        fileptr = int(gdb.parse_and_eval('(FILE*)$rdi'))
         offset = gdb.parse_and_eval('(unsigned long long)$rsi')
         whence = gdb.parse_and_eval('(int)$rdx')
         if whence == 0:
-            offsets[fd] = offset
-        elif whence == 1 and fd in offsets:
-            offsets[fd] += offset
+            offsets[fileptr] = offset
+        elif whence == 1 and fileptr in offsets:
+            offsets[fileptr] += offset
 
         return False
 
@@ -84,15 +84,15 @@ class WadRead(gdb.Breakpoint):
         ptr = gdb.parse_and_eval('(void*)$rdi')
         size = gdb.parse_and_eval('(size_t)$rsi')
         count = gdb.parse_and_eval('(size_t)$rdx')
-        fd = int(gdb.parse_and_eval('((FILE*)$rcx)->_fileno'))
+        fileptr = int(gdb.parse_and_eval('(FILE*)$rcx'))
 
         bytes_ = size*count
 
-        if fd in fds:
-            offset = offsets[fd]
-            offsets[fd] += bytes_
+        if fileptr in fileptrs:
+            offset = offsets[fileptr]
+            offsets[fileptr] += bytes_
 
-            name = fds[fd]
+            name = fileptrs[fileptr]
             if name in wads:
                 wad = wads[name]
                 idx = bisect.bisect_right(wad.offsets, offset)-1
@@ -119,6 +119,11 @@ WadRead()
 def register_wad(path):
     name = os.path.basename(path)
     wads[name] = Wad(path)
+def register_all(path):
+    wads["dr2_data.wad"] = Wad(os.path.join(path, "dr2_data.wad"))
+    wads["dr2_data_us.wad"] = Wad(os.path.join(path, "dr2_data_us.wad"))
+    wads["dr2_data_keyboard.wad"] = Wad(os.path.join(path, "dr2_data_keyboard.wad"))
+    wads["dr2_data_keyboard_us.wad"] = Wad(os.path.join(path, "dr2_data_keyboard_us.wad"))
 
 show_reads = False
 break_on = set()
