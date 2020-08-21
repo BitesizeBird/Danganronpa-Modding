@@ -166,7 +166,8 @@ Advance|210
 0x08|x
 
 ???
-For Nonstop Debates, this is usually 0. However, sometimes it's 2. Completely unsure why.
+For Nonstop Debates, this is usually 0. However, sometimes it's 2. Completely unsure why. 
+Can apply to remarks or white noise.
 
 ---------------------------------------------------------------------------
 
@@ -439,7 +440,9 @@ Use the voice line specified that is from Chapter 1.
 0x1c|x
 
 ???
-Seems to always be 0???
+Usually set to 0. Can apply to remarks or white noise.
+However, this seems to be always set to 1 when 0x08 is set to 2.
+But sometimes this is set to 1 when 0x08 is still 0.
 
 ---------------------------------------------------------------------------
 
@@ -457,7 +460,8 @@ Could be to determine either the character voice line to use or which character 
 0x1e|x
 
 ???
-Always seems to be set to 65535???
+Always seems to be set to 65535 for main chapter Class Trials???
+But is set to 0 for all 'Chapter 14' debates. (Chapter 14 nonstop files look to be copies of the DR1 Nonstop Debates?)
 
 ---------------------------------------------------------------------------
 
