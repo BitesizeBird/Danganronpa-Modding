@@ -32,3 +32,46 @@
 0x1f - 
 0x20 - 
 0x21 - 
+
+---------------------------------------------------------------------------
+
+0x0f - Angle
+---
+Angle|x
+
+The angle at which the text will travel across.
+Goes from 0 to 359 (presumably??? Probably loops around) where 0 is travelling up the screen and goes clockwise.
+
+e.g. Angle|270
+Makes the text travel across the screen towards the left.
+
+---------------------------------------------------------------------------
+
+0x10 - Scale
+---
+Scale|x
+
+The starting size of the text.
+This value is usually around 80 - 200. 
+Around 120 is a good, standard size.
+
+e.g.
+Scale|150
+Shows the text starting from size 150.
+
+---------------------------------------------------------------------------
+
+0x11 - Final Scale
+---
+Final Scale|x
+
+The ending size of the text.
+When set to 100, the scale of the text won't change with time. Presumably this is a percentage.
+
+
+e.g.
+Scale|80
+Final Scale|120
+
+Starts the text as size 80.
+Then, while that text is displayed, it grows in size to 120%.
