@@ -67,7 +67,7 @@ Value 2 seems to be used as the player text during Rebuttal Showdowns???
 
 Always 0 for Nonstop Debates
 For Rebuttal Showdowns, always 0 for opponent text and 2 for player text???
-So this could determine which half of the screen to apply the effects.
+So this could determine which half of the screen to apply the effects???
 
 ---------------------------------------------------------------------------
 
@@ -76,9 +76,10 @@ So this could determine which half of the screen to apply the effects.
 0x02|x
 
 ???
-Always 0 for Nonstop Debates???
+Always 0 for Nonstop Debates.
 For Rebuttal Showdowns, it was 1 for the opponent text and 0 for the player text.
 But after an advancement, the value alternated between 1 and 2 for the opponent text???
+So this could determine which half of the screen to apply the effects??? This does line up more with the Trial Camera parameters too than the above does.
 
 ---------------------------------------------------------------------------
 
@@ -97,14 +98,26 @@ Shooting this text's weakpoint with Truth Bullet 1 (starting from 0) will regist
 
 ---------------------------------------------------------------------------
 
-0x04 - ???
+0x04 - Shoot with Argue Point
 ---
-0x04|x
+0x4|x
 
-???
-Always 65535 for Nonstop Debates???
+Determines which Argue Point to use on the weak point where x is the TextID of that weak point.
+(In game, the player sometimes needs to 'memorize' a weak point using the 'Truth Flashback' and then shoot it at another weak point.)
+(i.e. absorb a weak point and shoot it at another.)
+
+If this value is set to anything but 65535, make sure to set the Shoot With Evidence value to 255 so that no other truth bullets will work.
+Set to 65535 otherwise.
+
+e.g.
+Shoot With Evidence|255
+0x4|3
+
+There will be a weak point for this text that can only be successfully shot with the 'absorbed' weak point that came from the section with TextID|3.
+
+
 For Rebuttal Showdowns, it's often 65535 too.
-For player text after advancement and after "Can you repeat that?", it was 5 which is where the second section begins.
+For player text (including after advancement and the "Can you repeat that?"), it was 5 which is where the second section begins.
 So this might be to set where the argument should now loop from???
 If 65535, no loop is set.
 
@@ -114,8 +127,10 @@ If 65535, no loop is set.
 ---
 0x05|x
 
-???
-Always 2000 for Nonstop Debates???
+Unsure what this is for.
+For Nonstop Debates, these are set to 2000 for normal text (though some in the Izuru debate have 200 but this seems like a mistake).
+Otherwise, 0 is used for white noise.
+
 But seems to be either 0 or 1 for Rebuttal Showdowns. Unsure what it determines.
 Mostly just seems to alternate? Aside from the player text which kept the number the same as the previous one (which was 0) but not for the "Can you repeat that?"???
 
@@ -136,12 +151,13 @@ Determines if the text has a weak point.
 ---
 Advance|x
 
-The amount of frames to display the text for before moving to the next text???
+The amount of frames to wait before moving to the next text section. Usually this is based around 210.
+As white noise is present, the timing of these must be taken into account too.
 
 e.g.
 Advance|210
 
-The text will show for 210 frames before moving to the next text.
+210 frames after this text has applied, apply the next text section.
 
 ---------------------------------------------------------------------------
 
@@ -150,6 +166,7 @@ The text will show for 210 frames before moving to the next text.
 0x08|x
 
 ???
+For Nonstop Debates, this is usually 0. However, sometimes it's 2. Completely unsure why.
 
 ---------------------------------------------------------------------------
 
@@ -157,13 +174,12 @@ The text will show for 210 frames before moving to the next text.
 ---
 0x09|x
 
-???
-Used to determine how the text transitions in??? Or out???
-Seems to usually match Transition below and in-game, the transition effect in and out seems to be usually the same.
+Determines the type of entry transition to apply to the text.
+Often this value matches with Transition below but it doesn't have to.
 
-0 - Fade in/out
-1 - Starting large, scale to determined size, fade in and rotate into place
-3 - Enters/Exits the screen fast by accelerating towards determinedd angle
+0 - Fade in
+1 - Starting large, then the text scales to determined size while fading in and rotating into place
+3 - Enters the screen fast by accelerating towards determined angle
 
 ---------------------------------------------------------------------------
 
@@ -171,11 +187,11 @@ Seems to usually match Transition below and in-game, the transition effect in an
 ---
 Transition|x
 
-The type of transition to have the text enter the screen with??? Or out???
+Determines the type of exit transition to apply to the text.
 
-0 - Fade in/out
-1 - Starting large, scale to determined size, fade in and rotate into place
-3 - Enters/Exits the screen fast by accelerating towards determinedd angle
+0 - Fade out
+1 - The text rotates as it shrinks and fades out.
+3 - Exits the screen fast by accelerating towards determined angle
 
 ---------------------------------------------------------------------------
 
@@ -322,8 +338,10 @@ Rotation Speed|x
 ---
 Character|x
 
-Determines which character is speaking.
-Determines sprite, voice line, and where the camera is pointing towards???
+Determines which character is speaking?
+This is set to 0 for white noise.
+
+Determines sprite, voice line, and where the camera is pointing towards??? Probably not considering the white noise.
 
 Character|1
 
@@ -336,6 +354,7 @@ Make Nagito the speaker of the text.
 Sprite|x
 
 Determines which expression to use for the determined character.
+This is set to 0 for white noise.
 
 Sprite|1
 
@@ -357,6 +376,7 @@ Check against the Trial Camera values to see if they match!!!
 0x18|x
 
 Character portrait shake???
+This is set to 0 for white noise.
 
 0 - No shake.
 1 - Shake.
@@ -369,6 +389,8 @@ Voice|x
 
 Used to determine which voice line to use from the Character specified above and the Chapter specified below.
 
+If set to 65535, no voice clip will play.
+
 e.g.
 Voice|2
 
@@ -379,6 +401,20 @@ Use Voice Line 2 from the Character and Chapter specified.
 0x1a - ???
 ---
 0x1a|x
+
+This determines the amount of time the player will gain/lose if they shoot that text with the silencer.
+
+
+Shooting remarks will decrease the timer by x amount of seconds.
+If the player is on Mean Action difficulty, x will be multipled by 1.5 (rounded down).
+For remarks, this is set to 10, 15 or 20, increasing in scale as the player progresses through the game.
+(Chapters 1 to 3: x = 10)
+(Chapters 4 & 5: x = 15)
+(Chapter 6: x = 20)
+
+Clearing white noise with the silencer will increase the timer by x amount of seconds.
+For white noise, this is usually between 1 and 4 and matches the value of Type.
+
 
 Usually seems to be 10 for Nonstop Debates and 0 for Rebuttal Showdowns???
 Or is it related to voice lines??? Volume???
