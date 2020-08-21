@@ -12,8 +12,8 @@ Hanron also seem to have a section at the end that determines where the Showdown
 0x06 - Has Weak Point
 0x07 - Advance
 0x08 - 
-0x09 - 
-0x0a - Transition
+0x09 - Entry Effect
+0x0a - Exit Effect
 0x0b - Fade Out
 0x0c - Horizontal
 0x0d - Vertical
@@ -21,13 +21,13 @@ Hanron also seem to have a section at the end that determines where the Showdown
 0x0f - Angle
 0x10 - Scale
 0x11 - Final Scale
-0x12 - 
+0x12 - Text Shake
 0x13 - Rotation
 0x14 - Rotation Speed
 0x15 - Character
 0x16 - Sprite
 0x17 - Background Animation
-0x18 - Portrait Shake ???
+0x18 - Portrait Shake
 0x19 - Voice
 0x1a - 
 0x1b - Chapter
@@ -128,7 +128,7 @@ If 65535, no loop is set.
 0x05|x
 
 Unsure what this is for.
-For Nonstop Debates, these are set to 2000 for normal text (though some in the Izuru debate have 200 but this seems like a mistake).
+For Nonstop Debates, these are set to 2000 for normal remarks (though some in the Izuru debate have 200 but this seems like a mistake).
 Otherwise, 0 is used for white noise.
 
 But seems to be either 0 or 1 for Rebuttal Showdowns. Unsure what it determines.
@@ -171,7 +171,7 @@ Can apply to remarks or white noise.
 
 ---------------------------------------------------------------------------
 
-0x09 - ???
+0x09 - Entry Effect
 ---
 0x09|x
 
@@ -184,7 +184,7 @@ Often this value matches with Transition below but it doesn't have to.
 
 ---------------------------------------------------------------------------
 
-0x0a - Transition
+0x0a - Exit Effect
 ---
 Transition|x
 
@@ -299,12 +299,11 @@ Then, while that text is displayed, it grows in size to 120%.
 
 ---------------------------------------------------------------------------
 
-0x12 - ???
+0x12 - Text Shake
 ---
 0x12|x
 
-???
-Text shake???
+Seems to control whether to shake the Text or not.
 
 0 - No text shake.
 1 - The text shakes.
@@ -372,12 +371,11 @@ Check against the Trial Camera values to see if they match!!!
 
 ---------------------------------------------------------------------------
 
-0x18 - ???
+0x18 - Portrait Shake
 ---
 0x18|x
 
-Character portrait shake???
-This is set to 0 for white noise.
+Controls whether to shake the character portrait or not.
 
 0 - No shake.
 1 - Shake.
@@ -399,26 +397,24 @@ Use Voice Line 2 from the Character and Chapter specified.
 
 ---------------------------------------------------------------------------
 
-0x1a - ???
+0x1a - Time Bonus
 ---
 0x1a|x
 
 This determines the amount of time the player will gain/lose if they shoot that text with the silencer.
 
-
 Shooting remarks will decrease the timer by x amount of seconds.
 If the player is on Mean Action difficulty, x will be multipled by 1.5 (rounded down).
-For remarks, this is set to 10, 15 or 20, increasing in scale as the player progresses through the game.
+
+For remarks in the base game, this is set to 10, 15 or 20, increasing in scale as the player progresses through the game.
 (Chapters 1 to 3: x = 10)
 (Chapters 4 & 5: x = 15)
 (Chapter 6: x = 20)
 
+
 Clearing white noise with the silencer will increase the timer by x amount of seconds.
-For white noise, this is usually between 1 and 4 and matches the value of Type.
 
-
-Usually seems to be 10 for Nonstop Debates and 0 for Rebuttal Showdowns???
-Or is it related to voice lines??? Volume???
+For white noise in the base game, this is usually between 1 and 4 and matches the value of Type.
 
 ---------------------------------------------------------------------------
 
@@ -426,7 +422,7 @@ Or is it related to voice lines??? Volume???
 ---
 Chapter|x
 
-Used to determine which voice line to use as voice lines are categorised by chapter???
+Used to determine which voice line to use as voice lines are categorised by chapter. (???)
 
 e.g.
 Chapter|1
@@ -461,7 +457,8 @@ Could be to determine either the character voice line to use or which character 
 
 ???
 Always seems to be set to 65535 for main chapter Class Trials???
-But is set to 0 for all 'Chapter 14' debates. (Chapter 14 nonstop files look to be copies of the DR1 Nonstop Debates?)
+But this is set to 0 for all 'Chapter 14' debates. Chapter 14 nonstop files look to be copies of the DR1 Chapter 1 Nonstop Debates.
+(May need to look at DR1 nonstop files to see if this is used with different parameters and then went unused for DR2.)
 
 ---------------------------------------------------------------------------
 
@@ -470,8 +467,10 @@ But is set to 0 for all 'Chapter 14' debates. (Chapter 14 nonstop files look to 
 0x1f|x
 
 ???
-Always set to 0 for Nonstop Debates???
-For Rebuttal Showdowns, was 65526 for opponent text before advancement, 65536 after advancement, 50 for the text with the weak point, and 0 for player text???
+Always set to 0 for Nonstop Debates. 
+Most likely reserved for just Rebuttal Showdowns. (Functions 0x1f, 0x20 0x21, and possibly 0x1e could be all made for DR2 specifically??? Check DR1 nonstop files!!!) 
+
+For Rebuttal Showdowns, was 65526 for opponent text before advancement, 65535 after advancement, 50 for the text with the weak point, and 0 for player text???
 
 ---------------------------------------------------------------------------
 
@@ -480,9 +479,11 @@ For Rebuttal Showdowns, was 65526 for opponent text before advancement, 65536 af
 0x20|x
 
 ???
-Always 0 for Nonstop Debates but varies for Rebuttal Showdowns (between 0 and 10)???
+Always set to 0 for Nonstop Debates. (Most likely reserved for just Rebuttal Showdowns. See 0x1f above.)
+
+Varies for Rebuttal Showdowns (between 0 and 10)???
 Was 10 for all before the Advancement, 0 for the Hajime's line, and 6 for the ones after Hajime's line.
-Maybe to do with how much the screen moves if the player misses the words to slash???
+Maybe to do with how much the screen moves if the player successfully slashes the text??? (Or maybe even misses the words to slash???)
 
 ---------------------------------------------------------------------------
 
@@ -491,6 +492,8 @@ Maybe to do with how much the screen moves if the player misses the words to sla
 0x21|x
 
 ???
-Always seems to be 0 for Nonstop Debates and 65535 for Rebuttal Showdowns???
+Always set to 0 for Nonstop Debates. (Most likely reserved for just Rebuttal Showdowns. See 0x1f above.)
+
+Always set to 65535 for Rebuttal Showdowns???
 
 ---------------------------------------------------------------------------
