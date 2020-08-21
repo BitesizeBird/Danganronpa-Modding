@@ -1,6 +1,9 @@
-Both Nonstop Debate (nonstop) and Rebuttal Showdown (hanron) files seem to follow this format.
+Nonstop Debate (nonstop), Shot Through the Heart (kokoro) and Rebuttal Showdown (hanron) files follow this format.
 Hanron also seem to have a section at the end that determines where the Showdown should loop from if the player has advanced???
 
+Need to check the Header values too!!!
+The first byte pair varies between 2C 01, 68 01, A4 01. (little endian?) (And there may be more byte pairs?)
+The second byte pair looks to be the Text Count, much like the .lin script files.
 ---------------------------------------------------------------------------
 
 0x00 - TextID
@@ -63,9 +66,6 @@ Determines the type the text will be.
 0 - Normal 
 1+ - White noise where this number is the number of shots it takes to clear the noise (maybe not exactly???) and the amount of seconds added to the timer when it's cleared.
 
-Value 2 seems to be used as the player text during Rebuttal Showdowns???
-
-Always 0 for Nonstop Debates
 For Rebuttal Showdowns, always 0 for opponent text and 2 for player text???
 So this could determine which half of the screen to apply the effects???
 
