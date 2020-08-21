@@ -35,14 +35,184 @@
 
 ---------------------------------------------------------------------------
 
+0x00 - TextID
+---
+TextID|x
+
+The ID of the text. 
+This is checked by the Check Flag A|0, x line in the relevant .lin script file.
+
+e.g.
+TextID|1
+
+Identifies the 1st (starting from 0) text to display.
+
+---------------------------------------------------------------------------
+
+0x01 - Type
+---
+Type|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x02 - ???
+---
+0x02|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x03 - Shoot With Evidence
+---
+Shoot With Evidence|x
+
+Determines which Truth Bullet to use on the weak point.
+If set to 255, it is a weak point with no correct truth bullet.
+If set to 65535, there is no weak point.
+
+e.g.
+Shoot With Evidence|1
+
+Shooting this text's weakpoint with Truth Bullet 1 (starting from 0) will register as correct.
+
+---------------------------------------------------------------------------
+
+0x04 - ???
+---
+0x04|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x05 - ???
+---
+0x05|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x06 - Has Weak Point
+---
+Has Weak Point|x
+
+Determines if the text has a weak point.
+
+0 - No weak point.
+1 - Has a weak point.
+
+---------------------------------------------------------------------------
+
+0x07 - Advance
+---
+Advance|x
+
+The amount of frames to display the text for before moving to the next text???
+
+e.g.
+Advance|210
+
+The text will show for 210 frames before moving to the next text.
+
+---------------------------------------------------------------------------
+
+0x08 - ???
+---
+0x08|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x09 - ???
+---
+0x09|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x0a - Transition
+---
+Transition|x
+
+The type of transition to have the text enter the screen with???
+
+0 - Fade in
+
+---------------------------------------------------------------------------
+
+0x0b - Fade Out
+---
+Fade out|x
+
+Determines which frame to fade out the text after initially displaying it??
+This seems to usually match Advance.
+
+e.g.
+Fade out|210
+
+Fade the text out after 210 frames have passed (which is 3.5 seconds).
+
+---------------------------------------------------------------------------
+
+0x0c - Horizontal
+---
+Horizontal|x
+
+The starting horizontal position where the text is displayed.
+Seems to use the PSP's resolution values of 480 × 272.
+So 0 is the left edge of the screen, 240 is the center and 480 is the right edge.
+
+e.g.
+Horizontal|120
+
+Display the text 120 across, so 1/4 across from the left side of the screen.
+
+---------------------------------------------------------------------------
+
+0x0d - Vertical
+---
+Vertical|x
+
+The starting vertical position where the text is displayed.
+Seems to use the PSP's resolution values of 480 × 272.
+So 0 is the top edge of the screen, 136 is the center and 272 is the bottom edge.
+
+e.g.
+Vertical|204
+
+Display the text 204 down, so 3/4s down the screen.
+
+---------------------------------------------------------------------------
+
+0x0e - Angle Acceleration
+---
+Angle Acceleration|x
+
+Determines how fast the text travels towards the specified Angle (see 0x0f below)???
+
+e.g.
+Angle Acceleration|25
+
+Make the text travel towards the specified angle at a speed of 25.
+
+---------------------------------------------------------------------------
+
 0x0f - Angle
 ---
 Angle|x
 
-The angle at which the text will travel across.
+The angle at which the text will travel towards.
 Goes from 0 to 359 (presumably??? Probably loops around) where 0 is travelling up the screen and goes clockwise.
 
-e.g. Angle|270
+e.g.
+Angle|270
+
 Makes the text travel across the screen towards the left.
 
 ---------------------------------------------------------------------------
@@ -57,6 +227,7 @@ Around 120 is a good, standard size.
 
 e.g.
 Scale|150
+
 Shows the text starting from size 150.
 
 ---------------------------------------------------------------------------
@@ -75,3 +246,143 @@ Final Scale|120
 
 Starts the text as size 80.
 Then, while that text is displayed, it grows in size to 120%.
+
+---------------------------------------------------------------------------
+
+0x12 - ???
+---
+0x12|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x13 - Rotation
+---
+Rotation|x
+
+The starting rotation of the text. Measured in degrees going clockwise from around the center of the text.
+
+While this seems similar to Angle, this is to determine the angle of the text itself. Angle is used to determine where the text should travel towards.
+Though usually, these two parameters are set similarly so that the text points towards where it is heading.
+
+e.g.
+Rotation|10
+
+Shows the text starting from a rotation 10 degrees clockwise.
+
+---------------------------------------------------------------------------
+
+0x14 - Rotation Speed
+---
+Rotation Speed|x
+
+!!!
+
+---------------------------------------------------------------------------
+
+0x15 - Character
+---
+Character|x
+
+Determines which character is speaking.
+Determines sprite, voice line, and where the camera is pointing towards???
+
+Character|1
+
+Make Nagito the speaker of the text.
+
+---------------------------------------------------------------------------
+
+0x16 - Sprite
+---
+Sprite|x
+
+Determines which expression to use for the determined character.
+
+Sprite|1
+
+Use expression 1 (starting from 0) for the determined character.
+
+---------------------------------------------------------------------------
+
+0x17 - Background Animation
+---
+Background Animation|x
+
+Presumably this is the Trial Camera to use.
+Check against the Trial Camera values to see if they match!!!
+
+---------------------------------------------------------------------------
+
+0x18 - ???
+---
+0x18|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x19 - Voice
+---
+Voice|x
+
+Used to determine which voice line to use from the Character specified above and the Chapter specified below.
+
+e.g.
+Voice|2
+
+Use Voice Line 2 from the Character and Chapter specified.
+
+---------------------------------------------------------------------------
+
+0x1a - ???
+---
+0x1a|x
+
+Usually seems to be 10??? Related to voice lines??? Volume???
+
+---------------------------------------------------------------------------
+
+0x1b - Chapter
+---
+Chapter|x
+
+Used to determine which voice line to use as voice lines are categorised by chapter???
+
+e.g.
+Chapter|1
+
+Use the voice line specified that is from Chapter 1.
+
+---------------------------------------------------------------------------
+
+0x1c - ???
+---
+0x1c|x
+
+???
+
+---------------------------------------------------------------------------
+
+0x1d - ???
+---
+0x1d|x
+
+Always seems to match Character value.
+Could be to determine either the character voice line to use or which character portrait to display???
+
+---------------------------------------------------------------------------
+
+0x1e|65535
+---------------------------------------------------------------------------
+
+0x1f|0
+---------------------------------------------------------------------------
+
+0x20|0
+---------------------------------------------------------------------------
+
+0x21|0
+
+---------------------------------------------------------------------------
