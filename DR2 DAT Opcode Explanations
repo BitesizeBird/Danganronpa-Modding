@@ -1,3 +1,8 @@
+Both Nonstop Debate (nonstop) and Rebuttal Showdown (hanron) files seem to follow this format.
+Hanron also seem to have a section at the end that determines where the Showdown should loop from if the player has advanced???
+
+---------------------------------------------------------------------------
+
 0x00 - TextID
 0x01 - Type
 0x02 - 
@@ -55,6 +60,10 @@ Type|x
 
 ???
 
+Always 0 for Nonstop Debates??? (Check debate with Agree Points.)
+For Rebuttal Showdowns, always 0 for opponent text and 2 for player text???
+So this could determine which half of the screen to apply the effects.
+
 ---------------------------------------------------------------------------
 
 0x02 - ???
@@ -62,6 +71,9 @@ Type|x
 0x02|x
 
 ???
+Always 0 for Nonstop Debates???
+For Rebuttal Showdowns, it was 1 for the opponent text and 0 for the player text.
+But after an advancement, the value alternated between 1 and 2 for the opponent text???
 
 ---------------------------------------------------------------------------
 
@@ -85,6 +97,11 @@ Shooting this text's weakpoint with Truth Bullet 1 (starting from 0) will regist
 0x04|x
 
 ???
+Always 65535 for Nonstop Debates???
+For Rebuttal Showdowns, it's often 65535 too.
+For player text after advancement and after "Can you repeat that?", it was 5 which is where the second section begins.
+So this might be to set where the argument should now loop from???
+If 65535, no loop is set.
 
 ---------------------------------------------------------------------------
 
@@ -93,6 +110,9 @@ Shooting this text's weakpoint with Truth Bullet 1 (starting from 0) will regist
 0x05|x
 
 ???
+Always 2000 for Nonstop Debates???
+But seems to be either 0 or 1 for Rebuttal Showdowns. Unsure what it determines.
+Mostly just seems to alternate? Aside from the player text which kept the number the same as the previous one (which was 0) but not for the "Can you repeat that?"???
 
 ---------------------------------------------------------------------------
 
@@ -133,6 +153,11 @@ The text will show for 210 frames before moving to the next text.
 0x09|x
 
 ???
+Used to determine how the text transitions in??? Or out???
+Seems to usually match Transition below and in-game, the transition effect in and out seems to be usually the same.
+
+0 - Fade in/out
+3 - Enters/Exits fast
 
 ---------------------------------------------------------------------------
 
@@ -140,9 +165,10 @@ The text will show for 210 frames before moving to the next text.
 ---
 Transition|x
 
-The type of transition to have the text enter the screen with???
+The type of transition to have the text enter the screen with??? Or out???
 
-0 - Fade in
+0 - Fade in/out
+3 - Enters/Exits fast
 
 ---------------------------------------------------------------------------
 
@@ -254,6 +280,10 @@ Then, while that text is displayed, it grows in size to 120%.
 0x12|x
 
 ???
+Text shake???
+
+0 - No text shake.
+1 - The text shakes.
 
 ---------------------------------------------------------------------------
 
@@ -319,7 +349,10 @@ Check against the Trial Camera values to see if they match!!!
 ---
 0x18|x
 
-???
+Character portrait shake???
+
+0 - No shake.
+1 - Shake.
 
 ---------------------------------------------------------------------------
 
@@ -340,7 +373,8 @@ Use Voice Line 2 from the Character and Chapter specified.
 ---
 0x1a|x
 
-Usually seems to be 10??? Related to voice lines??? Volume???
+Usually seems to be 10 for Nonstop Debates and 0 for Rebuttal Showdowns???
+Or is it related to voice lines??? Volume???
 
 ---------------------------------------------------------------------------
 
@@ -362,6 +396,7 @@ Use the voice line specified that is from Chapter 1.
 0x1c|x
 
 ???
+Seems to always be 0???
 
 ---------------------------------------------------------------------------
 
@@ -370,19 +405,45 @@ Use the voice line specified that is from Chapter 1.
 0x1d|x
 
 Always seems to match Character value.
-Could be to determine either the character voice line to use or which character portrait to display???
+Could be to determine either the character voice line to use or which character portrait to display??? Position of sprite??? Where the camera is pointing towards???
 
 ---------------------------------------------------------------------------
 
-0x1e|65535
+0x1e - ???
+---
+0x1e|x
+
+???
+Always seems to be set to 65535???
+
 ---------------------------------------------------------------------------
 
-0x1f|0
+0x1f - ???
+---
+0x1f|x
+
+???
+Always set to 0 for Nonstop Debates???
+For Rebuttal Showdowns, was 65526 for opponent text before advancement, 65536 after advancement, 50 for the text with the weak point, and 0 for player text???
+
 ---------------------------------------------------------------------------
 
-0x20|0
+0x20 - ???
+---
+0x20|x
+
+???
+Always 0 for Nonstop Debates but varies for Rebuttal Showdowns (between 0 and 10)???
+Was 10 for all before the Advancement, 0 for the Hajime's line, and 6 for the ones after Hajime's line.
+Maybe to do with how much the screen moves if the player misses the words to slash???
+
 ---------------------------------------------------------------------------
 
-0x21|0
+0x21 - ???
+---
+0x21|x
+
+???
+Always seems to be 0 for Nonstop Debates and 65535 for Rebuttal Showdowns???
 
 ---------------------------------------------------------------------------
