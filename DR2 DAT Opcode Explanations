@@ -58,9 +58,14 @@ Identifies the 1st (starting from 0) text to display.
 ---
 Type|x
 
-???
+Determines the type the text will be.
 
-Always 0 for Nonstop Debates??? (Check debate with Agree Points.)
+0 - Normal 
+1+ - White noise where this number is the number of shots it takes to clear the noise (maybe not exactly???) and the amount of seconds added to the timer when it's cleared.
+
+Value 2 seems to be used as the player text during Rebuttal Showdowns???
+
+Always 0 for Nonstop Debates
 For Rebuttal Showdowns, always 0 for opponent text and 2 for player text???
 So this could determine which half of the screen to apply the effects.
 
@@ -157,7 +162,8 @@ Used to determine how the text transitions in??? Or out???
 Seems to usually match Transition below and in-game, the transition effect in and out seems to be usually the same.
 
 0 - Fade in/out
-3 - Enters/Exits fast
+1 - Starting large, scale to determined size, fade in and rotate into place
+3 - Enters/Exits the screen fast by accelerating towards determinedd angle
 
 ---------------------------------------------------------------------------
 
@@ -168,7 +174,8 @@ Transition|x
 The type of transition to have the text enter the screen with??? Or out???
 
 0 - Fade in/out
-3 - Enters/Exits fast
+1 - Starting large, scale to determined size, fade in and rotate into place
+3 - Enters/Exits the screen fast by accelerating towards determinedd angle
 
 ---------------------------------------------------------------------------
 
