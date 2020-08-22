@@ -32,7 +32,7 @@ The second byte pair looks to be the Text Count, much like the .lin script files
 0x17 - Background Animation
 0x18 - Portrait Shake
 0x19 - Voice
-0x1a - 
+0x1a - Time Bonus
 0x1b - Chapter
 0x1c - Vertical Characters
 0x1d - 
