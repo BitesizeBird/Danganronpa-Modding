@@ -11,7 +11,7 @@ The second byte pair looks to be the Text Count, much like the .lin script files
 0x02 - Slashes
 0x03 - Shoot With Evidence
 0x04 - Shoot with Argue Point
-0x05 - 
+0x05 - Early Advance Frame
 0x06 - Has Weak Point
 0x07 - Advance
 0x08 - 
