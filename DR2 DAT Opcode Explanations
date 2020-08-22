@@ -122,22 +122,53 @@ There will be a weak point for this text that can only be successfully shot with
 For Rebuttal Showdowns, since this mechanic doesn't exist in this mode, it's often 65535 too.
 
 However, for player text, this seems to point to the section that starts the second part of the argument.
-(But if the player has multiple concurrent lines, the value for 0x4 is instead the value for the next text's TextID).
+(But if the player has multiple concurrent lines, the value for 0x4 is instead the value for the next text's TextID???)
+(This wasn't the case for at least Hanron 3??? The first player text was still 65535 and then the second was the expected value, that being the value of the next section's TextID.)
+
 So this might be to set where the argument should now loop from???
 If so, 65535 could be to not overwrite this value.
 
 ---------------------------------------------------------------------------
 
-0x05 - ???
+0x05 - Early Advance Frame
 ---
 0x5|x
 
-Unsure what this is for.
+Used for Rebuttal Showdowns.
+
 For Nonstop Debates, these are set to 2000 for normal remarks (though some in the Izuru debate have 200 but this seems like a mistake).
+(Could be worth looking at the Izuru debate and the debate straight after it to see what functions and parameters the game uses!!!)
+
 Otherwise, 0 is used for white noise.
 
-But seems to be either 0 or 1 for Rebuttal Showdowns. Unsure what it determines.
-Mostly just seems to alternate? Aside from the player text which kept the number the same as the previous one (which was 0) but not for the "Can you repeat that?"???
+
+For Rebuttal Showdowns, this is used to determine if the text can advance to the next section if the player slashes this text away.
+
+0 - Can't advance early
+1 - Can advance early
+
+This is often set to 1 for the section that appears in a group of sections that appear sequentially.
+
+e.g. (NOTE: This is NOT how the game formats its code and is a combination of some .lin code and nonstop .dat code.)
+Section 0:
+Text|"Did you"
+Advance|30
+0x5|0
+
+Section 1:
+Text|"forget what..."
+Advance|30
+0x5|0
+
+Section 2:
+Text|"Kazuichi said earlier?"
+Advance|180
+0x5|1
+
+"Did you", "forget what...", "Kazuichi said earlier?" all appear one 30 frames after the other.
+If the player slashes Section 0 or 1 away, nothing different will happen.
+However, if the player slashes away Section 2, the game will advance to Section 3 regardless if it has been 180 frames (see the Advance function below).
+This is usually set to 1 at the end of a group like this because the first sections appear too fast anyway.
 
 ---------------------------------------------------------------------------
 
@@ -152,7 +183,7 @@ Determines if the text has a weak point.
 
 ---------------------------------------------------------------------------
 
-0x07 - Advance
+0x07 - Advance After Frame
 ---
 Advance|x
 
@@ -554,6 +585,8 @@ This shifts the screen to the left by 6.
 ???
 Always set to 0 for Nonstop Debates???
 Always set to 65535 for Rebuttal Showdowns???
+Could be a flag to indicate the end of a section??? Though why nonstop and hanron use different values wouldn't make sense???
+
 (May need to look at DR1 nonstop files to see if this is was an existing function or created for DR2!!!)
 
 ---------------------------------------------------------------------------
