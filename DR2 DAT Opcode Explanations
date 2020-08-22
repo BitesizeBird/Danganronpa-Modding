@@ -8,9 +8,9 @@ The second byte pair looks to be the Text Count, much like the .lin script files
 
 0x00 - TextID
 0x01 - Type
-0x02 - 
+0x02 - Slashes
 0x03 - Shoot With Evidence
-0x04 - 
+0x04 - Shoot with Argue Point
 0x05 - 
 0x06 - Has Weak Point
 0x07 - Advance
@@ -34,11 +34,11 @@ The second byte pair looks to be the Text Count, much like the .lin script files
 0x19 - Voice
 0x1a - 
 0x1b - Chapter
-0x1c - 
+0x1c - Vertical Characters
 0x1d - 
 0x1e - 
-0x1f - 
-0x20 - 
+0x1f - Slashed Text Mood Effect
+0x20 - Missed Text Mood Effect
 0x21 - 
 
 ---------------------------------------------------------------------------
@@ -71,15 +71,18 @@ So this could determine which half of the screen to apply the effects???
 
 ---------------------------------------------------------------------------
 
-0x02 - ???
+0x02 - Slashes
 ---
-0x02|x
+0x2|x
 
-???
-Always 0 for Nonstop Debates.
-For Rebuttal Showdowns, it was 1 for the opponent text and 0 for the player text.
-But after an advancement, the value alternated between 1 and 2 for the opponent text???
-So this could determine which half of the screen to apply the effects??? This does line up more with the Trial Camera parameters too than the above does.
+This function is for Rebuttal Showdowns and so is always set to 0 for Nonstop Debates. 
+
+For Rebuttal Showdowns, this value determines how many slashes it takes to clear the text.
+
+e.g.
+0x2|2
+
+The player needs to slash this text 2 times before destroying it.
 
 ---------------------------------------------------------------------------
 
@@ -87,7 +90,7 @@ So this could determine which half of the screen to apply the effects??? This do
 ---
 Shoot With Evidence|x
 
-Determines which Truth Bullet to use on the weak point.
+Determines which Truth Bullet/Blade to use on the weak point.
 If set to 255, it is a weak point with no correct truth bullet.
 If set to 65535, there is no weak point.
 
@@ -116,16 +119,18 @@ Shoot With Evidence|255
 There will be a weak point for this text that can only be successfully shot with the 'absorbed' weak point that came from the section with TextID|3.
 
 
-For Rebuttal Showdowns, it's often 65535 too.
-For player text (including after advancement and the "Can you repeat that?"), it was 5 which is where the second section begins.
+For Rebuttal Showdowns, since this mechanic doesn't exist in this mode, it's often 65535 too.
+
+However, for player text, this seems to point to the section that starts the second part of the argument.
+(But if the player has multiple concurrent lines, the value for 0x4 is instead the value for the next text's TextID).
 So this might be to set where the argument should now loop from???
-If 65535, no loop is set.
+If so, 65535 could be to not overwrite this value.
 
 ---------------------------------------------------------------------------
 
 0x05 - ???
 ---
-0x05|x
+0x5|x
 
 Unsure what this is for.
 For Nonstop Debates, these are set to 2000 for normal remarks (though some in the Izuru debate have 200 but this seems like a mistake).
@@ -163,17 +168,18 @@ Advance|210
 
 0x08 - ???
 ---
-0x08|x
+0x8|x
 
 ???
-For Nonstop Debates, this is usually 0. However, sometimes it's 2. Completely unsure why. 
-Can apply to remarks or white noise.
+Unsure what this is.
+This usually is set to 2 when 0x1c (Vertical Characters) is set to 1.
+However, this isn't always the case. Sometimes, 0x8 is set to 2 when 0x1c is set to 0, and 0x8 is sometimes set to 0 when 0x1c is set to 1.
 
 ---------------------------------------------------------------------------
 
 0x09 - Entry Effect
 ---
-0x09|x
+0x9|x
 
 Determines the type of entry transition to apply to the text.
 Often this value matches with Transition below but it doesn't have to.
@@ -330,7 +336,20 @@ Shows the text starting from a rotation 10 degrees clockwise.
 ---
 Rotation Speed|x
 
-!!!
+When set to a value above 0, the text will rotate.
+
+x seems to be the number of degrees per second that the text rotates.
+
+To rotate anti-clockwise, set x = 65535 - y
+where y is the rotation speed.
+
+(Unsure where the cutoff point is for when the game starts rotating anti-clockwise.)
+(The highest value used for clockwise rotation is 360 so perhaps this is the limit???)
+
+e.g.
+Rotation Speed|100
+
+Rotate the text at 100 degrees per second.
 
 ---------------------------------------------------------------------------
 
@@ -401,10 +420,13 @@ Use Voice Line 2 from the Character and Chapter specified.
 ---
 0x1a|x
 
+Used for Nonstop Debates.
+For Rebuttal Showdowns, this value is always set to 0.
+
 This determines the amount of time the player will gain/lose if they shoot that text with the silencer.
 
-Shooting remarks will decrease the timer by x amount of seconds.
-If the player is on Mean Action difficulty, x will be multipled by 1.5 (rounded down).
+Shooting remarks with the silencer will decrease the timer by x amount of seconds.
+If the player is on Mean Action difficulty, x will automatically be multipled by 1.5 (rounded down).
 
 For remarks in the base game, this is set to 10, 15 or 20, increasing in scale as the player progresses through the game.
 (Chapters 1 to 3: x = 10)
@@ -412,9 +434,9 @@ For remarks in the base game, this is set to 10, 15 or 20, increasing in scale a
 (Chapter 6: x = 20)
 
 
-Clearing white noise with the silencer will increase the timer by x amount of seconds.
+Clearing white noise text with the silencer will increase the timer by x amount of seconds.
 
-For white noise in the base game, this is usually between 1 and 4 and matches the value of Type.
+For white noise in the base game, this value is usually between 1 and 4 and matches the value of Type.
 
 ---------------------------------------------------------------------------
 
@@ -431,14 +453,25 @@ Use the voice line specified that is from Chapter 1.
 
 ---------------------------------------------------------------------------
 
-0x1c - ???
+0x1c - Vertical Characters
 ---
 0x1c|x
 
-???
-Usually set to 0. Can apply to remarks or white noise.
-However, this seems to be always set to 1 when 0x08 is set to 2.
-But sometimes this is set to 1 when 0x08 is still 0.
+This function does not have any effect in the English version.
+Used only for Japanese text.
+(Might apply to other non-romanic-language versions but not romanic-language versions.)
+
+This seems to be used when the text is read from top to bottom rather than left to right.
+So each character is individually rotated 90 degrees anti-clockwise.
+
+0 - Horizontal characters
+1 - Vertical characters
+
+(Check to see if other values such as 1 have any effect!!! Perhaps even backwards text but more likely just rotating characters the other way if anything.)
+
+(0x1c is set to 1 sometimes in the first 'Chapter 14' Nonstop Debate which is presumably the first DR1 debate.
+However, the text isn't vertical there in DR1 itself.
+This could mean that 0x1c is a new function for DR2 used in place of 0x8 but if so, completely unsure why.)
 
 ---------------------------------------------------------------------------
 
@@ -456,34 +489,61 @@ Could be to determine either the character voice line to use or which character 
 0x1e|x
 
 ???
-Always seems to be set to 65535 for main chapter Class Trials???
+Always seems to be set to 65535 for main chapter Nonstop Debates and Rebuttal Showdowns???
 But this is set to 0 for all 'Chapter 14' debates. Chapter 14 nonstop files look to be copies of the DR1 Chapter 1 Nonstop Debates.
-(May need to look at DR1 nonstop files to see if this is used with different parameters and then went unused for DR2.)
+(May need to look at DR1 nonstop files to see if this is used with different parameters and then went unused for DR2!!!)
 
 ---------------------------------------------------------------------------
 
-0x1f - ???
+0x1f - Slashed Text Mood Effect
 ---
 0x1f|x
 
-???
-Always set to 0 for Nonstop Debates. 
-Most likely reserved for just Rebuttal Showdowns. (Functions 0x1f, 0x20 0x21, and possibly 0x1e could be all made for DR2 specifically??? Check DR1 nonstop files!!!) 
+This function is for Rebuttal Showdowns and so is always set to 0 for Nonstop Debates. 
 
-For Rebuttal Showdowns, was 65526 for opponent text before advancement, 65535 after advancement, 50 for the text with the weak point, and 0 for player text???
+If the player successfully clears the text by slashing it, the 'Mood' will shift, meaning that the middle of the screen will shift horizontally.
+Shifting to the right is in favour of the opponent.
+Shifting to the left is in favour of the player.
+
+To shift right, simply put the parameter to the value you desire.
+
+e.g.
+0x20|5
+This shifts the screen right by 5.
+
+
+To shift left, put the parameter as 65536 - y
+where y is your desired amount.
+
+e.g. 
+0x20|65530
+This shifts the screen to the left by 6.
 
 ---------------------------------------------------------------------------
 
-0x20 - ???
+0x20 - Missed Text Mood Effect
 ---
 0x20|x
 
-???
-Always set to 0 for Nonstop Debates. (Most likely reserved for just Rebuttal Showdowns. See 0x1f above.)
+This function is for Rebuttal Showdowns and so is always set to 0 for Nonstop Debates. 
 
-Varies for Rebuttal Showdowns (between 0 and 10)???
-Was 10 for all before the Advancement, 0 for the Hajime's line, and 6 for the ones after Hajime's line.
-Maybe to do with how much the screen moves if the player successfully slashes the text??? (Or maybe even misses the words to slash???)
+If the player fails to clear the text, the 'Mood' will shift, meaning that the middle of the screen will shift horizontally.
+Shifting to the right is in favour of the opponent.
+Shifting to the left is in favour of the player.
+
+To shift right, simply put the parameter to the value you desire.
+
+e.g.
+0x20|5
+This shifts the screen right by 5.
+
+
+To shift left, put the parameter as 65536 - y
+where y is your desired amount.
+
+e.g. 
+0x20|65530
+This shifts the screen to the left by 6.
 
 ---------------------------------------------------------------------------
 
@@ -492,8 +552,8 @@ Maybe to do with how much the screen moves if the player successfully slashes th
 0x21|x
 
 ???
-Always set to 0 for Nonstop Debates. (Most likely reserved for just Rebuttal Showdowns. See 0x1f above.)
-
+Always set to 0 for Nonstop Debates???
 Always set to 65535 for Rebuttal Showdowns???
+(May need to look at DR1 nonstop files to see if this is was an existing function or created for DR2!!!)
 
 ---------------------------------------------------------------------------
