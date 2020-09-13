@@ -388,7 +388,7 @@ Rotate the text at 100 degrees per second.
 ---
 Character|x
 
-Determines which character is speaking?
+Determines which character is speaking, which character's voice line to use, which character's sprite to use, and the character in the portrait.
 This is set to 0 for white noise.
 
 Determines sprite, voice line, and where the camera is pointing towards??? Probably not considering the white noise.
@@ -506,12 +506,12 @@ This could mean that 0x1c is a new function for DR2 used in place of 0x8 but if 
 
 ---------------------------------------------------------------------------
 
-0x1d - ???
+0x1d - Position
 ---
 0x1d|x
 
-Always seems to match Character value.
-Could be to determine either the character voice line to use or which character portrait to display??? Position of sprite??? Where the camera is pointing towards???
+Determines which podium the charatcer's sprite is placed in.
+Usually, this simply matches Character value.
 
 ---------------------------------------------------------------------------
 
@@ -540,15 +540,15 @@ To shift right, simply put the parameter to the value you desire.
 
 e.g.
 0x20|5
-This shifts the screen right by 5.
+This shifts the screen right by 5%.
 
 
-To shift left, put the parameter as 65536 - y
+To shift left, put the parameter as 65536 - y (or as a negative number)
 where y is your desired amount.
 
 e.g. 
 0x20|65530
-This shifts the screen to the left by 6.
+This shifts the screen to the left by 6%.
 
 ---------------------------------------------------------------------------
 
@@ -566,15 +566,15 @@ To shift right, simply put the parameter to the value you desire.
 
 e.g.
 0x20|5
-This shifts the screen right by 5.
+This shifts the screen right by 5%.
 
 
-To shift left, put the parameter as 65536 - y
+To shift left, put the parameter as 65536 - y (or as a negative number)
 where y is your desired amount.
 
 e.g. 
 0x20|65530
-This shifts the screen to the left by 6.
+This shifts the screen to the left by 6%.
 
 ---------------------------------------------------------------------------
 
