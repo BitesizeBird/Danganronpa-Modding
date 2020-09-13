@@ -1,8 +1,8 @@
 Nonstop Debate (nonstop), Shot Through the Heart (kokoro) and Rebuttal Showdown (hanron) files follow this format.
-Hanron also seem to have a section at the end that determines where the Showdown should loop from if the player has advanced???
+Rebuttal Showdowns also have sections at the end that determine how each loop section is handled.
 
 Need to check the Header values too!!!
-The first byte pair varies between 2C 01, 68 01, A4 01. (little endian?) (And there may be more byte pairs?)
+The first byte pair I'm unsure of.
 The second byte pair looks to be the Text Count, much like the .lin script files.
 ---------------------------------------------------------------------------
 
@@ -590,3 +590,138 @@ Could be a flag to indicate the end of a section??? Though why nonstop and hanro
 (May need to look at DR1 nonstop files to see if this is was an existing function or created for DR2!!!)
 
 ---------------------------------------------------------------------------
+
+Rebuttal Showdown Loops
+------
+
+Each Rebuttal Showdown has at least 2 loop sections.
+These loops each have the player slash through text and if the player successfully slashes enough text, they Advance to the next loop.
+
+As a reminder:
+When the player successfully slashes through text, they gain 'favour' and the screen divide moves to the left, giving more screen space to Hajime.
+When the player misses text, they lose favour and the screen divide moves to the right, giving more screen space to the opponent.
+
+However, in terms of these parameters and their typical values, it'll be more useful to consider 'favour' being for the opponent.
+Then, each time the player successfully slashes through text, the opponent loses favour.
+
+---------------------------------------------------------------------------
+
+Loop Length
+---
+Loop Length|x
+
+How many Sections until the start of the next loop.
+This includes Hajime's text too.
+
+e.g.
+Loop Length|5
+
+This loop has length 5, so the next loop will start at Section 5 (counting from 0).
+
+---------------------------------------------------------------------------
+
+Starting Favour
+---
+Starting Favour|x
+
+Determines how much favour the opponent starts with.
+Also determines the starting position of the screen divide between the two halves, measured in percentage.
+
+e.g.
+Starting Favour|60
+
+The opponent starts with
+The screen divide starts 60% across the screen.
+
+---------------------------------------------------------------------------
+
+Favour To Advance
+---
+Favour To Advance|x
+
+Determines how much favour the opponent must end with to Advance to the next loop.
+If they don't reach this threshold but are 10 favour within it, Cross Swords is triggered.
+Also determines the position of the arrow indicator across the screen in percentage.
+
+e.g.
+Favour To Advance|20
+
+The opponent must reach 20 favour or less for the player to Advance to the next loop.
+The arrow to show this threshold will appear 20% across the screen.
+
+---------------------------------------------------------------------------
+
+Sharpness Gentle
+---
+Sharpness Gentle|x
+
+Determines how many slashes the player is given in that loop when in Gentle Action difficulty.
+
+e.g.
+Sharpness Gentle|25
+
+The player can slash 25 times during this loop before being unable to slash anymore.
+
+---------------------------------------------------------------------------
+
+Sharpness Kind
+---
+Sharpness Kind|x
+
+Determines how many slashes the player is given in that loop when in Kind Action difficulty.
+
+e.g.
+Sharpness Gentle|15
+
+The player can slash 15 times during this loop before being unable to slash anymore.
+
+---------------------------------------------------------------------------
+
+Sharpness Mean
+---
+Sharpness Mean|x
+
+Determines how many slashes the player is given in that loop when in Mean Action difficulty.
+
+e.g.
+Sharpness Mean|10
+
+The player can slash 10 times during this loop before being unable to slash anymore.
+
+---------------------------------------------------------------------------
+
+Cross Sword Frames
+---
+Cross Sword Frames|x
+
+Determines how many frames Cross Swords lasts for.
+
+e.g.
+Sharpness Mean|120
+
+Cross Swords lasts 120 frames (2 seconds) before determining if the player succeeded or failed.
+
+---------------------------------------------------------------------------
+
+Cross Sword Clicks
+---
+Cross Sword Clicks|x
+
+Determines how many clicks/button presses the player must perform during Cross Swords to win.
+
+e.g.
+Cross Sword Clicks|10
+
+The player must click/press A 10 times to beat this Cross Sword.
+
+---------------------------------------------------------------------------
+
+Always Cross Swords
+---
+Always Cross Swords|x
+
+Determines if the player must perform Cross Swords regardless if they have exceeded the Favour to Advance Threshold.
+Usually, Cross Swords is only triggered if the player reached favour is that is at least 10 too high to Advance.
+
+0 - Not mandatory
+1 - Mandatory
