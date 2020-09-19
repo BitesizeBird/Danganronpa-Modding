@@ -137,9 +137,47 @@ Doesn't seem to be necessary ???
 
 ------------------------------------------------------------------------------------------------------------------------
 
-0x01 - ???
+0x1 - Load Sprite???
 ---
-0x1|???, ???, ???, ???
+0x1|???, Map ID, Character ID, State???
+
+Seems to be for loading/unloading a character's sprite from a Map.
+Doesn't appear in trials.
+
+
+0x1|0, 1, 1, 0
+0x1|0, 105, 1, 1
+The below was just after Nagito declared himself leaving in dialogue.
+Last parameter seems to be a State parameter, 0 for unload, 1 for load.
+This implies that Nagito was unloaded from Area 1 (the Beach) and then loaded into Area 105 (Nagito's cottage).
+
+This was used during Chapter 5 investigation which also lines up with the above idea.
+0x1|0, 161, 4, 1
+0x1|0, 131, 7, 1
+0x1|0, 166, 8, 1
+0x1|0, 105, 9, 1
+0x1|0, 163, 10, 1
+
+
+However, the below block is very common at the start of a script/section which does not follow the above idea.
+0x1|1, 99, 0, 252
+0x1|1, 99, 0, 253
+0x1|1, 99, 0, 254
+
+
+This was used as Monokuma was unloaded from a scene.
+Sprite|0, 16, 98, 0, 0
+0x1|0, 162, 16, 0
+The Sprite function might be only for where a sprite appears in the scene or to hide it.
+But 0x1 is to actually load and unload them?
+But using 0x1 does not seem to make a difference???
+
+Using 0x1 by itself with no Sprite function does not make anything happen.
+
+
+0x1|0, 104, 28, 1 
+At the start of Chapter 1, just after Monokuma announces it's 10pm, this is ran after Hajime's last line but before the player is allowed control.
+104 is Hajime's cottage but 28 doesn't align with any character.
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -489,9 +527,22 @@ Set Report Info|$characterID, $arg2, $state"
 
 ------------------------------------------------------------------------------------------------------------------------
 
-0x11 - ???
+0x11 - FTE Relationship???
 ---
-0x11|???, ???, ???, ???
+0x11|Character ID, Negative???, ???, Relationship???
+
+This function is used whenever the player interacts with a character within FTEs (or first introductions with them during the prologue).
+Sp perhaps some kind of relationship meter with each character???
+
+It appears around the time the game asks if you want to give the character a present.
+Could be that the relationship goes up (or even down?) by a certain amount when player gives character presents they like, love, dislike, etc.
+It also appears in the prologue scripts with the character introductions. Perhaps these were left over. 
+
+e.g.
+0x11|1, 1, 0, 2
+0x11|1, 0, 0, 20
+0x11|1, 0, 0, 0
+Used for Nagito FTEs.
 
 ------------------------------------------------------------------------------------------------------------------------
 
