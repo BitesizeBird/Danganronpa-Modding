@@ -36,7 +36,7 @@ The second byte pair looks to be the Text Count, much like the .lin script files
 0x1b - Chapter
 0x1c - Vertical Characters
 0x1d - Position
-0x1e - 
+0x1e - Music
 0x1f - Slashed Text Mood Effect
 0x20 - Missed Text Mood Effect
 0x21 - 
@@ -519,14 +519,15 @@ Usually, this simply matches Character value.
 
 ---------------------------------------------------------------------------
 
-0x1e - ???
+0x1e - Music
 ---
-0x1e|x
+0x1e|Music ID
 
-???
-Always seems to be set to 65535 for main chapter Nonstop Debates and Rebuttal Showdowns???
-But this is set to 0 for all 'Chapter 14' debates. Chapter 14 nonstop files look to be copies of the DR1 Chapter 1 Nonstop Debates.
-(May need to look at DR1 nonstop files to see if this is used with different parameters and then went unused for DR2!!!)
+Plays a song from the BGM.
+
+If set to -1 (65535), then no new song will play and the current song will continue.
+
+Seems to have gone unused in the base game as it is always set to -1.
 
 ---------------------------------------------------------------------------
 
