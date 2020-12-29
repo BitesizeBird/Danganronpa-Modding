@@ -29,8 +29,8 @@ The second byte pair looks to be the Text Count, much like the .lin script files
 0x14 - Rotation Speed
 0x15 - Character
 0x16 - Sprite
-0x17 - Background Animation
-0x18 - Portrait Shake
+0x17 - Camera
+0x18 - Portrait Shake / Camera 2
 0x19 - Voice
 0x1a - Time Bonus
 0x1b - Chapter
@@ -412,23 +412,27 @@ Use expression 1 (starting from 0) for the determined character.
 
 ---------------------------------------------------------------------------
 
-0x17 - Background Animation
+0x17 - Camera
 ---
 Background Animation|x
 
 Presumably this is the Trial Camera to use.
+During Rebuttal Showdowns, this controls the Trial Camera for the left half.
 Check against the Trial Camera values to see if they match!!!
 
 ---------------------------------------------------------------------------
 
-0x18 - Portrait Shake
+0x18 - Portrait Shake / Camera 2
 ---
 0x18|x
 
-Controls whether to shake the character portrait or not.
+During Nonstop Debates, this controls whether to shake the character portrait or not.
 
 0 - No shake.
 1 - Shake.
+
+
+During Rebuttal Showdowns, this controls the Trial Camera for the right half.
 
 ---------------------------------------------------------------------------
 
